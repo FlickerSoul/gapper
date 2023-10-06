@@ -46,9 +46,9 @@ class InjectionConfig:
 
         return new_module
 
-    def inject(self, module: Optional[ModuleType] = None) -> None:
+    def inject(self, mod: Optional[ModuleType] = None) -> None:
         """Inject the specified files and those in dirs into the module."""
-        module = module or self.injection_module_name
+        module: ModuleType | None = mod or self.injection_module
 
         if not module:
             raise ValueError("No module to inject into.")
@@ -84,6 +84,10 @@ def _inject_content(module: Optional[ModuleType], content_path: Path) -> None:
             raise ValueError(f"Unable to load file {content_path} for injection")
 
         temp_module = importlib.util.module_from_spec(spec)
+
+        if spec.loader is None:
+            raise RuntimeError("Unable to load file for injection due to None loader")
+
         spec.loader.exec_module(temp_module)
         wanted_properties = _grab_user_defined_properties(temp_module)
 

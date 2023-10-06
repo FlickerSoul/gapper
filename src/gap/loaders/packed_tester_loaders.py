@@ -20,8 +20,6 @@ class ProblemUnpickler(Unpickler):
         return super().find_class(module, name)
 
 
-def load_packed_tester(
-    path: Path, filename: str = "tester.pckl"
-) -> Problem[ProbInputType, ProbOutputType]:
+def load_packed_tester(path: Path, filename: str = "tester.pckl") -> Tester:
     with open(path / filename, "rb") as problem_pickle:
         return ProblemUnpickler(problem_pickle).load()

@@ -1,17 +1,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Self, Callable, Any
+from typing import Self, Callable, Any, Generic
 
 from gap.core.configs.injection import InjectionConfig
-from gap.core.problem import Problem, ProbInputType, ProbOutputType
+from gap.core.problem import Problem, ProbOutputType, ProbInputType
 
 
-def _check_config_building_flag[T: Callable](fn: T) -> T:
-    def _wrapper(self: Tester, *args: Any, **kwargs: Any) -> Any:
-        if self.tester_config.is_building:
+def _check_config_building_flag[**P, V, T: Callable[P, V]](fn: T) -> T:
+    def _wrapper(*args: P.args, **kwargs: P.kwargs) -> V:
+        self: TesterConfig = args[0]
+
+        if self.is_building:
             raise RuntimeError("Cannot call this method while building config.")
-        return fn(self, *args, **kwargs)
+        return fn(*args, **kwargs)
 
     return _wrapper
 
@@ -41,21 +43,32 @@ class TesterConfig:
         self._injection_config = value
 
 
-class Tester:
+class Tester(Generic[ProbInputType, ProbOutputType]):
     def __init__(
         self,
-        problem: Problem[ProbInputType, ProbOutputType],
         config: TesterConfig | None = None,
     ) -> None:
-        self.problem = problem
-        self.tester_config: TesterConfig = config or TesterConfig()
+        self._problem: Problem[ProbInputType, ProbOutputType] | None = None
+        self._tester_config: TesterConfig = config or TesterConfig()
 
-    def build_config(self) -> Self:
+    @property
+    def problem(self) -> Problem[ProbInputType, ProbOutputType] | None:
+        return self._problem
+
+    @problem.setter
+    def problem(self, prob: Problem) -> None:
+        self._problem = prob
+
+    @property
+    def tester_config(self) -> TesterConfig:
+        return self._tester_config
+
+    def build(self) -> Self:
         self.tester_config.start_building()
         return self
 
     def __enter__(self) -> Self:
-        return Self
+        return self
 
     def _finish_building_config(self) -> None:
         self.tester_config.finish_building()

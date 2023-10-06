@@ -4,7 +4,8 @@ from pathlib import Path
 
 __all__ = ["run_autograder"]
 
-from gap.loaders.packed_tester import load_packed_tester
+from gap.core.tester import Tester
+from gap.loaders.packed_tester_loaders import load_packed_tester
 
 AUTOGRADER_ROOT = Path("/autograder")
 AUTOGRADER_SRC = AUTOGRADER_ROOT / "source"
@@ -19,4 +20,4 @@ def run_autograder(
     metadata_file: Path = AUTOGRADER_METADATA,
     output_file: Path = AUTOGRADER_OUTPUT,
 ) -> None:
-    tester = load_packed_tester(autograder_path)
+    tester: Tester = load_packed_tester(autograder_path)
