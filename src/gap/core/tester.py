@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Self, Callable, Any
 
+from gap.core.configs.injection import InjectionConfig
 from gap.core.problem import Problem, ProbInputType, ProbOutputType
 
 
@@ -18,6 +19,7 @@ def _check_config_building_flag[T: Callable](fn: T) -> T:
 @dataclass
 class TesterConfig:
     _is_building: bool = False
+    _injection_config: InjectionConfig = field(default_factory=InjectionConfig)
 
     def start_building(self) -> None:
         self._is_building = True
@@ -28,6 +30,15 @@ class TesterConfig:
     @property
     def is_building(self) -> bool:
         return self._is_building
+
+    @property
+    def injection_config(self) -> InjectionConfig:
+        return self._injection_config
+
+    @injection_config.setter
+    @_check_config_building_flag
+    def injection_config(self, value: InjectionConfig) -> None:
+        self._injection_config = value
 
 
 class Tester:
@@ -51,12 +62,3 @@ class Tester:
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         self._finish_building_config()
-
-    @staticmethod
-    def _check_config_building_flag(fn: Callable[..., Any]) -> Callable[..., Any]:
-        def _wrapper(self: Tester, *args: Any, **kwargs: Any) -> Any:
-            if self.tester_config._is_building:
-                raise RuntimeError("Cannot call this method while building config.")
-            return fn(self, *args, **kwargs)
-
-        return _wrapper

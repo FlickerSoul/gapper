@@ -56,6 +56,12 @@ class InjectionConfig:
         for file_path in self.content_to_be_injected:
             _inject_content(module, file_path)
 
+    def find_auto_injection(self) -> None:
+        """Find the auto injection folder."""
+        self.content_to_be_injected.add(
+            _find_injection_dir(self.auto_injected_folder_name)
+        )
+
 
 def _grab_user_defined_properties(module: ModuleType) -> Set[str]:
     """Grab all the properties defined in the module."""
@@ -83,3 +89,27 @@ def _inject_content(module: Optional[ModuleType], content_path: Path) -> None:
 
         for wanted_property in wanted_properties:
             setattr(module, wanted_property, getattr(temp_module, wanted_property))
+
+
+def _find_injection_dir(
+    injection_dir: str, starting_dir: Optional[Path] = None
+) -> Path:
+    """Find the injection directory."""
+    target_folder = current_path = starting_dir or Path.cwd()
+
+    # sort of wrong, but it's ok, who will make a folder in the root
+    while current_path != current_path.parent:
+        if (target_folder := current_path / injection_dir).exists():
+            break
+
+        current_path = current_path.parent
+
+    if not target_folder.exists():
+        raise ValueError(
+            "No injection directory found. It's likely to be an config error. "
+        )
+
+    if not target_folder.is_dir():
+        raise ValueError(f"Injection directory ({target_folder}) is not a directory")
+
+    return target_folder
