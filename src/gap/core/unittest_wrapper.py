@@ -82,7 +82,7 @@ class TestCaseWrapper(TestCase, RunnableTest[TestResult, TestResult]):
 
     @_stdout_cm_adder
     def _eval_pipeline[Input](self, to_be_eval: Input, param: TestParam) -> Any:
-        raise NotImplemented("Pipeline evaluation is not implemented yet.")
+        raise NotImplemented
 
     def _select_eval_fn(self) -> EvalFn:
         if self.problem.config.mock_input:
@@ -92,20 +92,24 @@ class TestCaseWrapper(TestCase, RunnableTest[TestResult, TestResult]):
         else:
             return self._eval_regular
 
-    def run_test(self, submission: Any, proxy: TestResult) -> TestResult:
+    def run_test(self, submission: Any, result: TestResult) -> TestResult:
         try:
-            return self._run_test(submission, proxy)
+            self._run_test(submission, result)
         except AssertionError as e:
-            proxy.add_error(TestFailedError(e))
+            result.add_error(TestFailedError(e))
         except SyntaxError as e:
-            proxy.add_error(SubmissionSyntaxError(e))
+            result.add_error(SubmissionSyntaxError(e))
         except Exception as e:
-            proxy.add_error(InternalError(e))
+            result.add_error(InternalError(e))
+        else:
+            result.set_status("passed")
 
-    def _run_test(self, submission: Any, proxy: TestResult) -> TestResult:
+        return result
+
+    def _run_test(self, submission: Any, result: TestResult) -> TestResult:
         if self.test_param.param_info.gap_override_test is not None:
             self.test_param.param_info.gap_override_test(
-                self, proxy, self.problem.solution, submission
+                self, result, self.problem.solution, submission
             )
         else:
             if self.test_param.param_info.gap_override_check:
@@ -113,7 +117,7 @@ class TestCaseWrapper(TestCase, RunnableTest[TestResult, TestResult]):
                     self.test_param.param_info.gap_override_check
                 )
             else:
-                check_fn: CustomEqualityCheckFn = self.assertEqual
+                check_fn = self.assertEqual  # type: ignore
 
             eval_fn: EvalFn = self._select_eval_fn()
 
@@ -126,7 +130,7 @@ class TestCaseWrapper(TestCase, RunnableTest[TestResult, TestResult]):
             if self.problem.config.check_stdout:
                 check_fn(expected_out, actual_out)
 
-        return proxy
+        return result
 
     def load_context(self, context: ContextManager) -> Self:
         self._context = deepcopy(context)

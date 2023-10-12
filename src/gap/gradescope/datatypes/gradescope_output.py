@@ -42,7 +42,7 @@ class GradescopeTestJson:
 
     score: Optional[float] = None
     max_score: Optional[float] = None
-    status: PassStateType = None
+    status: PassStateType | None = None
     name: Optional[str] = None
     name_format: FormatType = "text"
     number: Optional[float] = None
@@ -104,7 +104,7 @@ class GradescopeJson:
         results_with_score = []
         results_with_weight = []
 
-        max_score_sum = 0
+        max_score_sum = 0.0
         weight_sum = 0
 
         for res in results:

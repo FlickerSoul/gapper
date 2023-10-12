@@ -75,7 +75,7 @@ class CaptureStdout:
 class ModuleLoader:
     @staticmethod
     def _load_module_spec_and_module(
-        path: Path, name: str = "module"
+        path: Path, name: str = "module", exec_mod: bool = False
     ) -> Tuple[ModuleSpec, ModuleType]:
         spec = importlib.util.spec_from_file_location(name, path)
 
@@ -88,6 +88,9 @@ class ModuleLoader:
             )
 
         md = importlib.util.module_from_spec(spec)
+
+        if exec_mod:
+            spec.loader.exec_module(md)
 
         return spec, md
 

@@ -79,8 +79,7 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
             for sub_path in path.iterdir():
                 cls._search_problem(sub_path)
         else:
-            spec, mod = cls._load_module_spec_and_module(path)
-            spec.loader.exec_module(mod)
+            spec, mod = cls._load_module_spec_and_module(path, exec_mod=True)
 
             for val in mod.__dict__.values():
                 if isinstance(val, Problem):

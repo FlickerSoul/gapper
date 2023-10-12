@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import tomllib
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -8,10 +9,10 @@ from typing import Self, Callable, Any, Generic, List, TYPE_CHECKING, Generator
 
 from dill import Unpickler, dump
 
+from dacite import from_dict, Config
+
 from gap.core.configs.injection import InjectionConfig
 from gap.core.errors import (
-    SubmissionSyntaxError,
-    TestFailedError,
     InternalError,
     NoSubmissionError,
     MultipleSubmissionError,
@@ -23,9 +24,6 @@ from gap.core.test_result import TestResult
 
 from gap.core.unittest_wrapper import ContextManager
 from gap.core.utils import ModuleLoader
-
-if TYPE_CHECKING:
-    from gap.core.unittest_wrapper import RunnableTest
 
 
 def _check_config_building_flag[**P, V, T: Callable[P, V]](fn: T) -> T:
@@ -73,6 +71,21 @@ class TesterConfig:
     @_check_config_building_flag
     def injection_config(self, value: InjectionConfig) -> None:
         self._injection_config = value
+
+    @classmethod
+    def from_toml(cls, path: Path, with_default: bool = True) -> TesterConfig:
+        try:
+            with open(path, "rb") as file:
+                return from_dict(
+                    data_class=TesterConfig,
+                    data=tomllib.load(file),
+                    config=Config(cast=[Path, set]),
+                )
+        except FileNotFoundError as e:
+            if with_default:
+                return TesterConfig()
+            else:
+                raise FileNotFoundError(f"File {path} not found.") from e
 
 
 class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
@@ -145,10 +158,10 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
             if path.suffix != ".py":
                 return None
 
-            spec, md = self._load_module_spec_and_module(path)
-            spec.loader.exec_module(md)
+            spec, md = self._load_module_spec_and_module(path, exec_mod=True)
 
             self.load_context_from_module(md)
+
             try:
                 yield self._load_symbol_from_module(
                     md, self.problem.expected_submission_name
