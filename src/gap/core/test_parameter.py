@@ -13,6 +13,7 @@ from typing import (
     Iterable,
     TYPE_CHECKING,
     Sequence,
+    ClassVar,
 )
 
 __all__ = [
@@ -162,18 +163,37 @@ class TestParam(ParamExtractor):
     def kwargs(self) -> dict[str, Any]:
         return self._kwargs
 
+    def format(self) -> str:
+        args_format = ", ".join(str(arg) for arg in self.args)
+        kwargs_format = ", ".join(
+            f"{kwarg}={value}" for kwarg, value in self.kwargs.items()
+        )
+
+        if args_format:
+            if kwargs_format:
+                return f"{args_format}, {kwargs_format}"
+            else:
+                return args_format
+        else:
+            return kwargs_format
+
 
 test_case = TestParam
 param = TestParam
 
 
 class TestParamBundle:
+    params: ClassVar[partial[TestParamBundle]]
+    zip: ClassVar[partial[TestParamBundle]]
+    product: ClassVar[partial[TestParamBundle]]
+    singular_params: ClassVar[partial[TestParamBundle]]
+
     def __init__(
         self,
         *args: Iterable[Any] | Any,
         gap_product: bool = False,
         gap_zip: bool = False,
-        gap_params: bool = False,
+        gap_params: bool = True,
         gap_singular_params: bool = False,
         **kwargs: Any,
     ) -> None:

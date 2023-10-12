@@ -1,6 +1,6 @@
 import traceback
 from types import TracebackType
-from typing import List
+from typing import List, Iterable
 
 
 class ErrorFormatter(Exception):
@@ -95,7 +95,7 @@ class NoProblemDefinedError(ErrorFormatter):
 
 
 class MultipleProblemsDefinedError(ErrorFormatter):
-    def __init__(self, *names: str):
+    def __init__(self, names: Iterable[str]):
         super().__init__()
         self.names = names
 

@@ -11,13 +11,14 @@ AUTOGRADER_SRC = AUTOGRADER_ROOT / "source"
 AUTOGRADER_SUBMISSION = AUTOGRADER_ROOT / "submission"
 AUTOGRADER_METADATA = AUTOGRADER_ROOT / "submission_metadata.json"
 AUTOGRADER_OUTPUT = AUTOGRADER_ROOT / "results/results.json"
-AUTOGRADER_TESTER_PICKLE = "tester.pckl"
+AUTOGRADER_TESTER_PICKLE = AUTOGRADER_SRC / "tester.pckl"
 
 
 def run_autograder(
-    autograder_path: Path = AUTOGRADER_SRC,
+    tester_path: Path = AUTOGRADER_TESTER_PICKLE,
     submission_dir: Path = AUTOGRADER_SUBMISSION,
     metadata_file: Path = AUTOGRADER_METADATA,
     output_file: Path = AUTOGRADER_OUTPUT,
 ) -> None:
-    tester: Tester = Tester.from_file(autograder_path)
+    tester: Tester = Tester.from_file(tester_path)
+    tester.load_submission_from_path(submission_dir)

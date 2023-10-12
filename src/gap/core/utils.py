@@ -9,15 +9,13 @@ from types import ModuleType
 from typing import Any, Callable, Iterable, Protocol, Self, Tuple
 
 from gap.core.unittest_wrapper import TestCaseWrapper
-from gap.core.test_result import TestResultProxy
+from gap.core.test_result import TestResult
 
 
 class CustomTestFn(Protocol):
     def __call__[
         T
-    ](
-        self, param: TestCaseWrapper, proxy: TestResultProxy, expected: T, actual: T
-    ) -> None:
+    ](self, param: TestCaseWrapper, proxy: TestResult, expected: T, actual: T) -> None:
         ...
 
 

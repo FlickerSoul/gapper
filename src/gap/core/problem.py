@@ -14,7 +14,6 @@ from typing import (
     TYPE_CHECKING,
     List,
     Generator,
-    Self,
 )
 
 from gap.core.errors import MultipleProblemsDefinedError, NoProblemDefinedError
@@ -96,7 +95,7 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
 
         if len(problems) > 1:
             raise MultipleProblemsDefinedError(
-                *(prob.expected_submission_name for prob in problems)
+                prob.expected_submission_name for prob in problems
             )
 
         return problems[0]

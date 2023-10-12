@@ -5,7 +5,8 @@ from typing import Protocol, Any, TYPE_CHECKING, NamedTuple, Callable, Self
 from unittest import TestCase
 from unittest.mock import patch
 
-from gap.core.test_result import TestResultProxy
+from gap.core.errors import TestFailedError, SubmissionSyntaxError, InternalError
+from gap.core.test_result import TestResult
 from gap.core.utils import generate_custom_input
 
 if TYPE_CHECKING:
@@ -49,7 +50,7 @@ def _stdout_cm_adder[
     return _wrapper
 
 
-class TestCaseWrapper(TestCase, RunnableTest[TestResultProxy, TestResultProxy]):
+class TestCaseWrapper(TestCase, RunnableTest[TestResult, TestResult]):
     def __init__(self, test_param: TestParam, problem: Problem) -> None:
         super().__init__()
         self._test_param = test_param
@@ -63,6 +64,10 @@ class TestCaseWrapper(TestCase, RunnableTest[TestResultProxy, TestResultProxy]):
     @property
     def problem(self) -> Problem:
         return self._problem
+
+    @property
+    def context(self) -> ContextManager | None:
+        return self._context
 
     @_stdout_cm_adder
     def _eval_regular[Input](self, to_be_eval: Input, param: TestParam) -> Any:
@@ -87,7 +92,17 @@ class TestCaseWrapper(TestCase, RunnableTest[TestResultProxy, TestResultProxy]):
         else:
             return self._eval_regular
 
-    def run_test(self, submission: Any, proxy: TestResultProxy) -> TestResultProxy:
+    def run_test(self, submission: Any, proxy: TestResult) -> TestResult:
+        try:
+            return self._run_test(submission, proxy)
+        except AssertionError as e:
+            proxy.add_error(TestFailedError(e))
+        except SyntaxError as e:
+            proxy.add_error(SubmissionSyntaxError(e))
+        except Exception as e:
+            proxy.add_error(InternalError(e))
+
+    def _run_test(self, submission: Any, proxy: TestResult) -> TestResult:
         if self.test_param.param_info.gap_override_test is not None:
             self.test_param.param_info.gap_override_test(
                 self, proxy, self.problem.solution, submission

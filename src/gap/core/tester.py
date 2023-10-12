@@ -19,7 +19,7 @@ from gap.core.errors import (
     MultipleContextValueError,
 )
 from gap.core.problem import Problem, ProbOutputType, ProbInputType
-from gap.core.test_result import TestResultProxy, TestResult
+from gap.core.test_result import TestResult
 
 from gap.core.unittest_wrapper import ContextManager
 from gap.core.utils import ModuleLoader
@@ -84,7 +84,6 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         self._problem: Problem[ProbInputType, ProbOutputType] = problem
         self._tester_config: TesterConfig = config or TesterConfig()
         self._submission: Any | None = None
-        self._test_results: List[TestResult] = []
         self._submission_context: ContextManager = ContextManager()
 
     @property
@@ -102,10 +101,6 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
     @property
     def submission(self) -> Any | None:
         return self._submission
-
-    @property
-    def test_results(self) -> List[TestResult]:
-        return self._test_results
 
     @property
     def submission_context(self) -> ContextManager:
@@ -193,7 +188,7 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
             if context_value_name not in self.submission_context:
                 raise MissingContextValueError(context_value_name)
 
-    def run(self) -> Self:
+    def run(self) -> List[TestResult]:
         if self.problem is None:
             raise InternalError("No problem loaded.")
 
@@ -202,25 +197,17 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
 
         self.check_context_completeness()
 
+        test_results: List[TestResult] = []
+
         for test in self.problem.generate_tests():
-            result = TestResult()
-            try:
+            test_results.append(
                 test.load_context(self.submission_context).run_test(
-                    deepcopy(self.submission), result.proxy
+                    deepcopy(self.submission),
+                    TestResult(default_name=test.test_param.format()),
                 )
-            except AssertionError as e:
-                result.proxy.add_error(TestFailedError(e))
-            except SyntaxError as e:
-                result.proxy.add_error(SubmissionSyntaxError(e))
-            except Exception as e:
-                result.proxy.add_error(InternalError(e))
+            )
 
-            self._test_results.append(result)
-
-        return self
-
-    def build_test_results(self) -> Self:
-        return self
+        return test_results
 
     @classmethod
     def from_file(cls, path: Path) -> Tester:
