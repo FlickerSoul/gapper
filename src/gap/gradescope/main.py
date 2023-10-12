@@ -5,13 +5,13 @@ from pathlib import Path
 __all__ = ["run_autograder"]
 
 from gap.core.tester import Tester
-from gap.loaders.packed_tester_loaders import load_packed_tester
 
 AUTOGRADER_ROOT = Path("/autograder")
 AUTOGRADER_SRC = AUTOGRADER_ROOT / "source"
 AUTOGRADER_SUBMISSION = AUTOGRADER_ROOT / "submission"
 AUTOGRADER_METADATA = AUTOGRADER_ROOT / "submission_metadata.json"
 AUTOGRADER_OUTPUT = AUTOGRADER_ROOT / "results/results.json"
+AUTOGRADER_TESTER_PICKLE = "tester.pckl"
 
 
 def run_autograder(
@@ -20,4 +20,4 @@ def run_autograder(
     metadata_file: Path = AUTOGRADER_METADATA,
     output_file: Path = AUTOGRADER_OUTPUT,
 ) -> None:
-    tester: Tester = load_packed_tester(autograder_path)
+    tester: Tester = Tester.from_file(autograder_path)
