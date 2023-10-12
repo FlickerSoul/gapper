@@ -5,6 +5,8 @@ from pathlib import Path
 __all__ = ["run_autograder"]
 
 from gap.core.tester import Tester
+from gap.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+from gap.gradescope.datatypes.gradescope_output import GradescopeJson
 
 AUTOGRADER_ROOT = Path("/autograder")
 AUTOGRADER_SRC = AUTOGRADER_ROOT / "source"
@@ -22,3 +24,6 @@ def run_autograder(
 ) -> None:
     tester: Tester = Tester.from_file(tester_path)
     tester.load_submission_from_path(submission_dir)
+    metadata = GradescopeSubmissionMetadata.from_file(metadata_file)
+    results = tester.run()
+    GradescopeJson.from_test_results(results, metadata, save_path=output_file)

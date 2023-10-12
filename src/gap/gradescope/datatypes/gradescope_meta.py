@@ -136,6 +136,6 @@ class GradescopeSubmissionMetadata:
     previous_submissions: List[GradescopePreviousSubmission]
 
     @classmethod
-    def load_from_file(cls, path: Path) -> GradescopeSubmissionMetadata:
+    def from_file(cls, path: Path) -> GradescopeSubmissionMetadata:
         """Load the submission metadata from a file."""
         return cls.from_json(path.read_text())  # type: ignore

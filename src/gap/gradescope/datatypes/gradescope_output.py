@@ -96,7 +96,7 @@ class GradescopeJson:
     stdout_visibility: Optional[str] = None
 
     @staticmethod
-    def synthesize_score(
+    def _synthesize_score(
         results: List[TestResult], metadata: GradescopeSubmissionMetadata
     ) -> float:
         total_score = metadata.assignment.total_points
@@ -169,7 +169,7 @@ class GradescopeJson:
     ) -> GradescopeJson:
         # this has to be calculated first
         # so that we can use it to calculate the score
-        score = cls.synthesize_score(results, metadata)
+        score = cls._synthesize_score(results, metadata)
         gs_json = cls(
             score=score,
             tests=[GradescopeTestJson.from_test_result(result) for result in results],
