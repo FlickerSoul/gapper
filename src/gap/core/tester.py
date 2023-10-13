@@ -25,6 +25,9 @@ from gap.core.test_result import TestResult
 from gap.core.unittest_wrapper import ContextManager
 from gap.core.utils import ModuleLoader
 
+if TYPE_CHECKING:
+    from gap.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+
 
 def _check_config_building_flag[**P, V, T: Callable[P, V]](fn: T) -> T:
     def _wrapper(*args: P.args, **kwargs: P.kwargs) -> V:
@@ -201,7 +204,9 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
             if context_value_name not in self.submission_context:
                 raise MissingContextValueError(context_value_name)
 
-    def run(self) -> List[TestResult]:
+    def run(
+        self, metadata: GradescopeSubmissionMetadata | None = None
+    ) -> List[TestResult]:
         if self.problem is None:
             raise InternalError("No problem loaded.")
 
@@ -214,7 +219,9 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
 
         for test in self.problem.generate_tests():
             test_results.append(
-                test.load_context(self.submission_context).run_test(
+                test.load_metadata(metadata)
+                .load_context(self.submission_context)
+                .run_test(
                     deepcopy(self.submission),
                     TestResult(default_name=test.test_param.format()),
                 )

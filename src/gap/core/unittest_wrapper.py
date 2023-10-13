@@ -13,19 +13,12 @@ if TYPE_CHECKING:
     from gap.core.problem import Problem
     from gap.core.test_parameter import TestParam
     from gap.core.utils import CustomEqualityCheckFn, CaptureStdout
+    from gap.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
 class ContextManager(dict):
     def __getattr__(self, item: str) -> Any:
         return self[item]
-
-
-class RunnableTest[Input, Result](Protocol):
-    def load_context(self, context: ContextManager) -> Self:
-        ...
-
-    def run_test(self, submission: Input, proxy: Result) -> Result:
-        ...
 
 
 class EvalOutput[Output](NamedTuple):
@@ -50,12 +43,13 @@ def _stdout_cm_adder[
     return _wrapper
 
 
-class TestCaseWrapper(TestCase, RunnableTest[TestResult, TestResult]):
+class TestCaseWrapper(TestCase):
     def __init__(self, test_param: TestParam, problem: Problem) -> None:
         super().__init__()
         self._test_param = test_param
         self._problem = problem
         self._context: ContextManager | None = None
+        self._metadata: GradescopeSubmissionMetadata | None = None
 
     @property
     def test_param(self) -> TestParam:
@@ -68,6 +62,10 @@ class TestCaseWrapper(TestCase, RunnableTest[TestResult, TestResult]):
     @property
     def context(self) -> ContextManager | None:
         return self._context
+
+    @property
+    def metadata(self) -> GradescopeSubmissionMetadata | None:
+        return self._metadata
 
     @_stdout_cm_adder
     def _eval_regular[Input](self, to_be_eval: Input, param: TestParam) -> Any:
@@ -134,4 +132,8 @@ class TestCaseWrapper(TestCase, RunnableTest[TestResult, TestResult]):
 
     def load_context(self, context: ContextManager) -> Self:
         self._context = deepcopy(context)
+        return self
+
+    def load_metadata(self, metadata: GradescopeSubmissionMetadata) -> Self:
+        self._metadata = metadata
         return self

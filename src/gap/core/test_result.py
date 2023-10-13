@@ -74,5 +74,9 @@ class TestResult:
         if set_failed:
             self.set_status("failed")
 
+    @property
+    def is_passed(self) -> bool:
+        return self.pass_status == "passed"
+
     def set_status(self, status: PassStateType) -> None:
         self.pass_status = status

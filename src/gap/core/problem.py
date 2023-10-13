@@ -17,7 +17,7 @@ from typing import (
 )
 
 from gap.core.errors import MultipleProblemsDefinedError, NoProblemDefinedError
-from gap.core.unittest_wrapper import RunnableTest, TestCaseWrapper
+from gap.core.unittest_wrapper import TestCaseWrapper
 from gap.core.utils import ModuleLoader
 
 if TYPE_CHECKING:

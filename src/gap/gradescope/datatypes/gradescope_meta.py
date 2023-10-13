@@ -115,7 +115,7 @@ class GradescopePreviousSubmission:
 
 
 @dataclass_json
-@dataclass
+@dataclass(frozen=True)
 class GradescopeSubmissionMetadata:
     """The JSON schema for Gradescope's submission metadata.
 

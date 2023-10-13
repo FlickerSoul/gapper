@@ -7,11 +7,11 @@ from typing import Optional, Literal, List, TYPE_CHECKING
 from dataclasses_json import dataclass_json
 
 from gap.core.errors import InternalError
-from gap.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
 if TYPE_CHECKING:
     from gap.core.test_result import TestResult
+    from gap.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
 VisibilityType = Literal["hidden", "after_due_date", "after_published", "visible"]
@@ -96,11 +96,7 @@ class GradescopeJson:
     stdout_visibility: Optional[str] = None
 
     @staticmethod
-    def _synthesize_score(
-        results: List[TestResult], metadata: GradescopeSubmissionMetadata
-    ) -> float:
-        total_score = metadata.assignment.total_points
-
+    def synthesize_score(results: List[TestResult], total_score: float) -> float:
         results_with_score = []
         results_with_weight = []
 
@@ -169,7 +165,7 @@ class GradescopeJson:
     ) -> GradescopeJson:
         # this has to be calculated first
         # so that we can use it to calculate the score
-        score = cls._synthesize_score(results, metadata)
+        score = cls.synthesize_score(results, metadata.assignment.total_points)
         gs_json = cls(
             score=score,
             tests=[GradescopeTestJson.from_test_result(result) for result in results],

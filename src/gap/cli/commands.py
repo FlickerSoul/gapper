@@ -1,11 +1,14 @@
 from pathlib import Path
 
 import typer
-from typing import Annotated
+from typing import Annotated, Optional
 
+from gap.cli.test_result_output import rich_print_test_results
 from gap.core.file_handlers import AutograderZipper
 from gap.core.problem import Problem
 from gap.core.tester import Tester, TesterConfig
+from gap.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+from gap.gradescope.datatypes.gradescope_output import GradescopeJson
 
 app = typer.Typer()
 
@@ -42,6 +45,15 @@ DebugOpt = Annotated[
         default_factory=lambda: False,
     ),
 ]
+MetadataOpt = Annotated[
+    Optional[Path],
+    typer.Option(
+        "--metadata",
+        "-m",
+        help="The path to the submission metadata file.",
+        default_factory=lambda: None,
+    ),
+]
 
 
 @app.command()
@@ -64,16 +76,27 @@ def run(
     path: ProblemPathArg,
     submission: SubmissionPathArg,
     config: TesterConfigPathOpt,
-    save_path: SavePathOpt,
     debug: DebugOpt,
+    metadata_path: MetadataOpt,
+    total_score: float = 20,
     sim_env: bool = False,
 ) -> None:
+    """Run the autograder on an example submission."""
     problem = Problem.from_file(path)
     tester_config = TesterConfig.from_toml(config)
+    metadata_file = (
+        None
+        if metadata_path is None
+        else GradescopeSubmissionMetadata.from_file(metadata_path)
+    )
+    total_score = (
+        metadata_file.assignment.total_points if metadata_file else total_score
+    )
+
     tester = Tester(problem, config=tester_config)
-    tester.load_submission_from_path(submission).run()
-    # TODO: metadata sim
-    # TODO: typer generate rich output
+    test_results = tester.load_submission_from_path(submission).run(metadata_file)
+    score_obtained = GradescopeJson.synthesize_score(test_results, total_score)
+    rich_print_test_results(test_results, score_obtained, total_score)
 
 
 __all__ = ["app"]
