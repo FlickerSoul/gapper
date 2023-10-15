@@ -12,7 +12,6 @@ class AutograderZipper:
     def __init__(self, tester: Tester) -> None:
         self._tester = tester
         self.gs_setup_files = {
-            f"setup-{version_info.major}.{version_info.minor}.sh",
             "run_autograder",
             "setup.py",
             "requirements.txt",
@@ -30,6 +29,11 @@ class AutograderZipper:
         with importlib.resources.as_file(
             importlib.resources.files("gap.gradescope.resources")
         ) as resource_folder:
+            zip_file.write(
+                resource_folder / f"setup-{version_info.major}.{version_info.minor}.sh",
+                arcname="setup.sh",
+            )
+
             for file in resource_folder.iterdir():
                 if file.name in self.gs_setup_files:
                     self.zip_file_path(file, zip_file, resource_folder)
