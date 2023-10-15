@@ -79,7 +79,6 @@ def run(
     debug: DebugOpt,
     metadata_path: MetadataOpt,
     total_score: float = 20,
-    sim_env: bool = False,
 ) -> None:
     """Run the autograder on an example submission."""
     problem = Problem.from_file(path)

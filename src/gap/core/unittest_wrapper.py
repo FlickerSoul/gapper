@@ -91,18 +91,28 @@ class TestCaseWrapper(TestCase):
             return self._eval_regular
 
     def run_test(self, submission: Any, result: TestResult) -> TestResult:
+        self._set_test_result(result)
+
         try:
             self._run_test(submission, result)
         except AssertionError as e:
-            result.add_error(TestFailedError(e))
+            result.add_error(TestFailedError(e), set_failed=result.is_pass_status_unset)
         except SyntaxError as e:
-            result.add_error(SubmissionSyntaxError(e))
+            result.add_error(
+                SubmissionSyntaxError(e), set_failed=result.is_pass_status_unset
+            )
         except Exception as e:
-            result.add_error(InternalError(e))
+            result.add_error(InternalError(e), set_failed=result.is_pass_status_unset)
         else:
-            result.set_status("passed")
+            if result.is_pass_status_unset:
+                result.set_status("passed")
 
         return result
+
+    def _set_test_result(self, result: TestResult) -> None:
+        result.set_extra_score(self.test_param.param_info.gap_extra_credit)
+        result.set_max_score(self.test_param.param_info.gap_score)
+        result.set_weight(self.test_param.param_info.gap_weight)
 
     def _run_test(self, submission: Any, result: TestResult) -> TestResult:
         if self.test_param.param_info.gap_override_test is not None:

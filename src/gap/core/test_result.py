@@ -18,7 +18,7 @@ class TestResult:
     weight: int | None = field(default=None)
     extra_score: float | None = field(default=None)
     errors: List[ErrorFormatter] = field(default_factory=list)
-    pass_status: PassStateType = "passed"
+    pass_status: PassStateType | None = None
     hidden: bool = False
     descriptions: List[str] = field(default_factory=list)
 
@@ -66,6 +66,12 @@ class TestResult:
     def set_score(self, score: float) -> None:
         self.score = score
 
+    def set_max_score(self, max_score: float) -> None:
+        self.max_score = max_score
+
+    def set_weight(self, weight: int) -> None:
+        self.weight = weight
+
     def set_extra_score(self, score: float) -> None:
         self.extra_score = score
 
@@ -77,6 +83,10 @@ class TestResult:
     @property
     def is_passed(self) -> bool:
         return self.pass_status == "passed"
+
+    @property
+    def is_pass_status_unset(self) -> bool:
+        return self.pass_status is None
 
     def set_status(self, status: PassStateType) -> None:
         self.pass_status = status

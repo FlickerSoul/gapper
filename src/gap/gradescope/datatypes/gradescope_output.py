@@ -53,6 +53,11 @@ class GradescopeTestJson:
 
     @classmethod
     def from_test_result(cls, result: TestResult) -> GradescopeTestJson:
+        if result.pass_status is None:
+            # even though gradescope says status is optional, setting it to None
+            # will cause an error.
+            raise InternalError("pass_status of a test result cannot be None.")
+
         return cls(
             score=result.score,
             max_score=result.max_score,
