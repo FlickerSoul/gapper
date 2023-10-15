@@ -183,6 +183,8 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         elif len(submission_list) > 1:
             raise MultipleSubmissionError()
 
+        self._submission = submission_list[0]
+
         return self
 
     def load_context_from_module(self, md: ModuleType) -> Self:

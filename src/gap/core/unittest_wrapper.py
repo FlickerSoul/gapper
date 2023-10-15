@@ -9,16 +9,21 @@ from gap.core.errors import TestFailedError, SubmissionSyntaxError, InternalErro
 from gap.core.test_result import TestResult
 from gap.core.utils import generate_custom_input
 
+from gap.core.utils import CaptureStdout
+
 if TYPE_CHECKING:
     from gap.core.problem import Problem
     from gap.core.test_parameter import TestParam
-    from gap.core.utils import CustomEqualityCheckFn, CaptureStdout
+    from gap.core.utils import CustomEqualityCheckFn
     from gap.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
 class ContextManager(dict):
     def __getattr__(self, item: str) -> Any:
-        return self[item]
+        try:
+            return self[item]
+        except KeyError as e:
+            raise AttributeError from e
 
 
 class EvalOutput[Output](NamedTuple):
@@ -144,6 +149,6 @@ class TestCaseWrapper(TestCase):
         self._context = deepcopy(context)
         return self
 
-    def load_metadata(self, metadata: GradescopeSubmissionMetadata) -> Self:
+    def load_metadata(self, metadata: GradescopeSubmissionMetadata | None) -> Self:
         self._metadata = metadata
         return self

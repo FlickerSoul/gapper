@@ -56,7 +56,7 @@ class ParamInfo:
     gap_expect_stdout: str | Sequence[str] | None = None
     gap_hidden: bool = False
     gap_name: str | None = None
-    gap_extra_credit: float = 0.0
+    gap_extra_credit: float | None = None
     gap_override_check: CustomEqualityCheckFn | None = None
     gap_override_test: CustomTestFn | None = None
     gap_description: str | None = None
@@ -120,7 +120,7 @@ class TestParam(ParamExtractor):
         gap_expect_stdout: str | Sequence[str] | None = None,
         gap_hidden: bool = False,
         gap_name: str | None = None,
-        gap_extra_credit: float = 0.0,
+        gap_extra_credit: float | None = None,
         gap_override_check: Callable[..., bool] | None = None,
         gap_override_test: Callable[..., Any] | None = None,
         gap_description: str | None = None,
@@ -140,7 +140,7 @@ class TestParam(ParamExtractor):
         gap_expect_stdout: str | Sequence[str] | None = None,
         gap_hidden: bool = False,
         gap_name: str | None = None,
-        gap_extra_credit: float = 0.0,
+        gap_extra_credit: float | None = None,
         gap_override_check: Callable[..., bool] | None = None,
         gap_override_test: Callable[..., Any] | None = None,
         gap_description: str | None = None,

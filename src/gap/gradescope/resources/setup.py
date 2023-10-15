@@ -7,7 +7,7 @@ def parse_requirements(file: str) -> list[str]:
 
 
 def get_version() -> str:
-    with open("_version.py") as f:
+    with open("gap/_version.py") as f:
         for line in f.readlines():
             if line.startswith("__version__"):
                 return line.split("=")[1].strip().strip('"')

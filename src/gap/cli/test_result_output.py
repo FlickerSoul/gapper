@@ -21,11 +21,11 @@ def rich_print_test_results(
     results: List[TestResult], total_score: float, score_obtained: float
 ) -> None:
     """Print a fancy summary of the problem."""
-    print(
+    rprint(
         Panel(
             "The following is the test results.",
             title="Overall",
-            subtitle=f"Total score: {total_score}",
+            subtitle=f"Total score: {total_score} | Score Obtained: {score_obtained}",
             **RICH_PANEL_OPTS,  # type: ignore
         )
     )

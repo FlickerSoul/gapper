@@ -61,4 +61,4 @@ class AutograderZipper:
         with importlib.resources.as_file(
             importlib.resources.files("gap")
         ) as package_path:
-            self.zip_file_path(package_path, zip_file, package_path)
+            self.zip_file_path(package_path, zip_file, package_path.parent)

@@ -18,7 +18,7 @@ class TestResult:
     weight: int | None = field(default=None)
     extra_score: float | None = field(default=None)
     errors: List[ErrorFormatter] = field(default_factory=list)
-    pass_status: PassStateType | None = None
+    pass_status: PassStateType | None = field(default=None)
     hidden: bool = False
     descriptions: List[str] = field(default_factory=list)
 
@@ -44,10 +44,20 @@ class TestResult:
 
     @property
     def rich_test_output(self) -> str:
-        descriptions = "Description(s): " + "\n".join(self.descriptions)
-        error_msg = "Error(s): \n" + (
-            "\n".join(err.format() for err in self.errors) if self.errors else ""
+        descriptions = (
+            "Description(s): " + "\n".join(self.descriptions)
+            if self.descriptions
+            else ""
         )
+        error_msg = (
+            "Error(s): \n"
+            + ("\n".join(err.format() for err in self.errors) if self.errors else "")
+            if self.errors
+            else ""
+        )
+
+        if not descriptions and not error_msg:
+            return "<No Description>"
 
         return f"{descriptions}\n" f"{error_msg}"
 
@@ -66,13 +76,13 @@ class TestResult:
     def set_score(self, score: float) -> None:
         self.score = score
 
-    def set_max_score(self, max_score: float) -> None:
+    def set_max_score(self, max_score: float | None) -> None:
         self.max_score = max_score
 
-    def set_weight(self, weight: int) -> None:
+    def set_weight(self, weight: int | None) -> None:
         self.weight = weight
 
-    def set_extra_score(self, score: float) -> None:
+    def set_extra_score(self, score: float | None) -> None:
         self.extra_score = score
 
     def add_error(self, error: ErrorFormatter, set_failed: bool = True) -> None:

@@ -25,7 +25,7 @@ class ErrorFormatter(Exception):
 
     def format_args(self) -> str:
         """Format the arguments of the error message."""
-        return ",\n".join(arg.rstrip("\n") for arg in self.args)
+        return ",\n".join(str(arg).rstrip("\n") for arg in self.args)
 
     def format(self) -> str:
         """Format the error message."""

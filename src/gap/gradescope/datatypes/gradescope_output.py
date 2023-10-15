@@ -40,16 +40,16 @@ class GradescopeTestJson:
         The test's visibility. "hidden", "visible", "after_due_date", "after_published"
     """
 
-    score: Optional[float] = None
-    max_score: Optional[float] = None
-    status: PassStateType | None = None
-    name: Optional[str] = None
-    name_format: FormatType = "text"
-    number: Optional[float] = None
-    output: Optional[str] = None
-    output_format: FormatType = "text"
-    tags: Optional[str] = None
-    visibility: VisibilityType = "visible"
+    score: Optional[float] = field(default=None)
+    max_score: Optional[float] = field(default=None)
+    status: Optional[PassStateType] = field(default=None)
+    name: Optional[str] = field(default=None)
+    name_format: FormatType = field(default="text")
+    number: Optional[float] = field(default=None)
+    output: Optional[str] = field(default=None)
+    output_format: FormatType = field(default="text")
+    tags: Optional[str] = field(default=None)
+    visibility: VisibilityType = field(default="visible")
 
     @classmethod
     def from_test_result(cls, result: TestResult) -> GradescopeTestJson:
@@ -122,9 +122,14 @@ class GradescopeJson:
             if res.max_score is not None:
                 results_with_score.append(res)
                 max_score_sum += res.max_score
-            else:
+            elif res.weight is not None:
                 results_with_weight.append(res)
                 weight_sum += res.weight
+            else:
+                raise InternalError(
+                    f"The max_score and weight of a test (result) cannot both be None, "
+                    f"but {res.rich_test_name} has both being None."
+                )
 
         if max_score_sum > total_score:
             raise InternalError(
@@ -135,7 +140,8 @@ class GradescopeJson:
         remaining_score = total_score - max_score_sum
 
         for res in results_with_weight:
-            res.score = res.weight * remaining_score / weight_sum  # type: ignore
+            assert res.weight is not None
+            res.max_score = res.weight * remaining_score / weight_sum
             res.weight = None
 
         for res in results:
@@ -152,13 +158,17 @@ class GradescopeJson:
 
                 continue
 
+            assert res.max_score is not None
+
             # interpret score with pass status
             if res.pass_status == "passed":
-                res.score = res.max_score + res.extra_score  # type: ignore
+                res.score = (
+                    res.max_score + 0 if res.extra_score is None else res.extra_score
+                )
             else:
                 res.score = 0
 
-        return sum(res.score for res in results)
+        return sum((res.score for res in results), 0.0)
 
     @classmethod
     def from_test_results(

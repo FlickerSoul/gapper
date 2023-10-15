@@ -25,5 +25,5 @@ def run_autograder(
     tester: Tester = Tester.from_file(tester_path)
     tester.load_submission_from_path(submission_dir)
     metadata = GradescopeSubmissionMetadata.from_file(metadata_file)
-    results = tester.run()
+    results = tester.load_submission_from_path(submission_dir).run(metadata=metadata)
     GradescopeJson.from_test_results(results, metadata, save_path=output_file)
