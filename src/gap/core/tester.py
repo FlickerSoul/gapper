@@ -236,6 +236,6 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
 
         return tester
 
-    def dump_to(self, path: Path) -> None:
+    def dump_to(self, path: Path | str) -> None:
         with open(path, "wb") as f:
             dump(self, f)

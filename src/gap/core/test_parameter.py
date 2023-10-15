@@ -21,6 +21,11 @@ __all__ = [
     "TestParamBundle",
     "test_case",
     "param",
+    "test_cases",
+    "test_cases_params",
+    "test_cases_zip",
+    "test_cases_product",
+    "test_cases_singular_params",
 ]
 
 
@@ -59,25 +64,36 @@ class ParamInfo:
     gap_score: float | None = None
     gap_weight: int | None = None
 
-
-def _select_param_info(kwargs: Dict[str, Any]) -> ParamInfo:
-    if kwargs["gap_score"] is not None and kwargs["gap_weight"] is not None:
-        raise ValueError("Cannot specify both gap_score and gap_weight.")
-    elif kwargs["gap_score"] is None and kwargs["gap_weight"] is None:
-        parameter_info = ParamInfo(**kwargs, gap_weight=1)
-    else:
-        parameter_info = ParamInfo(**kwargs)
-
-    return parameter_info
+    def update(self, new_info: Dict[str, Any]) -> None:
+        for key, value in new_info.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
 
 class ParamExtractor:
     def __init__(self, **kwargs: Any) -> None:
-        self._param_info = _select_param_info(kwargs)
+        self._param_info = type(self)._select_param_info(kwargs)
 
     @property
     def param_info(self) -> ParamInfo:
         return self._param_info
+
+    @staticmethod
+    def _select_param_info(kwargs: Dict[str, Any]) -> ParamInfo:
+        if (
+            kwargs.get("gap_score", None) is not None
+            and kwargs.get("gap_weight", None) is not None
+        ):
+            raise ValueError("Cannot specify both gap_score and gap_weight.")
+        elif (
+            kwargs.get("gap_score", None) is None
+            and kwargs.get("gap_weight", None) is None
+        ):
+            parameter_info = ParamInfo(**kwargs, gap_weight=1)
+        else:
+            parameter_info = ParamInfo(**kwargs)
+
+        return parameter_info
 
     @staticmethod
     def check_gap_kwargs_residue(kwargs: Dict[str, Any]) -> List[str]:
@@ -88,6 +104,9 @@ class ParamExtractor:
                 caught.append(kwarg)
 
         return caught
+
+    def update_gap_kwargs(self, **kwargs: Any) -> None:
+        self._param_info.update(kwargs)
 
 
 class TestParam(ParamExtractor):
