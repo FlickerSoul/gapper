@@ -10,6 +10,18 @@ readme = "README.md"
 gap = "gap.cli:app"
 gradescope-assignment-packer = "gap.cli:app"
 
+[tool.coverage.report]
+exclude_also = [
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+]
+
+[tool.coverage.run]
+omit = [
+    "src/gap/gradescope/resources/*"
+]
+
 [tool.poetry.dependencies]
 python = "^3.12"
 typer = "^0.9.0"
