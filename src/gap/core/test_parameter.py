@@ -191,11 +191,11 @@ class TestParam(ParamExtractor):
 
         if args_format:
             if kwargs_format:
-                return f"{args_format}, {kwargs_format}"
+                return f"({args_format}, {kwargs_format})"
             else:
-                return args_format
+                return f"({args_format})"
         else:
-            return kwargs_format
+            return f"({kwargs_format})"
 
 
 test_case = TestParam

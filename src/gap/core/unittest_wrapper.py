@@ -110,7 +110,7 @@ class TestCaseWrapper(TestCase):
             result.add_error(InternalError(e), set_failed=result.is_pass_status_unset)
         else:
             if result.is_pass_status_unset:
-                result.set_status("passed")
+                result.set_pass_status("passed")
 
         return result
 

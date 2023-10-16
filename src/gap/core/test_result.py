@@ -69,7 +69,7 @@ class TestResult:
     def add_description(self, detail: str) -> None:
         self.descriptions.append(detail)
 
-    def set_description(self, detail: Iterable[str]) -> None:
+    def set_descriptions(self, detail: Iterable[str]) -> None:
         self.descriptions = list(detail)
 
     def set_hidden(self, hidden: bool) -> None:
@@ -90,7 +90,7 @@ class TestResult:
     def add_error(self, error: ErrorFormatter, set_failed: bool = True) -> None:
         self.errors.append(error)
         if set_failed:
-            self.set_status("failed")
+            self.set_pass_status("failed")
 
     @property
     def is_passed(self) -> bool:
@@ -100,5 +100,5 @@ class TestResult:
     def is_pass_status_unset(self) -> bool:
         return self.pass_status is None
 
-    def set_status(self, status: PassStateType) -> None:
+    def set_pass_status(self, status: PassStateType) -> None:
         self.pass_status = status

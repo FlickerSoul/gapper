@@ -17,7 +17,7 @@ def test_override(
     sub_obj = submission(gas_station)
     tc.assertEqual(sol_obj.gas_station, sub_obj.gas_station)
 
-    result.set_status("passed")
+    result.set_pass_status("passed")
 
 
 @test_case(gap_override_test=test_override)

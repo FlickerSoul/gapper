@@ -55,7 +55,7 @@ class InternalError(ErrorFormatter):
         return (
             f"Internal Error. "
             f"The reason is following: \n{self.format_args()}\n"
-            f"Stack Trace: \n{self.extract_traceback_str()}"
+            f"Stack Trace: \n{tb_str if (tb_str := self.extract_traceback_str()) else 'Not Provided\n'}"
         )
 
 
