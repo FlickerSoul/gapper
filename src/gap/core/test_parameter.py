@@ -28,6 +28,7 @@ __all__ = [
     "test_cases_singular_params",
 ]
 
+from gap.core.errors import InternalError
 
 if TYPE_CHECKING:
     from gap.core.problem import Problem, ProbOutputType, ProbInputType
@@ -216,12 +217,13 @@ class TestParamBundle:
         gap_singular_params: bool = False,
         **kwargs: Any,
     ) -> None:
-        if gap_params + gap_zip + gap_product + gap_singular_params > 1:
+        if (gap_params + gap_zip + gap_product + gap_singular_params) != 1:
             raise ValueError(
                 "Exactly many of gap_product, gap_zip, or gap_params are True. "
-                "Only 0 or 1 of the flags is allowed. \n"
+                "Only 1 of the flags is allowed. \n"
                 f"You got: "
-                f"gap_product={gap_product}, gap_zip={gap_zip}, gap_params={gap_params}"
+                f"gap_product={gap_product}, gap_zip={gap_zip}, "
+                f"gap_params={gap_params}, gap_singular_params={gap_singular_params}"
             )
 
         # pop aga keywords out
@@ -244,7 +246,7 @@ class TestParamBundle:
                 *args, gap_zip=gap_zip, gap_product=gap_product, **kwargs
             )
         else:
-            self.final_params = type(self).parse_no_flag(*args, **kwargs)
+            raise InternalError("TestParamBundle.__init__ should not reach here.")
 
         type(self).add_gap_kwargs(gap_kwargs_dict, self.final_params)
 
@@ -254,14 +256,7 @@ class TestParamBundle:
         if kwargs:
             raise ValueError("gap_params=True ignores non-aga kwargs")
 
-        if len(args) != 1:
-            raise ValueError(
-                "gap_params=True requires exactly one iterable of sets of parameters"
-            )
-
-        return list(
-            arg if isinstance(arg, TestParam) else param(*arg) for arg in args[0]
-        )
+        return list(arg if isinstance(arg, TestParam) else param(*arg) for arg in args)
 
     @staticmethod
     def parse_singular_params(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
@@ -269,15 +264,7 @@ class TestParamBundle:
         if kwargs:
             raise ValueError("gap_singular_params=True ignores non-aga kwargs")
 
-        if len(args) != 1:
-            raise ValueError(
-                "gap_singular_params=True requires "
-                "exactly one iterable of sets of parameters"
-            )
-
-        return list(
-            arg if isinstance(arg, TestParam) else param(arg) for arg in args[0]
-        )
+        return list(arg if isinstance(arg, TestParam) else param(arg) for arg in args)
 
     @staticmethod
     def parse_zip_or_product(
