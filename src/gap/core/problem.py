@@ -10,7 +10,6 @@ from typing import (
     Optional,
     Iterable,
     overload,
-    Type,
     TYPE_CHECKING,
     List,
     Generator,
@@ -38,7 +37,7 @@ class ProblemConfig:
 class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
     def __init__(
         self,
-        solution: Type | Callable[ProbInputType, ProbOutputType],
+        solution: Callable[ProbInputType, ProbOutputType],
         *,
         config: ProblemConfig,
     ) -> None:
@@ -55,7 +54,7 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         return self._test_params
 
     @property
-    def solution(self) -> Type | Callable[ProbInputType, ProbOutputType]:
+    def solution(self) -> Callable[ProbInputType, ProbOutputType]:
         return self._solution
 
     @property
