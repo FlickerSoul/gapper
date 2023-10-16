@@ -63,7 +63,7 @@ def gen(
     save_path: SavePathOpt,
     debug: DebugOpt,
 ) -> None:
-    problem = Problem.from_file(path)
+    problem = Problem.from_path(path)
     tester_config = TesterConfig.from_toml(config)
     tester = Tester(problem, config=tester_config)
     AutograderZipper(tester).generate_zip(
@@ -81,7 +81,7 @@ def run(
     total_score: float = 20,
 ) -> None:
     """Run the autograder on an example submission."""
-    problem = Problem.from_file(path)
+    problem = Problem.from_path(path)
     tester_config = TesterConfig.from_toml(config)
     metadata = (
         None

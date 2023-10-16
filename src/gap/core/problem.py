@@ -76,7 +76,7 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
     def _search_problem(cls, path: Path) -> Generator[Problem, None, None]:
         if path.is_dir():
             for sub_path in path.iterdir():
-                cls._search_problem(sub_path)
+                yield from cls._search_problem(sub_path)
         else:
             spec, mod = cls._load_module_spec_and_module(path, exec_mod=True)
 
@@ -85,7 +85,7 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
                     yield val
 
     @classmethod
-    def from_file(cls, path: Path) -> Problem:
+    def from_path(cls, path: Path) -> Problem:
         problems = list(cls._search_problem(path))
 
         if len(problems) == 0:

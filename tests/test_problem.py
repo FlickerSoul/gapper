@@ -3,6 +3,7 @@ from typing import Any
 import pytest
 
 from gap import problem
+from gap.core.errors import NoProblemDefinedError, MultipleProblemsDefinedError
 from gap.core.problem import Problem
 from gap.core.test_parameter import TestParam
 from gap.core.unittest_wrapper import TestCaseWrapper
@@ -10,13 +11,15 @@ from tests.conftest import (
     TEST_PROBLEM_FOLDER,
     PROBLEM_CONFIG_VAR_NAME,
     preset_problem_paths,
+    NO_PROBLEM_FILE_FOLDER,
+    SINGLE_PROBLEM_DEFINED_FOLDER,
 )
 
 
 def test_problem_is_script() -> None:
     @problem(is_script=True)
     def prob():
-        pass
+        """Test problem is_script flag"""
 
     assert prob.config.is_script
     assert prob.config.check_stdout
@@ -28,25 +31,25 @@ def test_problem_is_script_flag_conflict() -> None:
 
         @problem(is_script=True, check_stdout=True)
         def prob():
-            pass
+            """Test problem is_script flag conflict"""
 
     with pytest.raises(ValueError):
 
         @problem(is_script=True, mock_input=True)
         def prob():
-            pass
+            """Test problem is_script flag conflict"""
 
     with pytest.raises(ValueError):
 
         @problem(is_script=True, check_stdout=True, mock_input=True)
         def prob():
-            pass
+            """Test problem is_script flag conflict"""
 
 
 def test_problem_std_flags() -> None:
     @problem(check_stdout=True)
     def prob():
-        pass
+        """Test problem std flags"""
 
     assert not prob.config.is_script
     assert prob.config.check_stdout
@@ -54,7 +57,7 @@ def test_problem_std_flags() -> None:
 
     @problem(mock_input=True)
     def prob():
-        pass
+        """Test problem std flags"""
 
     assert not prob.config.is_script
     assert not prob.config.check_stdout
@@ -62,7 +65,7 @@ def test_problem_std_flags() -> None:
 
     @problem(check_stdout=True, mock_input=True)
     def prob():
-        pass
+        """Test problem std flags"""
 
     assert not prob.config.is_script
     assert prob.config.check_stdout
@@ -72,7 +75,7 @@ def test_problem_std_flags() -> None:
 def test_capture_list() -> None:
     @problem(context=["a", "b"])
     def prob():
-        pass
+        """Test problem capture context"""
 
     assert prob.config.captured_context == ["a", "b"]
 
@@ -105,3 +108,17 @@ def test_generate_test_cases(problem_fixture: Problem[Any, Any]) -> None:
         assert test_case.test_param == test_param
         assert test_case.metadata is None
         assert test_case.context is None
+
+
+def test_no_problem_loading_error() -> None:
+    with pytest.raises(NoProblemDefinedError):
+        Problem.from_path(NO_PROBLEM_FILE_FOLDER)
+
+
+def test_load_problem_from_folder() -> None:
+    Problem.from_path(SINGLE_PROBLEM_DEFINED_FOLDER)
+
+
+def test_multiple_problem_loading_error() -> None:
+    with pytest.raises(MultipleProblemsDefinedError):
+        Problem.from_path(TEST_PROBLEM_FOLDER)

@@ -11,6 +11,8 @@ from gap.core.tester import Tester
 TEST_ASSET_FOLDER = Path(__file__).parent / "assets"
 TEST_PROBLEM_FOLDER = TEST_ASSET_FOLDER / "problems"
 TEST_SUBMISSIONS_FOLDER = TEST_ASSET_FOLDER / "submissions"
+NO_PROBLEM_FILE_FOLDER = TEST_ASSET_FOLDER / "no_problem_file"
+SINGLE_PROBLEM_DEFINED_FOLDER = TEST_ASSET_FOLDER / "single_problem_defined"
 
 PROBLEM_CONFIG_VAR_NAME = "__problem_config__"
 
@@ -41,13 +43,13 @@ def generate_problem_fixtures(problem_path: Path) -> None:
     @pytest.fixture(scope="session", name=problem_name)
     def _problem_wrapper() -> Problem[Any, Any]:
         config = _get_problem_config(problem_path)
-        problem = Problem.from_file(problem_path)
+        problem = Problem.from_path(problem_path)
         setattr(problem, PROBLEM_CONFIG_VAR_NAME, config)
         return problem
 
     @pytest.fixture(scope="session", name=tester_name)
     def _tester_wrapper(request: pytest.FixtureRequest) -> Tester[Any, Any]:
-        problem: Problem[Any, Any] = Problem.from_file(problem_path)
+        problem: Problem[Any, Any] = Problem.from_path(problem_path)
         return Tester(problem=problem)
 
     setattr(sys.modules[__name__], problem_name, _problem_wrapper)
