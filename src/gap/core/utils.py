@@ -28,7 +28,6 @@ class CustomEqualityCheckFn(Protocol):
 def generate_custom_input(input_list: Iterable[str]) -> Callable[[Any], str]:
     """Generate a custom input function for a test case."""
     _iterator = iter(input_list)
-    input()
 
     def _custom_input(*args: Any) -> str:
         """Mimic `input`'s behavior.

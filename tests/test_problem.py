@@ -79,7 +79,7 @@ def test_capture_list() -> None:
 
 @pytest.mark.parametrize(
     "problem_fixture",
-    preset_problem_paths(),
+    [pytest.param(p, id=p.name) for p in preset_problem_paths()],
     indirect=True,
 )
 def test_load_problem(problem_fixture: Problem[Any, Any]) -> None:
@@ -94,7 +94,7 @@ def test_load_problem(problem_fixture: Problem[Any, Any]) -> None:
 
 @pytest.mark.parametrize(
     "problem_fixture",
-    preset_problem_paths(),
+    [pytest.param(p, id=p.name) for p in preset_problem_paths()],
     indirect=True,
 )
 def test_generate_test_cases(problem_fixture: Problem[Any, Any]) -> None:

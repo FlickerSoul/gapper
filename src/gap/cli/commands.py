@@ -83,17 +83,15 @@ def run(
     """Run the autograder on an example submission."""
     problem = Problem.from_file(path)
     tester_config = TesterConfig.from_toml(config)
-    metadata_file = (
+    metadata = (
         None
         if metadata_path is None
         else GradescopeSubmissionMetadata.from_file(metadata_path)
     )
-    total_score = (
-        metadata_file.assignment.total_points if metadata_file else total_score
-    )
+    total_score = metadata.assignment.total_points if metadata else total_score
 
     tester = Tester(problem, config=tester_config)
-    test_results = tester.load_submission_from_path(submission).run(metadata_file)
+    test_results = tester.load_submission_from_path(submission).run(metadata)
     score_obtained = GradescopeJson.synthesize_score(test_results, total_score)
     rich_print_test_results(test_results, score_obtained, total_score)
 

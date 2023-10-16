@@ -122,6 +122,7 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
     def submission_context(self) -> ContextManager:
         return self._submission_context
 
+    # TODO: bad syntax
     def build(self) -> Self:
         self.tester_config.start_building()
         return self

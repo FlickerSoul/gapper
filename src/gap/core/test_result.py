@@ -57,9 +57,11 @@ class TestResult:
         )
 
         if not descriptions and not error_msg:
-            return "<No Description>"
+            detail_str = "<No Description>"
+        else:
+            detail_str = f"{descriptions}\n" f"{error_msg}"
 
-        return f"{descriptions}\n" f"{error_msg}"
+        return f"{self.pass_status.capitalize()}\n" f"{detail_str}"
 
     def set_name(self, name: str) -> None:
         self.name = name

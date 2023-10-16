@@ -7,7 +7,7 @@ from gap import problem, test_case
 def input_script() -> None:
     number_input = input("hello world! Please input a number: ")
     the_number = int(number_input)
-    print(f"you inputted {the_number} and its square is {number_input}")
+    print(f"you inputted {number_input} and its square is {the_number ** 2}")
 
 
 __problem_config__ = {
