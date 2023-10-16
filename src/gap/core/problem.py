@@ -75,9 +75,15 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
     @classmethod
     def _search_problem(cls, path: Path) -> Generator[Problem, None, None]:
         if path.is_dir():
+            if path.name == "__pycache__":
+                return
+
             for sub_path in path.iterdir():
                 yield from cls._search_problem(sub_path)
         else:
+            if path.suffix != ".py":
+                return
+
             spec, mod = cls._load_module_spec_and_module(path, exec_mod=True)
 
             for val in mod.__dict__.values():
