@@ -9,10 +9,15 @@ from gap.core.problem import Problem
 from gap.core.tester import Tester
 
 TEST_ASSET_FOLDER = Path(__file__).parent / "assets"
+
 TEST_PROBLEM_FOLDER = TEST_ASSET_FOLDER / "problems"
-TEST_SUBMISSIONS_FOLDER = TEST_ASSET_FOLDER / "submissions"
-NO_PROBLEM_FILE_FOLDER = TEST_ASSET_FOLDER / "no_problem_file"
+NO_PROBLEM_FILE_FOLDER = TEST_ASSET_FOLDER / "no_problem_defined"
 SINGLE_PROBLEM_DEFINED_FOLDER = TEST_ASSET_FOLDER / "single_problem_defined"
+
+TEST_SUBMISSIONS_FOLDER = TEST_ASSET_FOLDER / "submissions"
+NO_SUBMISSION_FOLDER = TEST_ASSET_FOLDER / "no_submission_defined"
+SINGLE_SUBMISSION_FOLDER = TEST_ASSET_FOLDER / "single_submission_defined"
+MULTIPLE_SUBMISSIONS_FOLDER = TEST_ASSET_FOLDER / "multiple_submissions_defined"
 
 PROBLEM_CONFIG_VAR_NAME = "__problem_config__"
 
