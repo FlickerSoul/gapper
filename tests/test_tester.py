@@ -3,7 +3,8 @@ from typing import Any
 
 import pytest
 
-from gap.core.errors import NoSubmissionError, MultipleSubmissionError
+from gap.core.problem import Problem
+from gap.core.errors import NoSubmissionError, MultipleSubmissionError, InternalError
 from gap.core.tester import Tester
 from tests.conftest import (
     preset_problem_paths,
@@ -53,3 +54,13 @@ def test_multiple_submissions_loading_error(request: pytest.FixtureRequest) -> N
     # the following two should run ok
     with pytest.raises(MultipleSubmissionError):
         tester.load_submission_from_path(MULTIPLE_SUBMISSIONS_FOLDER)
+
+
+def test_no_problem_internal_error() -> None:
+    with pytest.raises(InternalError, match="No problem loaded."):
+        Tester(None).run()  # type: ignore
+
+
+def test_no_submission_internal_error() -> None:
+    with pytest.raises(InternalError, match="No submission loaded."):
+        Tester(Problem(lambda: None, config=None)).run()  # type: ignore
