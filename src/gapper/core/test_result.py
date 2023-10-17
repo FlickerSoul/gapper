@@ -44,6 +44,7 @@ class TestResult:
 
     @property
     def rich_test_output(self) -> str:
+        pass_status_msg = self.pass_status.capitalize() if self.pass_status else ""
         descriptions = (
             "Description(s): " + "\n".join(self.descriptions)
             if self.descriptions
@@ -56,12 +57,11 @@ class TestResult:
             else ""
         )
 
-        if not descriptions and not error_msg:
-            detail_str = "<No Description>"
+        messages = list(filter(bool, [pass_status_msg, descriptions, error_msg]))
+        if len(messages) == 0:
+            return "<No Description>"
         else:
-            detail_str = f"{descriptions}\n" f"{error_msg}"
-
-        return f"{self.pass_status.capitalize()}\n" f"{detail_str}"
+            return "\n".join(messages)
 
     def set_name(self, name: str) -> None:
         self.name = name

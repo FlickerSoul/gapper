@@ -62,10 +62,10 @@ def test_test_result_rich_name() -> None:
 def test_test_result_rich_output() -> None:
     result = TestResult("test")
     result.set_pass_status("passed")
-    assert result.rich_test_output == "Passed\n<No Description>"
+    assert result.rich_test_output == "Passed"
 
     result.add_description("test description")
-    assert result.rich_test_output == "Passed\n" "Description(s): test description\n"
+    assert result.rich_test_output == "Passed\n" "Description(s): test description"
 
     result.add_error(InternalError("test error"), set_failed=False)
     assert (
@@ -81,7 +81,6 @@ def test_test_result_rich_output() -> None:
     result.set_descriptions([])
     assert result.rich_test_output == (
         "Passed\n"
-        "\n"
         "Error(s): \n"
         "Internal Error. The reason is following: \n"
         "test error\n"
@@ -92,7 +91,6 @@ def test_test_result_rich_output() -> None:
     result.add_error(InternalError("test error 2"), set_failed=True)
     assert result.rich_test_output == (
         "Failed\n"
-        "\n"
         "Error(s): \n"
         "Internal Error. The reason is following: \n"
         "test error\n"

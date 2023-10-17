@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from enum import Enum
 from functools import partial
@@ -14,6 +15,7 @@ from typing import (
     TYPE_CHECKING,
     Sequence,
     ClassVar,
+    Type,
 )
 
 __all__ = [
@@ -122,8 +124,8 @@ class TestParam(ParamExtractor):
         gap_hidden: bool = False,
         gap_name: str | None = None,
         gap_extra_credit: float | None = None,
-        gap_override_check: Callable[..., bool] | None = None,
-        gap_override_test: Callable[..., Any] | None = None,
+        gap_override_check: CustomEqualityCheckFn | None = None,
+        gap_override_test: CustomTestFn | None = None,
         gap_description: str | None = None,
         gap_is_pipeline: bool = False,
         gap_score: float | None = None,
@@ -142,8 +144,8 @@ class TestParam(ParamExtractor):
         gap_hidden: bool = False,
         gap_name: str | None = None,
         gap_extra_credit: float | None = None,
-        gap_override_check: Callable[..., bool] | None = None,
-        gap_override_test: Callable[..., Any] | None = None,
+        gap_override_check: CustomEqualityCheckFn | None = None,
+        gap_override_test: CustomTestFn | None = None,
         gap_description: str | None = None,
         gap_is_pipeline: bool = False,
         gap_weight: float | None = None,
@@ -197,6 +199,19 @@ class TestParam(ParamExtractor):
         else:
             return f"({kwargs_format})"
 
+    @classmethod
+    def bind_override(
+        cls,
+        *,
+        gap_override_check: CustomEqualityCheckFn | None = None,
+        gap_override_test: CustomTestFn | None = None,
+    ) -> partial[TestParam]:
+        return partial(
+            cls,
+            gap_override_check=gap_override_check,
+            gap_override_test=gap_override_test,
+        )
+
 
 test_case = TestParam
 param = TestParam
@@ -207,6 +222,54 @@ class TestParamBundle:
     zip: ClassVar[partial[TestParamBundle]]
     product: ClassVar[partial[TestParamBundle]]
     singular_params: ClassVar[partial[TestParamBundle]]
+
+    @overload
+    def __init__[
+        T: Problem[ProbInputType, ProbOutputType]
+    ](
+        self,
+        *args: Any,
+        gap_expect: Any | None = None,
+        gap_expect_stdout: str | Sequence[str] | None = None,
+        gap_hidden: bool = False,
+        gap_name: str | None = None,
+        gap_extra_credit: float | None = None,
+        gap_override_check: CustomEqualityCheckFn | None = None,
+        gap_override_test: CustomTestFn | None = None,
+        gap_description: str | None = None,
+        gap_is_pipeline: bool = False,
+        gap_score: float | None = None,
+        gap_product: bool = False,
+        gap_zip: bool = False,
+        gap_params: bool = True,
+        gap_singular_params: bool = False,
+        **kwargs,
+    ) -> None:
+        ...
+
+    @overload
+    def __init__[
+        T: Problem[ProbInputType, ProbOutputType]
+    ](
+        self,
+        *args: Any,
+        gap_expect: Any | None = None,
+        gap_expect_stdout: str | Sequence[str] | None = None,
+        gap_hidden: bool = False,
+        gap_name: str | None = None,
+        gap_extra_credit: float | None = None,
+        gap_override_check: CustomEqualityCheckFn | None = None,
+        gap_override_test: CustomTestFn | None = None,
+        gap_description: str | None = None,
+        gap_is_pipeline: bool = False,
+        gap_weight: float | None = None,
+        gap_product: bool = False,
+        gap_zip: bool = False,
+        gap_params: bool = True,
+        gap_singular_params: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        ...
 
     def __init__(
         self,
@@ -225,6 +288,11 @@ class TestParamBundle:
                 f"gap_product={gap_product}, gap_zip={gap_zip}, "
                 f"gap_params={gap_params}, gap_singular_params={gap_singular_params}"
             )
+
+        if gap_product:
+            raise warnings.warn("gap_product is deprecated.")
+        if gap_zip:
+            raise warnings.warn("gap_zip is deprecated.")
 
         # pop aga keywords out
         gap_kwargs_dict = {
@@ -307,14 +375,6 @@ class TestParamBundle:
         )
 
     @staticmethod
-    def parse_no_flag(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
-        """Parse the parameters for no flag."""
-        if kwargs:
-            raise ValueError("`test_cases` with no flags ignores non-aga kwargs")
-
-        return [param(arg) for arg in args]
-
-    @staticmethod
     def add_gap_kwargs(
         gap_kwargs: Dict[str, Any], final_params: List[TestParam]
     ) -> None:
@@ -361,6 +421,19 @@ class TestParamBundle:
             prob = final_param.register_test_param(prob)
 
         return prob
+
+    @classmethod
+    def bind_override(
+        cls,
+        *,
+        gap_override_check: CustomEqualityCheckFn | None = None,
+        gap_override_test: CustomTestFn | None = None,
+    ) -> partial[TestParamBundle]:
+        return partial(
+            cls,
+            gap_override_check=gap_override_check,
+            gap_override_test=gap_override_test,
+        )
 
 
 test_cases = TestParamBundle

@@ -175,7 +175,7 @@ class GradescopeJson:
         cls,
         results: List[TestResult],
         metadata: GradescopeSubmissionMetadata,
-        save_path: Path = None,
+        save_path: Path | None = None,
         **kwargs,
     ) -> GradescopeJson:
         # this has to be calculated first
