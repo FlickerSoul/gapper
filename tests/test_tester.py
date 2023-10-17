@@ -3,9 +3,9 @@ from typing import Any
 
 import pytest
 
-from gap.core.problem import Problem
-from gap.core.errors import NoSubmissionError, MultipleSubmissionError, InternalError
-from gap.core.tester import Tester
+from gapper.core.problem import Problem
+from gapper.core.errors import NoSubmissionError, MultipleSubmissionError, InternalError
+from gapper.core.tester import Tester
 from tests.conftest import (
     preset_problem_paths,
     TEST_SUBMISSIONS_FOLDER,

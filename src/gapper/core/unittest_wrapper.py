@@ -5,17 +5,17 @@ from typing import Protocol, Any, TYPE_CHECKING, NamedTuple, Callable, Self
 from unittest import TestCase
 from unittest.mock import patch
 
-from gap.core.errors import TestFailedError, SubmissionSyntaxError, InternalError
-from gap.core.test_result import TestResult
-from gap.core.utils import generate_custom_input
+from gapper.core.errors import TestFailedError, SubmissionSyntaxError, InternalError
+from gapper.core.test_result import TestResult
+from gapper.core.utils import generate_custom_input
 
-from gap.core.utils import CaptureStdout
+from gapper.core.utils import CaptureStdout
 
 if TYPE_CHECKING:
-    from gap.core.problem import Problem
-    from gap.core.test_parameter import TestParam
-    from gap.core.utils import CustomEqualityCheckFn
-    from gap.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+    from gapper.core.problem import Problem
+    from gapper.core.test_parameter import TestParam
+    from gapper.core.utils import CustomEqualityCheckFn
+    from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
 class ContextManager(dict):

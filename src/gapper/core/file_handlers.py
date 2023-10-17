@@ -3,7 +3,7 @@ from sys import version_info
 from zipfile import ZipFile
 import importlib.resources
 
-from gap.core.tester import Tester
+from gapper.core.tester import Tester
 
 from tempfile import TemporaryDirectory
 
@@ -27,7 +27,7 @@ class AutograderZipper:
 
     def _copy_gs_setup(self, zip_file: ZipFile) -> None:
         with importlib.resources.as_file(
-            importlib.resources.files("gap.gradescope.resources")
+            importlib.resources.files("gapper.gradescope.resources")
         ) as resource_folder:
             zip_file.write(
                 resource_folder / f"setup-{version_info.major}.{version_info.minor}.sh",
@@ -59,6 +59,6 @@ class AutograderZipper:
 
     def _copy_gap_package(self, zip_file: ZipFile) -> None:
         with importlib.resources.as_file(
-            importlib.resources.files("gap")
+            importlib.resources.files("gapper")
         ) as package_path:
             self.zip_file_path(package_path, zip_file, package_path.parent)

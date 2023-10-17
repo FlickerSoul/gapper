@@ -3,12 +3,12 @@ from pathlib import Path
 import typer
 from typing import Annotated, Optional
 
-from gap.cli.test_result_output import rich_print_test_results
-from gap.core.file_handlers import AutograderZipper
-from gap.core.problem import Problem
-from gap.core.tester import Tester, TesterConfig
-from gap.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
-from gap.gradescope.datatypes.gradescope_output import GradescopeJson
+from gapper.cli.test_result_output import rich_print_test_results
+from gapper.core.file_handlers import AutograderZipper
+from gapper.core.problem import Problem
+from gapper.core.tester import Tester, TesterConfig
+from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
 
 app = typer.Typer()
 

@@ -11,22 +11,22 @@ from dill import Unpickler, dump
 
 from dacite import from_dict, Config
 
-from gap.core.configs.injection import InjectionConfig
-from gap.core.errors import (
+from gapper.core.configs.injection import InjectionConfig
+from gapper.core.errors import (
     InternalError,
     NoSubmissionError,
     MultipleSubmissionError,
     MissingContextValueError,
     MultipleContextValueError,
 )
-from gap.core.problem import Problem, ProbOutputType, ProbInputType
-from gap.core.test_result import TestResult
+from gapper.core.problem import Problem, ProbOutputType, ProbInputType
+from gapper.core.test_result import TestResult
 
-from gap.core.unittest_wrapper import ContextManager
-from gap.core.utils import ModuleLoader
+from gapper.core.unittest_wrapper import ContextManager
+from gapper.core.utils import ModuleLoader
 
 if TYPE_CHECKING:
-    from gap.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+    from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
 def _check_config_building_flag[**P, V, T: Callable[P, V]](fn: T) -> T:

@@ -1,4 +1,4 @@
-from gap import problem, test_case
+from gapper import problem, test_case
 
 
 @test_case("1", "2")

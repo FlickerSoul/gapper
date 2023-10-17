@@ -12,7 +12,7 @@ apt-get install -y python3.12 python3.12-distutils
 apt-get clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# install gap
+# install gapper
 curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12
 pip install --upgrade setuptools wheel
 pip install -e /autograder/source

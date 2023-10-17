@@ -9,8 +9,8 @@ from types import ModuleType
 from typing import Any, Callable, Iterable, Protocol, Self, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from gap.core.unittest_wrapper import TestCaseWrapper
-    from gap.core.test_result import TestResult
+    from gapper.core.unittest_wrapper import TestCaseWrapper
+    from gapper.core.test_result import TestResult
 
 
 class CustomTestFn(Protocol):

@@ -15,12 +15,12 @@ from typing import (
     Generator,
 )
 
-from gap.core.errors import MultipleProblemsDefinedError, NoProblemDefinedError
-from gap.core.unittest_wrapper import TestCaseWrapper
-from gap.core.utils import ModuleLoader
+from gapper.core.errors import MultipleProblemsDefinedError, NoProblemDefinedError
+from gapper.core.unittest_wrapper import TestCaseWrapper
+from gapper.core.utils import ModuleLoader
 
 if TYPE_CHECKING:
-    from gap.core.test_parameter import TestParam
+    from gapper.core.test_parameter import TestParam
 
 ProbInputType = ParamSpec("ProbInputType")
 ProbOutputType = TypeVar("ProbOutputType")

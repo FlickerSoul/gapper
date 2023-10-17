@@ -28,11 +28,11 @@ __all__ = [
     "test_cases_singular_params",
 ]
 
-from gap.core.errors import InternalError
+from gapper.core.errors import InternalError
 
 if TYPE_CHECKING:
-    from gap.core.problem import Problem, ProbOutputType, ProbInputType
-    from gap.core.utils import CustomTestFn, CustomEqualityCheckFn
+    from gapper.core.problem import Problem, ProbOutputType, ProbInputType
+    from gapper.core.utils import CustomTestFn, CustomEqualityCheckFn
 
 
 class GapReservedKeywords(Enum):

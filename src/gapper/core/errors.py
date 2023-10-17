@@ -7,7 +7,7 @@ class ErrorFormatter(Exception):
     def extract_user_traceback(self, grader_path: str | None = None) -> List[str]:
         tbs: List[traceback.FrameSummary] = traceback.extract_tb(self.__traceback__)
         if grader_path is None:
-            filtered_tbs = filter(lambda tb: "gap" not in tb.filename, tbs)
+            filtered_tbs = filter(lambda tb: "gapper" not in tb.filename, tbs)
         else:
             filtered_tbs = filter(lambda tb: grader_path not in tb.filename, tbs)
         return traceback.format_list(list(filtered_tbs))

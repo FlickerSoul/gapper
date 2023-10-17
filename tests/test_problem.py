@@ -2,11 +2,11 @@ from typing import Any
 
 import pytest
 
-from gap import problem
-from gap.core.errors import NoProblemDefinedError, MultipleProblemsDefinedError
-from gap.core.problem import Problem
-from gap.core.test_parameter import TestParam
-from gap.core.unittest_wrapper import TestCaseWrapper
+from gapper import problem
+from gapper.core.errors import NoProblemDefinedError, MultipleProblemsDefinedError
+from gapper.core.problem import Problem
+from gapper.core.test_parameter import TestParam
+from gapper.core.unittest_wrapper import TestCaseWrapper
 from tests.conftest import (
     TEST_PROBLEM_FOLDER,
     PROBLEM_CONFIG_VAR_NAME,

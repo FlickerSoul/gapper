@@ -6,12 +6,12 @@ from typing import Optional, Literal, List, TYPE_CHECKING
 
 from dataclasses_json import dataclass_json
 
-from gap.core.errors import InternalError
+from gapper.core.errors import InternalError
 
 
 if TYPE_CHECKING:
-    from gap.core.test_result import TestResult
-    from gap.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+    from gapper.core.test_result import TestResult
+    from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
 VisibilityType = Literal["hidden", "after_due_date", "after_published", "visible"]

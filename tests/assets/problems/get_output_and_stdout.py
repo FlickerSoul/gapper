@@ -1,4 +1,4 @@
-from gap import problem, test_case, test_cases
+from gapper import problem, test_case, test_cases
 
 
 @test_cases([1.5, 2], [3.2, 4])

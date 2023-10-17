@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, List, Iterable
 
 
 if TYPE_CHECKING:
-    from gap.core.errors import ErrorFormatter
-    from gap.gradescope.datatypes.gradescope_output import PassStateType
+    from gapper.core.errors import ErrorFormatter
+    from gapper.gradescope.datatypes.gradescope_output import PassStateType
 
 
 @dataclass

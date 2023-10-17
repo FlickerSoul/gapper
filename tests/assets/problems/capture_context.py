@@ -1,8 +1,8 @@
 from typing import Any, Type
 
-from gap import problem, test_case
-from gap.core.test_result import TestResult
-from gap.core.unittest_wrapper import TestCaseWrapper
+from gapper import problem, test_case
+from gapper.core.test_result import TestResult
+from gapper.core.unittest_wrapper import TestCaseWrapper
 
 
 class GasStation:

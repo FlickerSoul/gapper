@@ -7,7 +7,7 @@ from rich.box import ROUNDED
 from rich.panel import Panel
 
 if TYPE_CHECKING:
-    from gap.core.test_result import TestResult
+    from gapper.core.test_result import TestResult
 
 
 RICH_PANEL_OPTS = {

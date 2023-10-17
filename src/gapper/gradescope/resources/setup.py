@@ -7,14 +7,14 @@ def parse_requirements(file: str) -> list[str]:
 
 
 def get_version() -> str:
-    with open("gap/_version.py") as f:
+    with open("gapper/_version.py") as f:
         for line in f.readlines():
             if line.startswith("__version__"):
                 return line.split("=")[1].strip().strip('"')
 
 
 setup(
-    name="gap",
+    name="gapper",
     version=get_version(),
     install_requires=parse_requirements("requirements.txt"),
 )

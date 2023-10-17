@@ -9,7 +9,7 @@ from typing import Optional, Literal, List
 from dataclasses_json import dataclass_json, config
 from marshmallow import fields
 
-from gap.gradescope.datatypes.gradescope_output import GradescopeJson
+from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
 
 
 @dataclass_json

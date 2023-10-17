@@ -31,16 +31,19 @@ class InjectionConfig:
     def create_injection_module(self) -> ModuleType:
         import sys  # pylint: disable=import-outside-toplevel
 
-        import gap  # pylint: disable=import-outside-toplevel, cyclic-import
+        import gapper  # pylint: disable=import-outside-toplevel, cyclic-import
 
         module_full_name = f"aga.{self.injection_module_name}"
 
-        if hasattr(gap, self.injection_module_name) or module_full_name in sys.modules:
+        if (
+            hasattr(gapper, self.injection_module_name)
+            or module_full_name in sys.modules
+        ):
             raise ValueError(f'Module "{module_full_name}" already exists.')
 
         new_module = ModuleType(module_full_name)
         setattr(new_module, self.injection_module_flag, True)
-        setattr(gap, self.injection_module_name, new_module)
+        setattr(gapper, self.injection_module_name, new_module)
 
         sys.modules[module_full_name] = new_module
 

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "gap"
+name = "gapper"
 version = "0.1.0"
 description = "Gradescope Assignment Packer"
 authors = ["Heyuan Zeng <hi@universe.observer>"]
@@ -7,8 +7,9 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.scripts]
-gap = "gap.cli:app"
-gradescope-assignment-packer = "gap.cli:app"
+gap = "gapper.cli:app"
+gapper = "gapper.cli:app"
+gradescope-assignment-packer = "gapper.cli:app"
 
 [tool.coverage.report]
 exclude_also = [

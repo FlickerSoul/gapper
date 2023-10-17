@@ -1,4 +1,4 @@
-from gap import problem
+from gapper import problem
 
 
 @problem()

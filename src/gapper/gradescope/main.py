@@ -4,9 +4,9 @@ from pathlib import Path
 
 __all__ = ["run_autograder"]
 
-from gap.core.tester import Tester
-from gap.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
-from gap.gradescope.datatypes.gradescope_output import GradescopeJson
+from gapper.core.tester import Tester
+from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
 
 AUTOGRADER_ROOT = Path("/autograder")
 AUTOGRADER_SRC = AUTOGRADER_ROOT / "source"

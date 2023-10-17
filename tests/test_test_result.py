@@ -3,8 +3,8 @@ from typing import Any
 
 import pytest
 
-from gap.core.errors import InternalError
-from gap.core.test_result import TestResult
+from gapper.core.errors import InternalError
+from gapper.core.test_result import TestResult
 
 
 @pytest.mark.parametrize(
