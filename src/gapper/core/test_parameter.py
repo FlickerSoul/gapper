@@ -285,8 +285,10 @@ class TestParamBundle:
         gap_hidden: bool | Sequence[bool] = False,
         gap_name: str | Sequence[str] | None = None,
         gap_extra_points: float | Sequence[float] | None = None,
-        gap_override_check: CustomEqualityCheckFn | None = None,
-        gap_override_test: CustomTestFn | None = None,
+        gap_override_check: CustomEqualityCheckFn
+        | Sequence[CustomEqualityCheckFn]
+        | None = None,
+        gap_override_test: CustomTestFn | Sequence[CustomTestFn] | None = None,
         gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
         gap_is_pipeline: bool | Sequence[bool] = False,
         gap_score: float | Sequence[float] | None = None,
@@ -309,8 +311,10 @@ class TestParamBundle:
         gap_hidden: bool | Sequence[bool] = False,
         gap_name: str | Sequence[str] | None = None,
         gap_extra_points: float | Sequence[float] | None = None,
-        gap_override_check: CustomEqualityCheckFn | None = None,
-        gap_override_test: CustomTestFn | None = None,
+        gap_override_check: CustomEqualityCheckFn
+        | Sequence[CustomEqualityCheckFn]
+        | None = None,
+        gap_override_test: CustomTestFn | Sequence[CustomTestFn] | None = None,
         gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
         gap_is_pipeline: bool | Sequence[bool] = False,
         gap_weight: float | Sequence[float] | None = None,
