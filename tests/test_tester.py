@@ -64,3 +64,22 @@ def test_no_problem_internal_error() -> None:
 def test_no_submission_internal_error() -> None:
     with pytest.raises(InternalError, match="No submission loaded."):
         Tester(Problem(lambda: None, config=None)).run()  # type: ignore
+
+
+@pytest.mark.parametrize(
+    "tester_fixture, name",
+    (pytest.param(p, p.name, id=p.name) for p in preset_problem_paths()),
+    indirect=["tester_fixture"],
+)
+def test_dump_and_load(tmp_path: Path, tester_fixture: Tester, name: str) -> None:
+    if tester_fixture.problem.config.is_script:
+        pytest.skip("Cannot pickle script problems.")
+
+    dump_file = tmp_path / f"{name}_tester.dump"
+    tester_fixture.dump_to(dump_file)
+    restored_tester = Tester.from_file(dump_file)
+    assert restored_tester.tester_config == tester_fixture.tester_config
+    assert (
+        restored_tester.submission_context.keys()
+        == tester_fixture.submission_context.keys()
+    )
