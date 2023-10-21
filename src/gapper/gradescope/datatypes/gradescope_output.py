@@ -151,7 +151,7 @@ class GradescopeJson:
                         f"Test {res.name} has a negative score ({res.score})."
                     )
 
-                if res.extra_score is not None:
+                if res.extra_points is not None:
                     raise InternalError(
                         f"In test ({res.name}) extra score is ignored because a score is set through custom test check."
                     )
@@ -163,7 +163,7 @@ class GradescopeJson:
             # interpret score with pass status
             if res.pass_status == "passed":
                 res.score = (
-                    res.max_score + 0 if res.extra_score is None else res.extra_score
+                    res.max_score + 0 if res.extra_points is None else res.extra_points
                 )
             else:
                 res.score = 0

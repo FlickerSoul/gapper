@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from enum import Enum
 from functools import partial
 from itertools import product
@@ -45,8 +45,8 @@ class GapReservedKeywords(Enum):
     gap_hidden = "gap_hidden"
     gap_name = "gap_name"
     gap_weight = "gap_weight"
-    gap_value = "gap_value"
-    gap_extra_credit = "gap_extra_credit"
+    gap_max_score = "gap_max_score"
+    gap_extra_points = "gap_extra_points"
     gap_override_check = "gap_override_check"
     gap_override_test = "gap_override_test"
     gap_description = "gap_description"
@@ -59,12 +59,12 @@ class ParamInfo:
     gap_expect_stdout: str | Sequence[str] | None = None
     gap_hidden: bool = False
     gap_name: str | None = None
-    gap_extra_credit: float | None = None
+    gap_extra_points: float | None = None
     gap_override_check: CustomEqualityCheckFn | None = None
     gap_override_test: CustomTestFn | None = None
     gap_description: str | Iterable[str] | None = None
     gap_is_pipeline: bool = False
-    gap_score: float | None = None
+    gap_max_score: float | None = None
     gap_weight: int | None = None
 
     def update(self, new_info: Dict[str, Any]) -> None:
@@ -125,9 +125,7 @@ class ParamExtractor:
 
 class TestParam(ParamExtractor):
     @overload
-    def __init__[
-        T: Problem[ProbInputType, ProbOutputType]
-    ](
+    def __init__(
         self,
         *args: Any,
         gap_expect: Any | None = None,
@@ -137,9 +135,9 @@ class TestParam(ParamExtractor):
         gap_extra_credit: float | None = None,
         gap_override_check: CustomEqualityCheckFn | None = None,
         gap_override_test: CustomTestFn | None = None,
-        gap_description: str | None = None,
+        gap_description: str | Iterable[str] | None = None,
         gap_is_pipeline: bool = False,
-        gap_score: float | None = None,
+        gap_max_score: float | None = None,
         **kwargs,
     ) -> None:
         """Initialize the gap test parameter (test_case).
@@ -154,14 +152,12 @@ class TestParam(ParamExtractor):
         :param gap_override_test: The custom test function.
         :param gap_description: The description of the test case.
         :param gap_is_pipeline: Whether the test case is a pipeline.
-        :param gap_score: The max score of the test case.
+        :param gap_max_score: The max score of the test case.
         :param kwargs: The keyword arguments for the test parameter, including kwargs.
         """
 
     @overload
-    def __init__[
-        T: Problem[ProbInputType, ProbOutputType]
-    ](
+    def __init__(
         self,
         *args: Any,
         gap_expect: Any | None = None,
@@ -171,7 +167,7 @@ class TestParam(ParamExtractor):
         gap_extra_credit: float | None = None,
         gap_override_check: CustomEqualityCheckFn | None = None,
         gap_override_test: CustomTestFn | None = None,
-        gap_description: str | None = None,
+        gap_description: str | Iterable[str] | None = None,
         gap_is_pipeline: bool = False,
         gap_weight: float | None = None,
         **kwargs: Any,
@@ -235,12 +231,17 @@ class TestParam(ParamExtractor):
         """Return the keyword arguments of the test parameter."""
         return self._kwargs
 
-    def format(self) -> str:
+    def format(self, with_gap_kwargs: bool = False) -> str:
         """Format the test parameter."""
-        args_format = ", ".join(str(arg) for arg in self.args)
-        kwargs_format = ", ".join(
-            f"{kwarg}={value}" for kwarg, value in self.kwargs.items()
-        )
+        args = self.args
+
+        if with_gap_kwargs:
+            kwargs = {**self.kwargs, **asdict(self.param_info)}
+        else:
+            kwargs = self.kwargs
+
+        args_format = ", ".join(str(arg) for arg in args)
+        kwargs_format = ", ".join(f"{kwarg}={value}" for kwarg, value in kwargs.items())
 
         if args_format:
             if kwargs_format:

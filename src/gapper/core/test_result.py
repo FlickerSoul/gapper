@@ -16,7 +16,7 @@ class TestResult:
     score: float | None = field(default=None)
     max_score: float | None = field(default=None)
     weight: int | None = field(default=None)
-    extra_score: float | None = field(default=None)
+    extra_points: float | None = field(default=None)
     errors: List[ErrorFormatter] = field(default_factory=list)
     pass_status: PassStateType | None = field(default=None)
     hidden: bool = False
@@ -33,7 +33,7 @@ class TestResult:
             self.weight is None or self.weight >= 0
         ), f"Weight must be non-negative ({self.rich_test_name}."
         assert (
-            self.extra_score is None or self.extra_score >= 0
+            self.extra_points is None or self.extra_points >= 0
         ), f"Extra score must be non-negative ({self.rich_test_name})."
 
     @property
@@ -84,8 +84,8 @@ class TestResult:
     def set_weight(self, weight: int | None) -> None:
         self.weight = weight
 
-    def set_extra_score(self, score: float | None) -> None:
-        self.extra_score = score
+    def set_extra_points(self, score: float | None) -> None:
+        self.extra_points = score
 
     def add_error(self, error: ErrorFormatter, set_failed: bool = True) -> None:
         self.errors.append(error)

@@ -16,7 +16,7 @@ from gapper.core.test_result import TestResult
             product(["score"], [1, 2.0, 3.0]),
             product(["max_score"], [1, 2.0, 3.0]),
             product(["weight"], [1, 2, 3]),
-            product(["extra_score"], [1, 2.0, 3.0]),
+            product(["extra_points"], [1, 2.0, 3.0]),
             product(["pass_status"], ["passed", "failed"]),
             product(["hidden"], [True, False]),
         )

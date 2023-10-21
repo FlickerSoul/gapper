@@ -5,7 +5,7 @@ from typing import Any, List, Generator
 
 import pytest
 
-from gapper.core.problem import Problem
+from gapper.core.problem import Problem, ProblemConfig
 from gapper.core.tester import Tester
 
 TEST_ASSET_FOLDER = Path(__file__).parent / "assets"
@@ -96,3 +96,8 @@ def all_preset_problem_tester_with_default_config(
     all_preset_problems,
 ) -> List[Tester[Any, Any]]:
     return [Tester(problem=problem) for problem in all_preset_problems]
+
+
+@pytest.fixture()
+def dummy_problem() -> Problem[Any, Any]:
+    return Problem(lambda: None, config=ProblemConfig())
