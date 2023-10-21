@@ -56,7 +56,7 @@ class GapReservedKeywords(Enum):
 @dataclass
 class ParamInfo:
     gap_expect: Any | None = None
-    gap_expect_stdout: str | Sequence[str] | None = None
+    gap_expect_stdout: str | None = None
     gap_hidden: bool = False
     gap_name: str | None = None
     gap_extra_points: float | None = None
@@ -129,10 +129,10 @@ class TestParam(ParamExtractor):
         self,
         *args: Any,
         gap_expect: Any | None = None,
-        gap_expect_stdout: str | Sequence[str] | None = None,
+        gap_expect_stdout: str | None = None,
         gap_hidden: bool = False,
         gap_name: str | None = None,
-        gap_extra_credit: float | None = None,
+        gap_extra_points: float | None = None,
         gap_override_check: CustomEqualityCheckFn | None = None,
         gap_override_test: CustomTestFn | None = None,
         gap_description: str | Iterable[str] | None = None,
@@ -147,7 +147,7 @@ class TestParam(ParamExtractor):
         :param gap_expect_stdout: The expected stdout of the test case.
         :param gap_hidden: Whether the test case is hidden.
         :param gap_name: The name of the test case.
-        :param gap_extra_credit: The extra credit of the test case.
+        :param gap_extra_points: The extra credit of the test case.
         :param gap_override_check: The custom equality check function.
         :param gap_override_test: The custom test function.
         :param gap_description: The description of the test case.
@@ -161,10 +161,10 @@ class TestParam(ParamExtractor):
         self,
         *args: Any,
         gap_expect: Any | None = None,
-        gap_expect_stdout: str | Sequence[str] | None = None,
+        gap_expect_stdout: str | None = None,
         gap_hidden: bool = False,
         gap_name: str | None = None,
-        gap_extra_credit: float | None = None,
+        gap_extra_points: float | None = None,
         gap_override_check: CustomEqualityCheckFn | None = None,
         gap_override_test: CustomTestFn | None = None,
         gap_description: str | Iterable[str] | None = None,
@@ -179,7 +179,7 @@ class TestParam(ParamExtractor):
         :param gap_expect_stdout: The expected stdout of the test case.
         :param gap_hidden: Whether the test case is hidden.
         :param gap_name: The name of the test case.
-        :param gap_extra_credit: The extra credit of the test case.
+        :param gap_extra_points: The extra credit of the test case.
         :param gap_override_check: The custom equality check function.
         :param gap_override_test: The custom test function.
         :param gap_description: The description of the test case.
@@ -187,7 +187,6 @@ class TestParam(ParamExtractor):
         :param gap_weight: The weight of the test case.
         :param kwargs: The keyword arguments for the test parameter, including kwargs.
         """
-        ...
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize the gap test parameter (test_case).
@@ -281,16 +280,16 @@ class TestParamBundle:
     ](
         self,
         *args: Any,
-        gap_expect: Any | None = None,
+        gap_expect: Any | Sequence[Any] | None = None,
         gap_expect_stdout: str | Sequence[str] | None = None,
-        gap_hidden: bool = False,
-        gap_name: str | None = None,
-        gap_extra_credit: float | None = None,
+        gap_hidden: bool | Sequence[bool] = False,
+        gap_name: str | Sequence[str] | None = None,
+        gap_extra_points: float | Sequence[float] | None = None,
         gap_override_check: CustomEqualityCheckFn | None = None,
         gap_override_test: CustomTestFn | None = None,
-        gap_description: str | None = None,
-        gap_is_pipeline: bool = False,
-        gap_score: float | None = None,
+        gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
+        gap_is_pipeline: bool | Sequence[bool] = False,
+        gap_score: float | Sequence[float] | None = None,
         gap_product: bool = False,
         gap_zip: bool = False,
         gap_params: bool = True,
@@ -305,16 +304,16 @@ class TestParamBundle:
     ](
         self,
         *args: Any,
-        gap_expect: Any | None = None,
+        gap_expect: Any | Sequence[Any] | None = None,
         gap_expect_stdout: str | Sequence[str] | None = None,
-        gap_hidden: bool = False,
-        gap_name: str | None = None,
-        gap_extra_credit: float | None = None,
+        gap_hidden: bool | Sequence[bool] = False,
+        gap_name: str | Sequence[str] | None = None,
+        gap_extra_points: float | Sequence[float] | None = None,
         gap_override_check: CustomEqualityCheckFn | None = None,
         gap_override_test: CustomTestFn | None = None,
-        gap_description: str | None = None,
-        gap_is_pipeline: bool = False,
-        gap_weight: float | None = None,
+        gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
+        gap_is_pipeline: bool | Sequence[bool] = False,
+        gap_weight: float | Sequence[float] | None = None,
         gap_product: bool = False,
         gap_zip: bool = False,
         gap_params: bool = True,
