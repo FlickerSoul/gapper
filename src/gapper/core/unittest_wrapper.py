@@ -115,9 +115,19 @@ class TestCaseWrapper(TestCase):
         return result
 
     def _set_test_result(self, result: TestResult) -> None:
+        result.set_name(self.test_param.param_info.gap_name)
         result.set_extra_score(self.test_param.param_info.gap_extra_credit)
         result.set_max_score(self.test_param.param_info.gap_score)
         result.set_weight(self.test_param.param_info.gap_weight)
+        result.set_hidden(self.test_param.param_info.gap_hidden)
+        if self.test_param.param_info.gap_description is not None:
+            result.add_description(
+                *(
+                    [self.test_param.param_info.gap_description]
+                    if isinstance(self.test_param.param_info.gap_description, str)
+                    else self.test_param.param_info.gap_description
+                )
+            )
 
     def _run_test(self, submission: Any, result: TestResult) -> TestResult:
         if self.test_param.param_info.gap_override_test is not None:

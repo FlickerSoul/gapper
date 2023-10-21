@@ -62,7 +62,7 @@ class ParamInfo:
     gap_extra_credit: float | None = None
     gap_override_check: CustomEqualityCheckFn | None = None
     gap_override_test: CustomTestFn | None = None
-    gap_description: str | None = None
+    gap_description: str | Iterable[str] | None = None
     gap_is_pipeline: bool = False
     gap_score: float | None = None
     gap_weight: int | None = None
@@ -75,14 +75,17 @@ class ParamInfo:
 
 class ParamExtractor:
     def __init__(self, **kwargs: Any) -> None:
+        """Initialize the gap test parameter."""
         self._param_info = type(self)._select_param_info(kwargs)
 
     @property
     def param_info(self) -> ParamInfo:
+        """Return the parameter information."""
         return self._param_info
 
     @staticmethod
     def _select_param_info(kwargs: Dict[str, Any]) -> ParamInfo:
+        """Select the parameter information to fill in."""
         if (
             kwargs.get("gap_score", None) is not None
             and kwargs.get("gap_weight", None) is not None
@@ -100,6 +103,10 @@ class ParamExtractor:
 
     @staticmethod
     def check_gap_kwargs_residue(kwargs: Dict[str, Any]) -> List[str]:
+        """Check if there are any residue gap kwargs.
+
+        :param kwargs: The keyword arguments to check.
+        """
         caught: List[str] = []
 
         for kwarg in kwargs.keys():
@@ -109,6 +116,10 @@ class ParamExtractor:
         return caught
 
     def update_gap_kwargs(self, **kwargs: Any) -> None:
+        """Update the gap kwargs with a set of kwargs.
+
+        :param kwargs: The keyword arguments to be pushed into the param_info.
+        """
         self._param_info.update(kwargs)
 
 
@@ -131,7 +142,21 @@ class TestParam(ParamExtractor):
         gap_score: float | None = None,
         **kwargs,
     ) -> None:
-        ...
+        """Initialize the gap test parameter (test_case).
+
+        :param args: The arguments for the test parameter.
+        :param gap_expect: The expected output of the test case.
+        :param gap_expect_stdout: The expected stdout of the test case.
+        :param gap_hidden: Whether the test case is hidden.
+        :param gap_name: The name of the test case.
+        :param gap_extra_credit: The extra credit of the test case.
+        :param gap_override_check: The custom equality check function.
+        :param gap_override_test: The custom test function.
+        :param gap_description: The description of the test case.
+        :param gap_is_pipeline: Whether the test case is a pipeline.
+        :param gap_score: The max score of the test case.
+        :param kwargs: The keyword arguments for the test parameter, including kwargs.
+        """
 
     @overload
     def __init__[
@@ -151,9 +176,30 @@ class TestParam(ParamExtractor):
         gap_weight: float | None = None,
         **kwargs: Any,
     ) -> None:
+        """Initialize the gap test parameter (test_case).
+
+        :param args: The arguments for the test parameter.
+        :param gap_expect: The expected output of the test case.
+        :param gap_expect_stdout: The expected stdout of the test case.
+        :param gap_hidden: Whether the test case is hidden.
+        :param gap_name: The name of the test case.
+        :param gap_extra_credit: The extra credit of the test case.
+        :param gap_override_check: The custom equality check function.
+        :param gap_override_test: The custom test function.
+        :param gap_description: The description of the test case.
+        :param gap_is_pipeline: Whether the test case is a pipeline.
+        :param gap_weight: The weight of the test case.
+        :param kwargs: The keyword arguments for the test parameter, including kwargs.
+        """
         ...
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize the gap test parameter (test_case).
+
+        :param args: The arguments for the test parameter.
+        :param kwargs: The keyword arguments for the test parameter, including kwargs.
+        """
+
         super().__init__(
             **{
                 k.value: kwargs.pop(k.value)
@@ -169,23 +215,28 @@ class TestParam(ParamExtractor):
         self._kwargs = kwargs
 
     def __call__[T: Problem[ProbInputType, ProbOutputType]](self, prob: T) -> T:
+        """Make itself to be a decorator."""
         return self.register_test_param(prob)
 
     def register_test_param[
         T: Problem[ProbInputType, ProbOutputType]
     ](self, prob: T) -> T:
+        """Register the test parameter to the problem."""
         prob.add_test_parameter(self)
         return prob
 
     @property
     def args(self) -> tuple[Any, ...]:
+        """Return the arguments of the test parameter."""
         return self._args
 
     @property
     def kwargs(self) -> dict[str, Any]:
+        """Return the keyword arguments of the test parameter."""
         return self._kwargs
 
     def format(self) -> str:
+        """Format the test parameter."""
         args_format = ", ".join(str(arg) for arg in self.args)
         kwargs_format = ", ".join(
             f"{kwarg}={value}" for kwarg, value in self.kwargs.items()
@@ -280,6 +331,15 @@ class TestParamBundle:
         gap_singular_params: bool = False,
         **kwargs: Any,
     ) -> None:
+        """Initialize the test parameter bundle (test_cases).
+
+        :param args: The arguments for the test parameter bundle.
+        :param gap_product: Whether to take the cartesian product of the arguments.
+        :param gap_zip: Whether to zip the arguments.
+        :param gap_params: Whether to parse the arguments as parameters.
+        :param gap_singular_params: Whether to parse the arguments as singular parameters.
+        :param kwargs: The keyword arguments for the test parameter bundle.
+        """
         if (gap_params + gap_zip + gap_product + gap_singular_params) != 1:
             raise ValueError(
                 "Exactly many of gap_product, gap_zip, or gap_params are True. "

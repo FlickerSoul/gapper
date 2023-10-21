@@ -66,8 +66,8 @@ class TestResult:
     def set_name(self, name: str) -> None:
         self.name = name
 
-    def add_description(self, detail: str) -> None:
-        self.descriptions.append(detail)
+    def add_description(self, *detail: str) -> None:
+        self.descriptions.extend(detail)
 
     def set_descriptions(self, detail: Iterable[str]) -> None:
         self.descriptions = list(detail)
