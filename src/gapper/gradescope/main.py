@@ -7,13 +7,12 @@ __all__ = ["run_autograder"]
 from gapper.core.tester import Tester
 from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
-
-AUTOGRADER_ROOT = Path("/autograder")
-AUTOGRADER_SRC = AUTOGRADER_ROOT / "source"
-AUTOGRADER_SUBMISSION = AUTOGRADER_ROOT / "submission"
-AUTOGRADER_METADATA = AUTOGRADER_ROOT / "submission_metadata.json"
-AUTOGRADER_OUTPUT = AUTOGRADER_ROOT / "results/results.json"
-AUTOGRADER_TESTER_PICKLE = AUTOGRADER_SRC / "tester.pckl"
+from gapper.gradescope.vars import (
+    AUTOGRADER_TESTER_PICKLE,
+    AUTOGRADER_SUBMISSION,
+    AUTOGRADER_METADATA,
+    AUTOGRADER_OUTPUT,
+)
 
 
 def run_autograder(

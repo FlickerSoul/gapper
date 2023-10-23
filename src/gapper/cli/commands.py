@@ -7,8 +7,15 @@ from gapper.cli.test_result_output import rich_print_test_results
 from gapper.core.file_handlers import AutograderZipper
 from gapper.core.problem import Problem
 from gapper.core.tester import Tester, TesterConfig
+from gapper.gradescope import run_autograder
 from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
+from gapper.gradescope.vars import (
+    AUTOGRADER_TESTER_PICKLE,
+    AUTOGRADER_SUBMISSION,
+    AUTOGRADER_METADATA,
+    AUTOGRADER_OUTPUT,
+)
 
 app = typer.Typer()
 
@@ -57,6 +64,23 @@ MetadataOpt = Annotated[
 
 
 @app.command()
+def check(path: ProblemPathArg, debug: DebugOpt) -> None:
+    problem = Problem.from_path(path)
+    try:
+        for test in problem.generate_tests():
+            pass_flag = test.check_test()
+            test_desc = (
+                f"skipped due to no expect"
+                if pass_flag is None
+                else f"passed: {pass_flag}"
+            )
+            typer.echo(f"Test {test.test_param.format()} {test_desc}")
+    except Exception as e:
+        typer.echo(f"Error: {e}")
+        raise typer.Exit(code=1)
+
+
+@app.command()
 def gen(
     path: ProblemPathArg,
     config: TesterConfigPathOpt,
@@ -94,6 +118,31 @@ def run(
     test_results = tester.load_submission_from_path(submission).run(metadata)
     score_obtained = GradescopeJson.synthesize_score(test_results, total_score)
     rich_print_test_results(test_results, score_obtained, total_score)
+
+
+@app.command()
+def run_in_prod(
+    debug: DebugOpt,
+    tester_path: Annotated[
+        Path,
+        typer.Argument(help="The path to the tester pickle file."),
+    ] = AUTOGRADER_TESTER_PICKLE,
+    submission_dir: Annotated[
+        Path,
+        typer.Argument(help="The path to the submission directory."),
+    ] = AUTOGRADER_SUBMISSION,
+    metadata_file: Annotated[
+        Path,
+        typer.Argument(
+            help="The path to the submission metadata file.",
+        ),
+    ] = AUTOGRADER_METADATA,
+    output_file: Annotated[
+        Path,
+        typer.Argument(help="The path to the output file."),
+    ] = AUTOGRADER_OUTPUT,
+) -> None:
+    run_autograder(tester_path, submission_dir, metadata_file, output_file)
 
 
 __all__ = ["app"]

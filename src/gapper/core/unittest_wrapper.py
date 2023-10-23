@@ -114,6 +114,42 @@ class TestCaseWrapper(TestCase):
 
         return result
 
+    def check_test(self) -> bool | None:
+        if (
+            not self.test_param.param_info.gap_expect
+            and not self.test_param.param_info.gap_expect_stdout
+        ):
+            return
+
+        if self.test_param.param_info.gap_override_test is not None:
+            raise Warning("gap_override_test is not None, check_test is ignored.")
+        else:
+            if self.test_param.param_info.gap_override_check:
+                check_fn: CustomEqualityCheckFn = (
+                    self.test_param.param_info.gap_override_check
+                )
+            else:
+                check_fn = self.assertEqual  # type: ignore
+
+            eval_fn: EvalFn = self._select_eval_fn()
+
+            actual_result, actual_out = eval_fn(self.problem.solution, self.test_param)
+
+            flag = True
+
+            if self.test_param.param_info.gap_expect is not None:
+                try:
+                    check_fn(actual_result, self.test_param.param_info.gap_expect)
+                except AssertionError:
+                    flag = False
+
+            if self.test_param.param_info.gap_expect_stdout is not None:
+                flag = flag & (
+                    actual_out == self.test_param.param_info.gap_expect_stdout
+                )
+
+            return flag
+
     def _set_test_result(self, result: TestResult) -> None:
         result.set_name(self.test_param.param_info.gap_name)
         result.set_extra_points(self.test_param.param_info.gap_extra_points)
