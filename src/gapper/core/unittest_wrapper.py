@@ -6,6 +6,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from gapper.core.errors import TestFailedError, SubmissionSyntaxError, InternalError
+from gapper.core.pipeline_support import PipelineBase
 from gapper.core.test_result import TestResult
 from gapper.core.utils import generate_custom_input
 
@@ -78,6 +79,7 @@ class TestCaseWrapper(TestCase):
 
     @_stdout_cm_adder
     def _eval_mock_input[Input](self, to_be_eval: Input, param: TestParam) -> Any:
+        """Evaluate the function with mock input."""
         with patch("builtins.input", generate_custom_input(deepcopy(param.args))):
             result = to_be_eval()
 
@@ -85,9 +87,22 @@ class TestCaseWrapper(TestCase):
 
     @_stdout_cm_adder
     def _eval_pipeline[Input](self, to_be_eval: Input, param: TestParam) -> Any:
-        raise NotImplemented
+        """Evaluate the pipeline."""
+        result = []
+        for i, pipeline_entry in enumerate(param.args):
+            if not isinstance(pipeline_entry, PipelineBase):
+                raise InternalError(f"The {i}th pipeline entry is not a PipelineBase.")
+
+            if pipeline_entry.replace:
+                to_be_eval = pipeline_entry(to_be_eval)
+                result.append(None)
+            else:
+                result.append(pipeline_entry(to_be_eval))
+
+        return result
 
     def _select_eval_fn(self) -> EvalFn:
+        """Select the eval function based on the test parameter."""
         if self.problem.config.mock_input:
             return self._eval_mock_input
         elif self.test_param.param_info.gap_is_pipeline:
@@ -96,6 +111,12 @@ class TestCaseWrapper(TestCase):
             return self._eval_regular
 
     def run_test(self, submission: Any, result: TestResult) -> TestResult:
+        """Run the test on the submission.
+
+        :submission: The submission to be tested.
+        :result: The result object to be used and written to.
+        :return: The result object passed to this method.
+        """
         self._set_test_result(result)
 
         try:
@@ -115,6 +136,10 @@ class TestCaseWrapper(TestCase):
         return result
 
     def check_test(self) -> bool | None:
+        """Check if the test passes.
+
+        :return: True if the test passes, False if the test fails, None if the test is skipped.
+        """
         if (
             not self.test_param.param_info.gap_expect
             and not self.test_param.param_info.gap_expect_stdout
@@ -151,6 +176,7 @@ class TestCaseWrapper(TestCase):
             return flag
 
     def _set_test_result(self, result: TestResult) -> None:
+        """Set the test result object to default values specified in the info."""
         result.set_name(self.test_param.param_info.gap_name)
         result.set_extra_points(self.test_param.param_info.gap_extra_points)
         result.set_max_score(self.test_param.param_info.gap_max_score)
@@ -166,6 +192,8 @@ class TestCaseWrapper(TestCase):
             )
 
     def _run_test(self, submission: Any, result: TestResult) -> TestResult:
+        """Run the test on the submission."""
+
         if self.test_param.param_info.gap_override_test is not None:
             self.test_param.param_info.gap_override_test(
                 self, result, self.problem.solution, submission
@@ -192,9 +220,11 @@ class TestCaseWrapper(TestCase):
         return result
 
     def load_context(self, context: ContextManager) -> Self:
+        """Load the context into the test case."""
         self._context = deepcopy(context)
         return self
 
     def load_metadata(self, metadata: GradescopeSubmissionMetadata | None) -> Self:
+        """Load the metadata into the test case."""
         self._metadata = metadata
         return self

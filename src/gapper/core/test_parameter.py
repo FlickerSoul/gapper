@@ -7,7 +7,6 @@ from functools import partial
 from itertools import product
 from typing import (
     Any,
-    Callable,
     overload,
     Dict,
     List,
@@ -15,7 +14,6 @@ from typing import (
     TYPE_CHECKING,
     Sequence,
     ClassVar,
-    Type,
 )
 
 __all__ = [
@@ -124,6 +122,8 @@ class ParamExtractor:
 
 
 class TestParam(ParamExtractor):
+    pipeline: ClassVar[partial[TestParam]]
+
     @overload
     def __init__(
         self,
@@ -266,6 +266,7 @@ class TestParam(ParamExtractor):
 
 test_case = TestParam
 param = TestParam
+test_case.pipeline = partial(TestParam, gap_is_pipeline=True)
 
 
 class TestParamBundle:
