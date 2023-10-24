@@ -8,13 +8,29 @@ GAP is a tool that allows you to create a Gradescope autograder from a decorator
 
 ### Installation
 
+Install from PyPI
 ```bash
-# for now, before the project is uploaded to PyPI, you can install it from GitHub
+pip install gapper
+```
+
+Install from source
+```bash
 git clone https://github.com/FlickerSoul/gapper.git
 pip install -e gapper
 ```
 
 ### Usage 
+
+Suppose you'd like to create a Gradescope autograder that tests the following function: 
+
+```python
+def add(x: int, y: int) -> int:
+    return x + y
+```
+
+You can create one by adding the `@problem` decorator to the function, and then specifying the test cases using the `@test_case` or `@test_cases` decorator. 
+
+You can notice that the `@test_case` and `@test_cases` decorators take in parameters that should be passed into the function under test. 
 
 ```python
 from gapper import problem, test_case, test_cases
@@ -27,10 +43,20 @@ def add(x: int, y: int) -> int:
     return x + y
 ```
 
-```python
-from gapper import problem, test_cases, test_case, param
-from typing import Iterable
+The following are several ways to specify test cases. 
 
+This is how you can specify a test cases with one iterable parameter.
+
+```python
+from gapper import problem, test_cases, param
+from typing import Iterable, Generator
+import random
+
+def randomly_generate_numbers(times: int) -> Generator[param, None, None]:
+    for _ in range(times):
+        yield param([random.randint(0, 100) for _ in range(random.randint(0, 100))])
+
+@test_cases(*randomly_generate_numbers(10), gap_max_score=1)
 @test_cases(param([1, 2]), param([3, 4]))       # param is a helper that allows you to specify parameters, in a more 
 @test_cases([[5, 6]], [[7, 8]])                 # readable way. This problem has 6 test cases, where the parameters are 
 @test_cases.singular_params([9, 10], [11, 12])  # [1,2]; [3,4]; [5,6]; [7,8]; [9,10]; [11,12]. The three ways of 
@@ -38,6 +64,8 @@ from typing import Iterable
 def sum_many(args: Iterable[int]) -> int:       # @test_case([5, 6], [7, 8]) does not work because will treat [x, y]
     return sum(args)                            # as two parameters instead of a list.
 ```
+
+This is how you can specify a test cases with keyword arguments.
 
 ```python
 from gapper import problem, test_cases, test_case, param
@@ -49,6 +77,8 @@ from gapper import problem, test_cases, test_case, param
 def add(a: int, x: int, y: int = 20) -> int:
     return a * x + y
 ```
+
+This is how you can override the equality check between the solution and the submission.
 
 ```python
 from gapper import problem, test_cases, test_case  
@@ -63,6 +93,8 @@ def override_check(solution_ans, submission_ans) -> bool:
 def generate_numbers(x: int) -> Iterable[int]:
     return range(x)
 ```
+
+This is how you can override how the submission should be tested.
 
 ```python
 from gapper import problem, test_case, test_cases
