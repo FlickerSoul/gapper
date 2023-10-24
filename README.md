@@ -89,8 +89,5 @@ def add(x: int, y: int) -> int:
 
 ## TODO: 
 
-- [ ] Add support for injection 
-- [ ] Add support for checking correct answers, similar to `aga check`
-- [ ] Add pipeline checking support 
 - [ ] Add support debug support 
 - [ ] Dev Documentation/Wiki
