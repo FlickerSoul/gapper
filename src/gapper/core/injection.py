@@ -8,7 +8,7 @@ import typer
 
 
 @dataclass
-class InjectionConfig:
+class InjectionHandler:
     content_to_be_injected: Set[Path] = field(default_factory=set)
     injection_module_name: str = field(default="injection")
     auto_injected_folder_name: str = field(default="gap_injection")

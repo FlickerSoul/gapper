@@ -3,8 +3,8 @@ from typing import Any
 import pytest
 
 from gapper import problem
-from gapper.core.configs.injection import InjectionConfig
 from gapper.core.errors import NoProblemDefinedError, MultipleProblemsDefinedError
+from gapper.core.injection import InjectionHandler
 from gapper.core.problem import Problem
 from gapper.core.test_parameter import TestParam
 from gapper.core.unittest_wrapper import TestCaseWrapper
@@ -127,9 +127,9 @@ def test_multiple_problem_loading_error() -> None:
 
 
 def test_load_auto_inject() -> None:
-    injection_config = InjectionConfig().setup(
+    injection_handle = InjectionHandler().setup(
         INJECTION_PROBLEM_FOLDER,
         [INJECTION_PROBLEM_FOLDER / "temp_injected_content.py"],
     )
-    injection_config.inject()
+    injection_handle.inject()
     Problem.from_path(INJECTION_PROBLEM_FOLDER / "auto_inject.py")

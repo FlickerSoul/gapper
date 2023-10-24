@@ -4,10 +4,10 @@ import typer
 from typing import Annotated, Optional, List
 
 from gapper.cli.test_result_output import rich_print_test_results
-from gapper.core.configs.injection import InjectionConfig
+from gapper.core.injection import InjectionHandler
 from gapper.core.file_handlers import AutograderZipper
 from gapper.core.problem import Problem
-from gapper.core.tester import Tester, TesterConfig
+from gapper.core.tester import Tester
 from gapper.gradescope import run_autograder
 from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
@@ -91,7 +91,7 @@ def check(
     auto_inject: AutoInjectOpt,
     inject: InjectOpt,
 ) -> None:
-    InjectionConfig().setup(auto_inject, inject).inject()
+    InjectionHandler().setup(auto_inject, inject).inject()
 
     problem = Problem.from_path(path)
     try:
@@ -111,17 +111,15 @@ def check(
 @app.command()
 def gen(
     path: ProblemPathArg,
-    config: TesterConfigPathOpt,
     save_path: SavePathOpt,
     auto_inject: AutoInjectOpt,
     inject: InjectOpt,
     debug: DebugOpt,
 ) -> None:
-    tester_config = TesterConfig.from_toml(config)
-    tester_config.injection_config.setup(auto_inject, inject).inject()
+    InjectionHandler().setup(auto_inject, inject).inject()
 
     problem = Problem.from_path(path)
-    tester = Tester(problem, config=tester_config)
+    tester = Tester(problem)
     AutograderZipper(tester).generate_zip(
         save_path / f"{problem.expected_submission_name}.zip"
     )
@@ -131,7 +129,6 @@ def gen(
 def run(
     path: ProblemPathArg,
     submission: SubmissionPathArg,
-    config: TesterConfigPathOpt,
     debug: DebugOpt,
     metadata_path: MetadataOpt,
     auto_inject: AutoInjectOpt,
@@ -139,17 +136,16 @@ def run(
     total_score: float = 20,
 ) -> None:
     """Run the autograder on an example submission."""
-    tester_config = TesterConfig.from_toml(config)
     metadata = (
         None
         if metadata_path is None
         else GradescopeSubmissionMetadata.from_file(metadata_path)
     )
     total_score = metadata.assignment.total_points if metadata else total_score
-    tester_config.injection_config.setup(auto_inject, inject).inject()
+    InjectionHandler().setup(auto_inject, inject).inject()
 
     problem = Problem.from_path(path)
-    tester = Tester(problem, config=tester_config)
+    tester = Tester(problem)
     test_results = tester.load_submission_from_path(submission).run(metadata)
     score_obtained = GradescopeJson.synthesize_score(test_results, total_score)
     rich_print_test_results(test_results, score_obtained, total_score)

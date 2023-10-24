@@ -78,7 +78,6 @@ def test_dump_and_load(tmp_path: Path, tester_fixture: Tester, name: str) -> Non
     dump_file = tmp_path / f"{name}_tester.dump"
     tester_fixture.dump_to(dump_file)
     restored_tester = Tester.from_file(dump_file)
-    assert restored_tester.tester_config == tester_fixture.tester_config
     assert (
         restored_tester.submission_context.keys()
         == tester_fixture.submission_context.keys()
