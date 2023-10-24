@@ -1,6 +1,6 @@
 import traceback
 from types import TracebackType
-from typing import List, Iterable
+from typing import Iterable, List
 
 
 class ErrorFormatter(Exception):

@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Iterable
-
+from typing import TYPE_CHECKING, Iterable, List
 
 if TYPE_CHECKING:
     from gapper.core.errors import ErrorFormatter

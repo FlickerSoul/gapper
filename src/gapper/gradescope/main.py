@@ -5,14 +5,12 @@ from pathlib import Path
 __all__ = ["run_autograder"]
 
 from gapper.core.tester import Tester
-from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+from gapper.gradescope.datatypes.gradescope_meta import \
+    GradescopeSubmissionMetadata
 from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
-from gapper.gradescope.vars import (
-    AUTOGRADER_TESTER_PICKLE,
-    AUTOGRADER_SUBMISSION,
-    AUTOGRADER_METADATA,
-    AUTOGRADER_OUTPUT,
-)
+from gapper.gradescope.vars import (AUTOGRADER_METADATA, AUTOGRADER_OUTPUT,
+                                    AUTOGRADER_SUBMISSION,
+                                    AUTOGRADER_TESTER_PICKLE)
 
 
 def run_autograder(

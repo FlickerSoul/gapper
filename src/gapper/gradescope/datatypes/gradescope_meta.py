@@ -1,15 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Literal, List
+from typing import List, Literal, Optional
 
-from dataclasses_json import dataclass_json, config
-from marshmallow import fields
-
+from dataclasses_json import config, dataclass_json
 from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
+from marshmallow import fields
 
 
 @dataclass_json

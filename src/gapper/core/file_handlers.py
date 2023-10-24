@@ -1,11 +1,10 @@
+import importlib.resources
 from pathlib import Path
 from sys import version_info
+from tempfile import TemporaryDirectory
 from zipfile import ZipFile
-import importlib.resources
 
 from gapper.core.tester import Tester
-
-from tempfile import TemporaryDirectory
 
 
 class AutograderZipper:

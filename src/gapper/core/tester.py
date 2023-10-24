@@ -3,26 +3,20 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 from types import ModuleType
-from typing import Self, Callable, Any, Generic, List, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, Callable, Generator, Generic, List, Self
 
 from dill import Unpickler, dump
-
-
-from gapper.core.errors import (
-    InternalError,
-    NoSubmissionError,
-    MultipleSubmissionError,
-    MissingContextValueError,
-    MultipleContextValueError,
-)
-from gapper.core.problem import Problem, ProbOutputType, ProbInputType
+from gapper.core.errors import (InternalError, MissingContextValueError,
+                                MultipleContextValueError,
+                                MultipleSubmissionError, NoSubmissionError)
+from gapper.core.problem import ProbInputType, Problem, ProbOutputType
 from gapper.core.test_result import TestResult
-
 from gapper.core.unittest_wrapper import ContextManager
 from gapper.core.utils import ModuleLoader
 
 if TYPE_CHECKING:
-    from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+    from gapper.gradescope.datatypes.gradescope_meta import \
+        GradescopeSubmissionMetadata
 
 
 class ProblemUnpickler(Unpickler):

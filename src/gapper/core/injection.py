@@ -2,7 +2,7 @@ import importlib.util
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import ModuleType
-from typing import Set, Optional, Self, Sequence
+from typing import Optional, Self, Sequence, Set
 
 import typer
 

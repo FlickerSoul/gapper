@@ -6,11 +6,12 @@ from importlib.machinery import ModuleSpec
 from io import StringIO
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Callable, Iterable, Protocol, Self, Tuple, TYPE_CHECKING
+from typing import (TYPE_CHECKING, Any, Callable, Iterable, Protocol, Self,
+                    Tuple)
 
 if TYPE_CHECKING:
-    from gapper.core.unittest_wrapper import TestCaseWrapper
     from gapper.core.test_result import TestResult
+    from gapper.core.unittest_wrapper import TestCaseWrapper
 
 
 class CustomTestFn(Protocol):

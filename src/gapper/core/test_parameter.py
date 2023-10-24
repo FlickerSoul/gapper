@@ -1,20 +1,12 @@
 from __future__ import annotations
 
 import warnings
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from enum import Enum
 from functools import partial
 from itertools import product
-from typing import (
-    Any,
-    overload,
-    Dict,
-    List,
-    Iterable,
-    TYPE_CHECKING,
-    Sequence,
-    ClassVar,
-)
+from typing import (TYPE_CHECKING, Any, ClassVar, Dict, Iterable, List,
+                    Sequence, overload)
 
 __all__ = [
     "TestParam",
@@ -31,8 +23,8 @@ __all__ = [
 from gapper.core.errors import InternalError
 
 if TYPE_CHECKING:
-    from gapper.core.problem import Problem, ProbOutputType, ProbInputType
-    from gapper.core.utils import CustomTestFn, CustomEqualityCheckFn
+    from gapper.core.problem import ProbInputType, Problem, ProbOutputType
+    from gapper.core.utils import CustomEqualityCheckFn, CustomTestFn
 
 
 class GapReservedKeywords(Enum):

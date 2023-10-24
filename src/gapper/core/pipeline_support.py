@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Type, Any
+from typing import Any, ClassVar, Type
 
 
 class PipelineBase:

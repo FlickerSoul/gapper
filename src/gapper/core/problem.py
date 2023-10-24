@@ -2,20 +2,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import (
-    Callable,
-    Generic,
-    ParamSpec,
-    TypeVar,
-    Optional,
-    Iterable,
-    overload,
-    TYPE_CHECKING,
-    List,
-    Generator,
-)
+from typing import (TYPE_CHECKING, Callable, Generator, Generic, Iterable,
+                    List, Optional, ParamSpec, TypeVar, overload)
 
-from gapper.core.errors import MultipleProblemsDefinedError, NoProblemDefinedError
+from gapper.core.errors import (MultipleProblemsDefinedError,
+                                NoProblemDefinedError)
 from gapper.core.unittest_wrapper import TestCaseWrapper
 from gapper.core.utils import ModuleLoader
 
