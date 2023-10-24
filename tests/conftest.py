@@ -13,6 +13,7 @@ TEST_ASSET_FOLDER = Path(__file__).parent / "assets"
 TEST_PROBLEM_FOLDER = TEST_ASSET_FOLDER / "problems"
 NO_PROBLEM_FILE_FOLDER = TEST_ASSET_FOLDER / "no_problem_defined"
 SINGLE_PROBLEM_DEFINED_FOLDER = TEST_ASSET_FOLDER / "single_problem_defined"
+INJECTION_PROBLEM_FOLDER = TEST_ASSET_FOLDER / "injection_problems"
 
 TEST_SUBMISSIONS_FOLDER = TEST_ASSET_FOLDER / "submissions"
 NO_SUBMISSION_FOLDER = TEST_ASSET_FOLDER / "no_submission_defined"

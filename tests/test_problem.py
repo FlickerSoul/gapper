@@ -3,6 +3,7 @@ from typing import Any
 import pytest
 
 from gapper import problem
+from gapper.core.configs.injection import InjectionConfig
 from gapper.core.errors import NoProblemDefinedError, MultipleProblemsDefinedError
 from gapper.core.problem import Problem
 from gapper.core.test_parameter import TestParam
@@ -13,6 +14,7 @@ from tests.conftest import (
     preset_problem_paths,
     NO_PROBLEM_FILE_FOLDER,
     SINGLE_PROBLEM_DEFINED_FOLDER,
+    INJECTION_PROBLEM_FOLDER,
 )
 
 
@@ -122,3 +124,12 @@ def test_load_problem_from_folder() -> None:
 def test_multiple_problem_loading_error() -> None:
     with pytest.raises(MultipleProblemsDefinedError):
         Problem.from_path(TEST_PROBLEM_FOLDER)
+
+
+def test_load_auto_inject() -> None:
+    injection_config = InjectionConfig().setup(
+        INJECTION_PROBLEM_FOLDER,
+        [INJECTION_PROBLEM_FOLDER / "temp_injected_content.py"],
+    )
+    injection_config.inject()
+    Problem.from_path(INJECTION_PROBLEM_FOLDER / "auto_inject.py")

@@ -2,7 +2,7 @@ import importlib.util
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import ModuleType
-from typing import Set, Optional
+from typing import Set, Optional, Self, Sequence
 
 import typer
 
@@ -13,7 +13,18 @@ class InjectionConfig:
     injection_module_name: str = field(default="injection")
     auto_injected_folder_name: str = field(default="gap_injection")
     injection_module_flag: str = field(default="__gap_injection_module__")
-    injection_module: Optional[ModuleType] = field(default=None)
+
+    def setup(
+        self, auto_inject: bool | Path, inject_module_paths: Sequence[Path]
+    ) -> Self:
+        if auto_inject:
+            self.find_auto_injection(
+                auto_inject if isinstance(auto_inject, Path) else None
+            )
+        if inject_module_paths:
+            self.content_to_be_injected.update(inject_module_paths)
+
+        return self
 
     @property
     def is_valid(self) -> bool:
@@ -33,7 +44,7 @@ class InjectionConfig:
 
         import gapper  # pylint: disable=import-outside-toplevel, cyclic-import
 
-        module_full_name = f"aga.{self.injection_module_name}"
+        module_full_name = f"gapper.{self.injection_module_name}"
 
         if (
             hasattr(gapper, self.injection_module_name)
@@ -51,7 +62,7 @@ class InjectionConfig:
 
     def inject(self, mod: Optional[ModuleType] = None) -> None:
         """Inject the specified files and those in dirs into the module."""
-        module: ModuleType | None = mod or self.injection_module
+        module: ModuleType | None = mod or self.create_injection_module()
 
         if not module:
             raise ValueError("No module to inject into.")
@@ -59,16 +70,21 @@ class InjectionConfig:
         for file_path in self.content_to_be_injected:
             _inject_content(module, file_path)
 
-    def find_auto_injection(self) -> None:
+    def find_auto_injection(self, path: Path | None = None) -> None:
         """Find the auto injection folder."""
+        path = path or Path.cwd()
+
         self.content_to_be_injected.add(
-            _find_injection_dir(self.auto_injected_folder_name)
+            _find_injection_dir(self.auto_injected_folder_name, path)
         )
 
 
 def _grab_user_defined_properties(module: ModuleType) -> Set[str]:
     """Grab all the properties defined in the module."""
-    return {name for name in dir(module) if not name.startswith("_")}
+    if hasattr(module, "__all__"):
+        return set(module.__all__)
+    else:
+        return {name for name in dir(module) if not name.startswith("_")}
 
 
 def _inject_content(module: Optional[ModuleType], content_path: Path) -> None:
@@ -98,11 +114,9 @@ def _inject_content(module: Optional[ModuleType], content_path: Path) -> None:
             setattr(module, wanted_property, getattr(temp_module, wanted_property))
 
 
-def _find_injection_dir(
-    injection_dir: str, starting_dir: Optional[Path] = None
-) -> Path:
+def _find_injection_dir(injection_dir: str, starting_dir: Optional[Path]) -> Path:
     """Find the injection directory."""
-    target_folder = current_path = starting_dir or Path.cwd()
+    target_folder = current_path = starting_dir
 
     # sort of wrong, but it's ok, who will make a folder in the root
     while current_path != current_path.parent:
