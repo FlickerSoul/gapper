@@ -6,8 +6,9 @@ from pathlib import Path
 from typing import List, Literal, Optional
 
 from dataclasses_json import config, dataclass_json
-from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
 from marshmallow import fields
+
+from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
 
 
 @dataclass_json

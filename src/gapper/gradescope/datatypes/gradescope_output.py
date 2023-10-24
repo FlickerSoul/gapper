@@ -5,12 +5,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, List, Literal, Optional
 
 from dataclasses_json import dataclass_json
+
 from gapper.core.errors import InternalError
 
 if TYPE_CHECKING:
     from gapper.core.test_result import TestResult
-    from gapper.gradescope.datatypes.gradescope_meta import \
-        GradescopeSubmissionMetadata
+    from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
 VisibilityType = Literal["hidden", "after_due_date", "after_published", "visible"]

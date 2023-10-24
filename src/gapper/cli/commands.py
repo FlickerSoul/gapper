@@ -2,18 +2,21 @@ from pathlib import Path
 from typing import Annotated, List, Optional
 
 import typer
+
 from gapper.cli.test_result_output import rich_print_test_results
 from gapper.core.file_handlers import AutograderZipper
 from gapper.core.injection import InjectionHandler
 from gapper.core.problem import Problem
 from gapper.core.tester import Tester
 from gapper.gradescope import run_autograder
-from gapper.gradescope.datatypes.gradescope_meta import \
-    GradescopeSubmissionMetadata
+from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
-from gapper.gradescope.vars import (AUTOGRADER_METADATA, AUTOGRADER_OUTPUT,
-                                    AUTOGRADER_SUBMISSION,
-                                    AUTOGRADER_TESTER_PICKLE)
+from gapper.gradescope.vars import (
+    AUTOGRADER_METADATA,
+    AUTOGRADER_OUTPUT,
+    AUTOGRADER_SUBMISSION,
+    AUTOGRADER_TESTER_PICKLE,
+)
 
 app = typer.Typer()
 
