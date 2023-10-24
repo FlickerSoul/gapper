@@ -85,13 +85,13 @@ class ParamExtractor:
     def _select_param_info(kwargs: Dict[str, Any]) -> ParamInfo:
         """Select the parameter information to fill in."""
         if (
-            kwargs.get("gap_score", None) is not None
-            and kwargs.get("gap_weight", None) is not None
+            kwargs.get(GapReservedKeywords.gap_max_score.value, None) is not None
+            and kwargs.get(GapReservedKeywords.gap_weight.value, None) is not None
         ):
-            raise ValueError("Cannot specify both gap_score and gap_weight.")
+            raise ValueError("Cannot specify both gap_max_score and gap_weight.")
         elif (
-            kwargs.get("gap_score", None) is None
-            and kwargs.get("gap_weight", None) is None
+            kwargs.get(GapReservedKeywords.gap_max_score.value, None) is None
+            and kwargs.get(GapReservedKeywords.gap_weight.value, None) is None
         ):
             parameter_info = ParamInfo(**kwargs, gap_weight=1)
         else:
@@ -292,7 +292,7 @@ class TestParamBundle:
         gap_override_test: CustomTestFn | Sequence[CustomTestFn] | None = None,
         gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
         gap_is_pipeline: bool | Sequence[bool] = False,
-        gap_score: float | Sequence[float] | None = None,
+        gap_max_score: float | Sequence[float] | None = None,
         gap_product: bool = False,
         gap_zip: bool = False,
         gap_params: bool = True,
