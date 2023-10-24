@@ -19,6 +19,12 @@ jobs:
         python-version: ["3.12"]
     steps:
     - uses: actions/checkout@v3
+    - name: Install poetry
+      run: |
+        curl -O -sSL https://install.python-poetry.org/install-poetry.py
+        python install-poetry.py -y 
+        echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
+        rm install-poetry.py
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -26,8 +32,12 @@ jobs:
         cache: 'poetry'
     - name: Install dependencies
       run: |
-        python -m pip install poetry
+        poetry env use ${{ matrix.python-version }}
         poetry install
+    - name: Print python versions
+      run: |
+        python -V
+        poetry run python -V
     - name: Test with pytest
       run: |
         poetry run pytest
