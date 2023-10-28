@@ -80,6 +80,7 @@ InjectOpt = Annotated[
         "--inject",
         "-i",
         help="The path to the tester file to inject.",
+        default_factory=list,
     ),
 ]
 
