@@ -1,7 +1,7 @@
 from gapper import problem, test_case, test_cases
 
 
-@test_cases([1, 2], [3, 4])
+@test_cases.params([1, 2], [3, 4])
 @test_case(1, 2)
 @test_case(3, 4)
 @problem()

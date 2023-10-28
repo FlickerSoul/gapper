@@ -5,8 +5,16 @@ from dataclasses import asdict, dataclass
 from enum import Enum
 from functools import partial
 from itertools import product
-from typing import (TYPE_CHECKING, Any, ClassVar, Dict, Iterable, List,
-                    Sequence, overload)
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    Dict,
+    Iterable,
+    List,
+    Sequence,
+    overload,
+)
 
 __all__ = [
     "TestParam",
@@ -15,6 +23,7 @@ __all__ = [
     "param",
     "test_cases",
     "test_cases_params",
+    "test_cases_param_iter",
     "test_cases_zip",
     "test_cases_product",
     "test_cases_singular_params",
@@ -28,7 +37,7 @@ if TYPE_CHECKING:
 
 
 class GapReservedKeywords(Enum):
-    """Reserved keywords for aga."""
+    """Reserved keywords for gap."""
 
     gap_expect = "gap_expect"
     gap_expect_stdout = "gap_expect_stdout"
@@ -263,6 +272,7 @@ test_case.pipeline = partial(TestParam, gap_is_pipeline=True)
 
 class TestParamBundle:
     params: ClassVar[partial[TestParamBundle]]
+    param_iter: ClassVar[partial[TestParamBundle]]
     zip: ClassVar[partial[TestParamBundle]]
     product: ClassVar[partial[TestParamBundle]]
     singular_params: ClassVar[partial[TestParamBundle]]
@@ -287,7 +297,8 @@ class TestParamBundle:
         gap_max_score: float | Sequence[float] | None = None,
         gap_product: bool = False,
         gap_zip: bool = False,
-        gap_params: bool = True,
+        gap_params: bool = False,
+        gap_param_iter: bool = False,
         gap_singular_params: bool = False,
         **kwargs,
     ) -> None:
@@ -313,7 +324,8 @@ class TestParamBundle:
         gap_weight: float | Sequence[float] | None = None,
         gap_product: bool = False,
         gap_zip: bool = False,
-        gap_params: bool = True,
+        gap_params: bool = False,
+        gap_param_iter: bool = False,
         gap_singular_params: bool = False,
         **kwargs: Any,
     ) -> None:
@@ -324,7 +336,8 @@ class TestParamBundle:
         *args: Iterable[Any] | Any,
         gap_product: bool = False,
         gap_zip: bool = False,
-        gap_params: bool = True,
+        gap_params: bool = False,
+        gap_param_iter: bool = False,
         gap_singular_params: bool = False,
         **kwargs: Any,
     ) -> None:
@@ -337,7 +350,9 @@ class TestParamBundle:
         :param gap_singular_params: Whether to parse the arguments as singular parameters.
         :param kwargs: The keyword arguments for the test parameter bundle.
         """
-        if (gap_params + gap_zip + gap_product + gap_singular_params) != 1:
+        if (
+            gap_params + gap_param_iter + gap_zip + gap_product + gap_singular_params
+        ) != 1:
             raise ValueError(
                 "Exactly many of gap_product, gap_zip, or gap_params are True. "
                 "Only 1 of the flags is allowed. \n"
@@ -350,8 +365,10 @@ class TestParamBundle:
             raise warnings.warn("gap_product is deprecated.")
         if gap_zip:
             raise warnings.warn("gap_zip is deprecated.")
+        if gap_singular_params:
+            raise warnings.warn("gap_singular_params is deprecated.")
 
-        # pop aga keywords out
+        # pop gap keywords out
         gap_kwargs_dict = {
             kwd.value: kwargs.pop(kwd.value)
             for kwd in GapReservedKeywords
@@ -359,11 +376,11 @@ class TestParamBundle:
         }
 
         if gap_params:
-            # build final params
-            # So we're allowing [param(1, 2), [3, 4]] as a valid input
             self.final_params: List[TestParam] = type(self).parse_params(
                 *args, **kwargs
             )
+        elif gap_param_iter:
+            self.final_params = type(self).parse_param_iter(*args, **kwargs)
         elif gap_singular_params:
             self.final_params = type(self).parse_singular_params(*args, **kwargs)
         elif gap_zip or gap_product:
@@ -376,10 +393,24 @@ class TestParamBundle:
         type(self).add_gap_kwargs(gap_kwargs_dict, self.final_params)
 
     @staticmethod
+    def parse_param_iter(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
+        if kwargs:
+            raise ValueError("gap_param_iter=True ignores non-gap kwargs")
+
+        if len(args) != 1:
+            raise ValueError("gap_param_iter=True only accepts 1 arg")
+
+        arg_iter = args[0]
+
+        return list(
+            arg if isinstance(arg, TestParam) else param(*arg) for arg in arg_iter
+        )
+
+    @staticmethod
     def parse_params(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
         """Parse the parameters for param sequence."""
         if kwargs:
-            raise ValueError("gap_params=True ignores non-aga kwargs")
+            raise ValueError("gap_params=True ignores non-gap kwargs")
 
         return list(arg if isinstance(arg, TestParam) else param(*arg) for arg in args)
 
@@ -387,7 +418,7 @@ class TestParamBundle:
     def parse_singular_params(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
         """Parse the parameters for param sequence."""
         if kwargs:
-            raise ValueError("gap_singular_params=True ignores non-aga kwargs")
+            raise ValueError("gap_singular_params=True ignores non-gap kwargs")
 
         return list(arg if isinstance(arg, TestParam) else param(arg) for arg in args)
 
@@ -436,7 +467,7 @@ class TestParamBundle:
         gap_kwargs: Dict[str, Any], final_params: List[TestParam]
     ) -> None:
         """Add gap_kwargs to the finalized parameters."""
-        # process aga input type
+        # process gap input type
         for gap_kwarg_key, gap_kwarg_value in gap_kwargs.items():
             if isinstance(gap_kwarg_value, Iterable) and not isinstance(
                 gap_kwarg_value, str
@@ -445,7 +476,7 @@ class TestParamBundle:
             else:
                 gap_kwargs[gap_kwarg_key] = [gap_kwarg_value] * len(final_params)
 
-        # validate aga input type
+        # validate gap input type
         if not all(
             len(gap_kwarg_value) == len(final_params)
             for gap_kwarg_value in gap_kwargs.values()
@@ -457,14 +488,14 @@ class TestParamBundle:
                 f"which is {len(final_params)}"
             )
 
-        # the aga kwargs list we want
+        # the gap kwargs list we want
         gap_kwargs_list: List[Dict[str, Any]] = [
             dict(zip(gap_kwargs.keys(), gap_kwarg_value))
             for gap_kwarg_value in zip(*gap_kwargs.values())
         ]
 
         if not gap_kwargs_list:
-            # generate default aga kwargs dict if there are no aga kwargs
+            # generate default gap kwargs dict if there are no gap kwargs
             gap_kwargs_list = [{} for _ in final_params]
 
         for final_param, kwargs in zip(final_params, gap_kwargs_list):
@@ -494,11 +525,13 @@ class TestParamBundle:
 
 
 test_cases = TestParamBundle
-test_cases_params = partial(test_cases, aga_params=True)
-test_cases_zip = partial(test_cases, aga_zip=True)
-test_cases_product = partial(test_cases, aga_product=True)
-test_cases_singular_params = partial(test_cases, aga_singular_params=True)
+test_cases_params = partial(test_cases, gap_params=True)
+test_cases_param_iter = partial(test_cases, gap_param_iter=True)
+test_cases_zip = partial(test_cases, gap_zip=True)
+test_cases_product = partial(test_cases, gap_product=True)
+test_cases_singular_params = partial(test_cases, gap_singular_params=True)
 test_cases.params = test_cases_params
+test_cases.param_iter = test_cases_param_iter
 test_cases.product = test_cases_product
 test_cases.zip = test_cases_zip
 test_cases.singular_params = test_cases_singular_params
