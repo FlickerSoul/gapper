@@ -13,6 +13,7 @@ from typing import (
     Iterable,
     List,
     Sequence,
+    Tuple,
     overload,
 )
 
@@ -376,24 +377,26 @@ class TestParamBundle:
         }
 
         if gap_params:
-            self.final_params: List[TestParam] = type(self).parse_params(
-                *args, **kwargs
-            )
+            final_params: List[TestParam | Tuple[Iterable[Any], Dict[Any, Any]]] = type(
+                self
+            ).parse_params(*args, **kwargs)
         elif gap_param_iter:
-            self.final_params = type(self).parse_param_iter(*args, **kwargs)
+            final_params = type(self).parse_param_iter(*args, **kwargs)
         elif gap_singular_params:
-            self.final_params = type(self).parse_singular_params(*args, **kwargs)
+            final_params = type(self).parse_singular_params(*args, **kwargs)
         elif gap_zip or gap_product:
-            self.final_params = type(self).parse_zip_or_product(
+            final_params = type(self).parse_zip_or_product(
                 *args, gap_zip=gap_zip, gap_product=gap_product, **kwargs
             )
         else:
             raise InternalError("TestParamBundle.__init__ should not reach here.")
 
-        type(self).add_gap_kwargs(gap_kwargs_dict, self.final_params)
+        self.final_params = type(self).build_params(gap_kwargs_dict, final_params)
 
     @staticmethod
-    def parse_param_iter(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
+    def parse_param_iter(
+        *args: Iterable[Any], **kwargs: Any
+    ) -> List[TestParam | Tuple[Iterable[Any], Dict[Any, Any]]]:
         if kwargs:
             raise ValueError("gap_param_iter=True ignores non-gap kwargs")
 
@@ -403,24 +406,28 @@ class TestParamBundle:
         arg_iter = args[0]
 
         return list(
-            arg if isinstance(arg, TestParam) else param(*arg) for arg in arg_iter
+            arg if isinstance(arg, TestParam) else (arg, {}) for arg in arg_iter
         )
 
     @staticmethod
-    def parse_params(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
+    def parse_params(
+        *args: Iterable[Any], **kwargs: Any
+    ) -> List[TestParam | Tuple[Iterable[Any], Dict[Any, Any]]]:
         """Parse the parameters for param sequence."""
         if kwargs:
             raise ValueError("gap_params=True ignores non-gap kwargs")
 
-        return list(arg if isinstance(arg, TestParam) else param(*arg) for arg in args)
+        return list(arg if isinstance(arg, TestParam) else (arg, {}) for arg in args)
 
     @staticmethod
-    def parse_singular_params(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
+    def parse_singular_params(
+        *args: Iterable[Any], **kwargs: Any
+    ) -> List[TestParam | Tuple[Iterable[Any], Dict[Any, Any]]]:
         """Parse the parameters for param sequence."""
         if kwargs:
             raise ValueError("gap_singular_params=True ignores non-gap kwargs")
 
-        return list(arg if isinstance(arg, TestParam) else param(arg) for arg in args)
+        return list(arg if isinstance(arg, TestParam) else ([arg], {}) for arg in args)
 
     @staticmethod
     def parse_zip_or_product(
@@ -428,7 +435,7 @@ class TestParamBundle:
         gap_product: bool = False,
         gap_zip: bool = False,
         **kwargs: Any,
-    ) -> List[TestParam]:
+    ) -> List[Tuple[Iterable[Any], Dict[Any, Any]]]:
         """Parse parameters for zip or product."""
         if not gap_zip ^ gap_product:
             raise ValueError("exactly one of gap_zip or gap_product must be True")
@@ -458,14 +465,14 @@ class TestParamBundle:
 
         # ======= zipping all the args together =======
         return list(
-            param(*curr_args, **dict(zip(kwargs.keys(), curr_kwargs)))
+            (curr_args, dict(zip(kwargs.keys(), curr_kwargs)))
             for (curr_args, curr_kwargs) in all_args_and_kwargs
         )
 
     @staticmethod
-    def add_gap_kwargs(
+    def build_params(
         gap_kwargs: Dict[str, Any], final_params: List[TestParam]
-    ) -> None:
+    ) -> List[TestParam]:
         """Add gap_kwargs to the finalized parameters."""
         # process gap input type
         for gap_kwarg_key, gap_kwarg_value in gap_kwargs.items():
@@ -498,8 +505,17 @@ class TestParamBundle:
             # generate default gap kwargs dict if there are no gap kwargs
             gap_kwargs_list = [{} for _ in final_params]
 
+        result: List[TestParam] = []
         for final_param, kwargs in zip(final_params, gap_kwargs_list):
-            final_param.update_gap_kwargs(**kwargs)
+            if isinstance(final_param, TestParam):
+                final_param.update_gap_kwargs(**kwargs)
+            else:
+                final_param[1].update(kwargs)
+                final_param = TestParam(*final_param[0], **final_param[1])
+
+            result.append(final_param)
+
+        return result
 
     def __call__(
         self, prob: Problem[ProbInputType, ProbOutputType]
