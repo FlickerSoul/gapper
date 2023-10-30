@@ -90,15 +90,8 @@ class ParamExtractor:
             and kwargs.get(GapReservedKeywords.gap_weight.value, None) is not None
         ):
             raise ValueError("Cannot specify both gap_max_score and gap_weight.")
-        elif (
-            kwargs.get(GapReservedKeywords.gap_max_score.value, None) is None
-            and kwargs.get(GapReservedKeywords.gap_weight.value, None) is None
-        ):
-            parameter_info = ParamInfo(**kwargs, gap_weight=1)
         else:
-            parameter_info = ParamInfo(**kwargs)
-
-        return parameter_info
+            return ParamInfo(**kwargs)
 
     @staticmethod
     def check_gap_kwargs_residue(kwargs: Dict[str, Any]) -> List[str]:

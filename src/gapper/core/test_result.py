@@ -101,3 +101,6 @@ class TestResult:
 
     def set_pass_status(self, status: PassStateType) -> None:
         self.pass_status = status
+
+    def set_default_weight(self) -> None:
+        self.weight = 1

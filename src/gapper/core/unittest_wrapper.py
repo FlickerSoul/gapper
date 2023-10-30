@@ -5,8 +5,7 @@ from typing import TYPE_CHECKING, Any, Callable, NamedTuple, Protocol, Self
 from unittest import TestCase
 from unittest.mock import patch
 
-from gapper.core.errors import (InternalError, SubmissionSyntaxError,
-                                TestFailedError)
+from gapper.core.errors import InternalError, SubmissionSyntaxError, TestFailedError
 from gapper.core.pipeline_support import PipelineBase
 from gapper.core.test_result import TestResult
 from gapper.core.utils import CaptureStdout, generate_custom_input
@@ -15,8 +14,7 @@ if TYPE_CHECKING:
     from gapper.core.problem import Problem
     from gapper.core.test_parameter import TestParam
     from gapper.core.utils import CustomEqualityCheckFn
-    from gapper.gradescope.datatypes.gradescope_meta import \
-        GradescopeSubmissionMetadata
+    from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
 class ContextManager(dict):
@@ -117,7 +115,7 @@ class TestCaseWrapper(TestCase):
         :result: The result object to be used and written to.
         :return: The result object passed to this method.
         """
-        self._set_test_result(result)
+        self._setup_test_result(result)
 
         try:
             self._run_test(submission, result)
@@ -175,12 +173,18 @@ class TestCaseWrapper(TestCase):
 
             return flag
 
-    def _set_test_result(self, result: TestResult) -> None:
+    def _setup_test_result(self, result: TestResult) -> None:
         """Set the test result object to default values specified in the info."""
         result.set_name(self.test_param.param_info.gap_name)
         result.set_extra_points(self.test_param.param_info.gap_extra_points)
-        result.set_max_score(self.test_param.param_info.gap_max_score)
-        result.set_weight(self.test_param.param_info.gap_weight)
+        if (
+            self.test_param.param_info.gap_max_score is None
+            and self.test_param.param_info.gap_weight is None
+        ):
+            result.set_default_weight()
+        else:
+            result.set_max_score(self.test_param.param_info.gap_max_score)
+            result.set_weight(self.test_param.param_info.gap_weight)
         result.set_hidden(self.test_param.param_info.gap_hidden)
         if self.test_param.param_info.gap_description is not None:
             result.add_description(
