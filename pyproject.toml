@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gapper"
-version = "0.3.0"
+version = "0.3.1"
 description = "Gradescope Assignment Packer"
 authors = ["Heyuan Zeng <hi@universe.observer>"]
 license = "MIT"
@@ -33,6 +33,7 @@ dill = "^0.3.7"
 dataclasses-json = "^0.6.1"
 dacite = "^1.8.1"
 rich = "^13.6.0"
+pytest = "^7.4.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.2"
