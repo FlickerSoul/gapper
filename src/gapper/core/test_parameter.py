@@ -332,6 +332,7 @@ class TestParamBundle:
         gap_params: bool = False,
         gap_param_iter: bool = False,
         gap_singular_params: bool = False,
+        gap_singular_param_iter: bool = False,
         **kwargs: Any,
     ) -> None:
         """Initialize the test parameter bundle (test_cases).
@@ -344,7 +345,12 @@ class TestParamBundle:
         :param kwargs: The keyword arguments for the test parameter bundle.
         """
         if (
-            gap_params + gap_param_iter + gap_zip + gap_product + gap_singular_params
+            gap_params
+            + gap_param_iter
+            + gap_zip
+            + gap_product
+            + gap_singular_params
+            + gap_singular_param_iter
         ) != 1:
             raise ValueError(
                 "Exactly many of gap_product, gap_zip, or gap_params are True. "
@@ -358,8 +364,6 @@ class TestParamBundle:
             raise warnings.warn("gap_product is deprecated.")
         if gap_zip:
             raise warnings.warn("gap_zip is deprecated.")
-        if gap_singular_params:
-            raise warnings.warn("gap_singular_params is deprecated.")
 
         # pop gap keywords out
         gap_kwargs_dict = {
@@ -376,6 +380,8 @@ class TestParamBundle:
             self.final_params = type(self).parse_param_iter(*args, **kwargs)
         elif gap_singular_params:
             self.final_params = type(self).parse_singular_params(*args, **kwargs)
+        elif gap_singular_param_iter:
+            self.final_params = type(self).parse_singular_param_iter(*args, **kwargs)
         elif gap_zip or gap_product:
             self.final_params = type(self).parse_zip_or_product(
                 *args, gap_zip=gap_zip, gap_product=gap_product, **kwargs
@@ -388,10 +394,13 @@ class TestParamBundle:
     @staticmethod
     def parse_param_iter(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
         if kwargs:
-            raise ValueError("gap_param_iter=True ignores non-gap kwargs")
+            raise ValueError(
+                "gap_param_iter=True ignores non-gap kwargs. "
+                "Please use `param()` directive to assist specifying kwargs."
+            )
 
         if len(args) != 1:
-            raise ValueError("gap_param_iter=True only accepts 1 arg")
+            raise ValueError("gap_param_iter=True only accepts 1 iterable argument.")
 
         arg_iter = args[0]
 
@@ -403,7 +412,10 @@ class TestParamBundle:
     def parse_params(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
         """Parse the parameters for param sequence."""
         if kwargs:
-            raise ValueError("gap_params=True ignores non-gap kwargs")
+            raise ValueError(
+                "gap_params=True ignores non-gap kwargs. "
+                "Please use `param()` directive to assist specifying kwargs."
+            )
 
         return list(arg if isinstance(arg, TestParam) else param(*arg) for arg in args)
 
@@ -411,9 +423,31 @@ class TestParamBundle:
     def parse_singular_params(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
         """Parse the parameters for param sequence."""
         if kwargs:
-            raise ValueError("gap_singular_params=True ignores non-gap kwargs")
+            raise ValueError(
+                "gap_singular_params=True ignores non-gap kwargs. "
+                "Please use `param()` directive to assist specifying kwargs."
+            )
 
-        return list(arg if isinstance(arg, TestParam) else param(arg) for arg in args)
+        if len(args) != 1:
+            raise ValueError(
+                "gap_singular_param_iter=True only accepts 1 iterable argument."
+            )
+
+        arg_iter = args[0]
+
+        return list(
+            arg if isinstance(arg, TestParam) else param(arg) for arg in arg_iter
+        )
+
+    @staticmethod
+    def parse_singular_param_iter(
+        *args: Iterable[Any], **kwargs: Any
+    ) -> List[TestParam]:
+        if kwargs:
+            raise ValueError(
+                "gap_singular_param_iter=True ignores non-gap kwargs. "
+                "Please use `param()` directive to assist specifying kwargs."
+            )
 
     @staticmethod
     def parse_zip_or_product(
