@@ -27,6 +27,7 @@ __all__ = [
     "test_cases_zip",
     "test_cases_product",
     "test_cases_singular_params",
+    "test_cases_singular_param_iter",
 ]
 
 from gapper.core.errors import InternalError
@@ -269,6 +270,7 @@ class TestParamBundle:
     zip: ClassVar[partial[TestParamBundle]]
     product: ClassVar[partial[TestParamBundle]]
     singular_params: ClassVar[partial[TestParamBundle]]
+    singular_param_iter: ClassVar[partial[TestParamBundle]]
 
     @overload
     def __init__[
@@ -563,8 +565,10 @@ test_cases_param_iter = partial(test_cases, gap_param_iter=True)
 test_cases_zip = partial(test_cases, gap_zip=True)
 test_cases_product = partial(test_cases, gap_product=True)
 test_cases_singular_params = partial(test_cases, gap_singular_params=True)
+test_cases_singular_param_iter = partial(test_cases, gap_singular_param_iter=True)
 test_cases.params = test_cases_params
 test_cases.param_iter = test_cases_param_iter
 test_cases.product = test_cases_product
 test_cases.zip = test_cases_zip
 test_cases.singular_params = test_cases_singular_params
+test_cases.singular_param_iter = test_cases_singular_param_iter
