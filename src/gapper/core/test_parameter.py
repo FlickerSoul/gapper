@@ -293,6 +293,7 @@ class TestParamBundle:
         gap_params: bool = False,
         gap_param_iter: bool = False,
         gap_singular_params: bool = False,
+        gap_singular_param_iter: bool = False,
         **kwargs,
     ) -> None:
         ...
@@ -320,6 +321,7 @@ class TestParamBundle:
         gap_params: bool = False,
         gap_param_iter: bool = False,
         gap_singular_params: bool = False,
+        gap_singular_param_iter: bool = False,
         **kwargs: Any,
     ) -> None:
         ...
@@ -341,7 +343,9 @@ class TestParamBundle:
         :param gap_product: Whether to take the cartesian product of the arguments.
         :param gap_zip: Whether to zip the arguments.
         :param gap_params: Whether to parse the arguments as parameters.
+        :param gap_param_iter: Whether to parse the argument as parameter iterators.
         :param gap_singular_params: Whether to parse the arguments as singular parameters.
+        :param gap_singular_param_iter: Whether to parse the arguments as singular parameter iterators.
         :param kwargs: The keyword arguments for the test parameter bundle.
         """
         if (
