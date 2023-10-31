@@ -22,18 +22,29 @@ def test_test_params_gap_kwargs_length_matching() -> None:
 
 
 def test_test_params_params() -> None:
-    @test_cases.params([1], [2], [3])
-    @problem()
-    def square(a: int) -> int:
-        return a**2
+    bundle = test_cases.params([1], [2], [3])
 
-    assert len(square.test_cases) == 3
+    assert len(bundle.final_params) == 3
 
 
 def test_test_params_param_iter() -> None:
-    @test_cases.param_iter([i] for i in range(3))
-    @problem()
-    def square(a: int) -> int:
-        return a**2
+    bundle = test_cases.param_iter([i] for i in range(3))
 
-    assert len(square.test_cases) == 3
+    assert len(bundle.final_params) == 3
+
+
+def test_test_singular_params() -> None:
+    # singular params is expected not to unfold
+    bundle = test_cases.singular_params(
+        [i for i in range(3)],
+        [i for i in range(3)],
+    )
+
+    assert len(bundle.final_params) == 2
+
+
+def test_test_singular_param_iter() -> None:
+    # singular params is expected not to unfold
+    bundle = test_cases.singular_param_iter([i for i in range(3)] for _ in range(10))
+
+    assert len(bundle.final_params) == 10
