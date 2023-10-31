@@ -115,6 +115,11 @@ class ParamExtractor:
         """
         self._param_info.update(kwargs)
 
+    def __eq__(self, other: ParamExtractor) -> bool:
+        if isinstance(other, ParamExtractor):
+            return self.param_info == other.param_info
+        return False
+
 
 class TestParam(ParamExtractor):
     pipeline: ClassVar[partial[TestParam]]
@@ -257,6 +262,19 @@ class TestParam(ParamExtractor):
             gap_override_check=gap_override_check,
             gap_override_test=gap_override_test,
         )
+
+    def __eq__(self, other: TestParam) -> bool:
+        if isinstance(other, TestParam):
+            return (
+                self.args == other.args
+                and self.kwargs == other.kwargs
+                and super().__eq__(other)
+            )
+
+        return False
+
+    def __repr__(self) -> str:
+        return f"param{self.format(with_gap_kwargs=True)}"
 
 
 test_case = TestParam
