@@ -92,6 +92,7 @@ def check(
     auto_inject: AutoInjectOpt,
     inject: InjectOpt,
 ) -> None:
+    """Check if the problem is defined correctly again the gap_check fields."""
     InjectionHandler().setup(auto_inject, inject).inject()
 
     problem = Problem.from_path(path)
@@ -117,6 +118,7 @@ def gen(
     inject: InjectOpt,
     debug: DebugOpt,
 ) -> None:
+    """Generate the autograder for a problem."""
     InjectionHandler().setup(auto_inject, inject).inject()
 
     problem = Problem.from_path(path)
@@ -174,6 +176,7 @@ def run_in_prod(
         typer.Argument(help="The path to the output file."),
     ] = AUTOGRADER_OUTPUT,
 ) -> None:
+    """Run the autograder in production mode."""
     run_autograder(tester_path, submission_dir, metadata_file, output_file)
 
 
