@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.scripts]
 gap = "gapper.cli:app"
 gapper = "gapper.cli:app"
-gradescope-assignment-packer = "gapper.cli:app"
+gradescope-autograder-packer = "gapper.cli:app"
 
 [tool.coverage.report]
 exclude_also = [
