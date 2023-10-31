@@ -428,16 +428,7 @@ class TestParamBundle:
                 "Please use `param()` directive to assist specifying kwargs."
             )
 
-        if len(args) != 1:
-            raise ValueError(
-                "gap_singular_param_iter=True only accepts 1 iterable argument."
-            )
-
-        arg_iter = args[0]
-
-        return list(
-            arg if isinstance(arg, TestParam) else param(arg) for arg in arg_iter
-        )
+        return list(arg if isinstance(arg, TestParam) else param(arg) for arg in args)
 
     @staticmethod
     def parse_singular_param_iter(
@@ -448,6 +439,17 @@ class TestParamBundle:
                 "gap_singular_param_iter=True ignores non-gap kwargs. "
                 "Please use `param()` directive to assist specifying kwargs."
             )
+
+        if len(args) != 1:
+            raise ValueError(
+                "gap_singular_param_iter=True only accepts 1 iterable argument."
+            )
+
+        arg_iter = args[0]
+
+        return list(
+            arg if isinstance(arg, TestParam) else param(arg) for arg in arg_iter
+        )
 
     @staticmethod
     def parse_zip_or_product(
