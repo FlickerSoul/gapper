@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from textwrap import indent
 from typing import TYPE_CHECKING, Iterable, List
 
 if TYPE_CHECKING:
@@ -44,19 +45,19 @@ class TestResult:
     @property
     def rich_test_output(self) -> str:
         pass_status_msg = self.pass_status.capitalize() if self.pass_status else ""
-        descriptions = (
-            "Description(s): " + "\n".join(self.descriptions)
-            if self.descriptions
-            else ""
-        )
-        error_msg = (
-            "Error(s): \n"
-            + ("\n".join(err.format() for err in self.errors) if self.errors else "")
-            if self.errors
-            else ""
+
+        description_info = indent("\n".join(self.descriptions), " " * 2)
+        description_msg = (
+            "Description(s): \n" + description_info if self.descriptions else ""
         )
 
-        messages = list(filter(bool, [pass_status_msg, descriptions, error_msg]))
+        error_info = indent(
+            "\n".join(err.format() for err in self.errors),
+            " " * 2,
+        )
+        error_msg = "Error(s): \n" + error_info if self.errors else ""
+
+        messages = list(filter(bool, [pass_status_msg, description_msg, error_msg]))
         if len(messages) == 0:
             return "<No Description>"
         else:

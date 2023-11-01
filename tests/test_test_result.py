@@ -65,40 +65,43 @@ def test_test_result_rich_output() -> None:
     assert result.rich_test_output == "Passed"
 
     result.add_description("test description")
-    assert result.rich_test_output == "Passed\n" "Description(s): test description"
+    assert result.rich_test_output == (
+        "Passed\n" + "Description(s): \n" + "  test description"
+    )
 
     result.add_error(InternalError("test error"), set_failed=False)
     assert (
         result.rich_test_output == "Passed\n"
-        "Description(s): test description\n"
+        "Description(s): \n"
+        "  test description\n"
         "Error(s): \n"
-        "Internal Error. The reason is following: \n"
-        "test error\n"
-        "Stack Trace: \n"
-        "Not Provided\n"
+        "  Internal Error. The reason is following: \n"
+        "    test error\n"
+        "  Stack Trace: \n"
+        "    Not Provided\n"
     )
 
     result.set_descriptions([])
     assert result.rich_test_output == (
         "Passed\n"
         "Error(s): \n"
-        "Internal Error. The reason is following: \n"
-        "test error\n"
-        "Stack Trace: \n"
-        "Not Provided\n"
+        "  Internal Error. The reason is following: \n"
+        "    test error\n"
+        "  Stack Trace: \n"
+        "    Not Provided\n"
     )
 
     result.add_error(InternalError("test error 2"), set_failed=True)
     assert result.rich_test_output == (
         "Failed\n"
         "Error(s): \n"
-        "Internal Error. The reason is following: \n"
-        "test error\n"
-        "Stack Trace: \n"
-        "Not Provided\n"
+        "  Internal Error. The reason is following: \n"
+        "    test error\n"
+        "  Stack Trace: \n"
+        "    Not Provided\n"
         "\n"
-        "Internal Error. The reason is following: \n"
-        "test error 2\n"
-        "Stack Trace: \n"
-        "Not Provided\n"
+        "  Internal Error. The reason is following: \n"
+        "    test error 2\n"
+        "  Stack Trace: \n"
+        "    Not Provided\n"
     )

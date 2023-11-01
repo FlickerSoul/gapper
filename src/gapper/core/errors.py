@@ -1,4 +1,5 @@
 import traceback
+from textwrap import indent
 from types import TracebackType
 from typing import Iterable, List
 
@@ -23,9 +24,11 @@ class ErrorFormatter(Exception):
             tb = tb.tb_next
         return tb
 
-    def format_args(self) -> str:
+    def format_args(self, indent_num: int = 0) -> str:
         """Format the arguments of the error message."""
-        return ",\n".join(str(arg).rstrip("\n") for arg in self.args)
+        return indent(
+            ",\n".join(str(arg).rstrip("\n") for arg in self.args), " " * indent_num
+        )
 
     def format(self) -> str:
         """Format the error message."""
@@ -36,26 +39,28 @@ class TestFailedError(ErrorFormatter):
     """Raised when a test fails."""
 
     def format(self) -> str:
-        return (
-            f"Test Assertion Failed. The reason is following: \n{self.format_args()}\n"
-        )
+        return f"Test Assertion Failed. The reason is following: \n{self.format_args(indent_num=2)}\n"
 
 
 class SubmissionSyntaxError(ErrorFormatter):
     """Raised when a submission has syntax errors."""
 
     def format(self) -> str:
-        return f"The submission has syntax errors. The reason is following: \n{self.format_args()}\n"
+        return f"The submission has syntax errors. The reason is following: \n{self.format_args(indent_num=2)}\n"
 
 
 class InternalError(ErrorFormatter):
     """Raised when an internal error occurs in the framework."""
 
     def format(self) -> str:
+        tb_info = indent(
+            tb_str if (tb_str := self.extract_traceback_str()) else "Not Provided\n",
+            "  ",
+        )
         return (
             f"Internal Error. "
-            f"The reason is following: \n{self.format_args()}\n"
-            f"Stack Trace: \n{tb_str if (tb_str := self.extract_traceback_str()) else 'Not Provided\n'}"
+            f"The reason is following: \n{self.format_args(indent_num=2)}\n"
+            f"Stack Trace: \n{tb_info}"
         )
 
 
