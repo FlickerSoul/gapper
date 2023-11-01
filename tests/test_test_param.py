@@ -225,6 +225,8 @@ def test_test_singular_params(args, kwargs, results) -> None:
 )
 def test_test_singular_param_iter(args, kwargs, results) -> None:
     # singular params is expected not to unfold
-    bundle = test_cases.singular_param_iter([i for i in range(3)] for _ in range(10))
+    bundle = test_cases.singular_param_iter(*args, **kwargs)
 
-    assert len(bundle.final_params) == 10
+    assert len(bundle.final_params) == len(results)
+    for i, j in zip(bundle.final_params, results):
+        assert i == j
