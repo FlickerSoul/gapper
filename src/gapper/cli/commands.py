@@ -3,7 +3,7 @@ from typing import Annotated, List, Optional
 
 import typer
 
-from gapper.cli.test_result_output import rich_print_test_results
+from gapper.cli.rich_test_result_output import rich_print_test_results
 from gapper.core.file_handlers import AutograderZipper
 from gapper.core.injection import InjectionHandler
 from gapper.core.problem import Problem
