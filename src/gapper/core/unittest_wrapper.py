@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, Callable, NamedTuple, Protocol, Self
+from typing import TYPE_CHECKING, Any, Callable, NamedTuple, Protocol, Self, Tuple
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -133,7 +133,7 @@ class TestCaseWrapper(TestCase):
 
         return result
 
-    def check_test(self) -> bool | None:
+    def check_test(self) -> Tuple[bool, Any, str] | None:
         """Check if the test passes.
 
         :return: True if the test passes, False if the test fails, None if the test is skipped.
@@ -142,7 +142,7 @@ class TestCaseWrapper(TestCase):
             not self.test_param.param_info.gap_expect
             and not self.test_param.param_info.gap_expect_stdout
         ):
-            return
+            return None
 
         if self.test_param.param_info.gap_override_test is not None:
             raise Warning("gap_override_test is not None, check_test is ignored.")
@@ -171,7 +171,7 @@ class TestCaseWrapper(TestCase):
                     actual_out == self.test_param.param_info.gap_expect_stdout
                 )
 
-            return flag
+            return flag, actual_result, actual_out
 
     def _setup_test_result(self, result: TestResult) -> None:
         """Set the test result object to default values specified in the info."""

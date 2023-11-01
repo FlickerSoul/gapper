@@ -98,12 +98,23 @@ def check(
     problem = Problem.from_path(path)
     try:
         for test in problem.generate_tests():
-            pass_flag = test.check_test()
-            test_desc = (
-                f"skipped due to no expect"
-                if pass_flag is None
-                else f"passed: {pass_flag}"
-            )
+            checked_result = test.check_test()
+            if checked_result is None:
+                test_desc = "skipped due to no gap_expect or gap_expect_stdout"
+            else:
+                pass_flag, result, output = checked_result
+                test_desc = f"passed: {pass_flag}"
+                if not pass_flag:
+                    test_desc += (
+                        f"\n"
+                        f"  result: {result}\n"
+                        f"  expected result: {test.test_param.param_info.gap_expect}"
+                    )
+                    test_desc += (
+                        f"\n"
+                        f"  output: {output}\n"
+                        f"  expected output: {test.test_param.param_info.gap_expect_stdout}"
+                    )
             typer.echo(f"Test {test.test_param.format()} {test_desc}")
     except Exception as e:
         typer.echo(f"Error: {e}")
