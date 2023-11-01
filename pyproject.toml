@@ -5,6 +5,8 @@ description = "Gradescope Assignment Packer"
 authors = ["Heyuan Zeng <hi@universe.observer>"]
 license = "MIT"
 readme = "README.md"
+repository = "https://github.com/FlickerSoul/gapper"
+documentation = "https://github.com/FlickerSoul/gapper/wiki"
 
 [tool.poetry.scripts]
 gap = "gapper.cli:app"
