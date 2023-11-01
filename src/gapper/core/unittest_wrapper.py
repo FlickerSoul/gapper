@@ -1,7 +1,16 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, Callable, NamedTuple, Protocol, Self, Tuple
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    NamedTuple,
+    Protocol,
+    Self,
+    Sequence,
+    Tuple,
+)
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -220,6 +229,22 @@ class TestCaseWrapper(TestCase):
             check_fn(expected_result, actual_result)
             if self.problem.config.check_stdout:
                 check_fn(expected_out, actual_out)
+
+            if self.test_param.param_info.gap_post_checks is not None:
+                if not isinstance(self.test_param.param_info.gap_post_checks, Sequence):
+                    post_checks = [self.test_param.param_info.gap_post_checks]
+                else:
+                    post_checks = self.test_param.param_info.gap_post_checks
+
+                for post_check in post_checks:
+                    post_check(
+                        self,
+                        result,
+                        self.problem.solution,
+                        submission,
+                        (expected_result, expected_out),
+                        (actual_result, actual_out),
+                    )
 
         return result
 

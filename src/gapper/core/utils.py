@@ -6,8 +6,7 @@ from importlib.machinery import ModuleSpec
 from io import StringIO
 from pathlib import Path
 from types import ModuleType
-from typing import (TYPE_CHECKING, Any, Callable, Iterable, Protocol, Self,
-                    Tuple)
+from typing import TYPE_CHECKING, Any, Callable, Iterable, Protocol, Self, Tuple
 
 if TYPE_CHECKING:
     from gapper.core.test_result import TestResult
@@ -23,6 +22,21 @@ class CustomTestFn(Protocol):
 
 class CustomEqualityCheckFn(Protocol):
     def __call__[T](self, expected: T, actual: T, msg: str | None = None) -> None:
+        ...
+
+
+class PostChecksFn(Protocol):
+    def __call__[
+        T
+    ](
+        self,
+        param: TestCaseWrapper,
+        proxy: TestResult,
+        solution: T,
+        submission: T,
+        expected_results: Tuple[Any, str | None],
+        actual_results: Tuple[Any, str | None],
+    ) -> None:
         ...
 
 

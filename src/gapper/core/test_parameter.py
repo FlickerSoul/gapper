@@ -34,7 +34,7 @@ from gapper.core.errors import InternalError
 
 if TYPE_CHECKING:
     from gapper.core.problem import ProbInputType, Problem, ProbOutputType
-    from gapper.core.utils import CustomEqualityCheckFn, CustomTestFn
+    from gapper.core.utils import CustomEqualityCheckFn, CustomTestFn, PostChecksFn
 
 
 class GapReservedKeywords(Enum):
@@ -49,6 +49,7 @@ class GapReservedKeywords(Enum):
     gap_extra_points = "gap_extra_points"
     gap_override_check = "gap_override_check"
     gap_override_test = "gap_override_test"
+    gap_post_checks = "gap_post_checks"
     gap_description = "gap_description"
     gap_is_pipeline = "gap_is_pipeline"
 
@@ -62,6 +63,7 @@ class ParamInfo:
     gap_extra_points: float | None = None
     gap_override_check: CustomEqualityCheckFn | None = None
     gap_override_test: CustomTestFn | None = None
+    gap_post_checks: List[PostChecksFn] | PostChecksFn | None = None
     gap_description: str | Iterable[str] | None = None
     gap_is_pipeline: bool = False
     gap_max_score: float | None = None
@@ -144,6 +146,7 @@ class TestParam(ParamExtractor):
         gap_extra_points: float | None = None,
         gap_override_check: CustomEqualityCheckFn | None = None,
         gap_override_test: CustomTestFn | None = None,
+        gap_post_checks: List[PostChecksFn] | PostChecksFn | None = None,
         gap_description: str | Iterable[str] | None = None,
         gap_is_pipeline: bool = False,
         gap_max_score: float | None = None,
@@ -159,6 +162,7 @@ class TestParam(ParamExtractor):
         :param gap_extra_points: The extra credit of the test case.
         :param gap_override_check: The custom equality check function.
         :param gap_override_test: The custom test function.
+        :param gap_post_checks: The custom post check functions.
         :param gap_description: The description of the test case.
         :param gap_is_pipeline: Whether the test case is a pipeline.
         :param gap_max_score: The max score of the test case.
@@ -176,6 +180,7 @@ class TestParam(ParamExtractor):
         gap_extra_points: float | None = None,
         gap_override_check: CustomEqualityCheckFn | None = None,
         gap_override_test: CustomTestFn | None = None,
+        gap_post_checks: List[PostChecksFn] | PostChecksFn | None = None,
         gap_description: str | Iterable[str] | None = None,
         gap_is_pipeline: bool = False,
         gap_weight: float | None = None,
@@ -191,6 +196,7 @@ class TestParam(ParamExtractor):
         :param gap_extra_points: The extra credit of the test case.
         :param gap_override_check: The custom equality check function.
         :param gap_override_test: The custom test function.
+        :param gap_post_checks: The custom post check functions.
         :param gap_description: The description of the test case.
         :param gap_is_pipeline: Whether the test case is a pipeline.
         :param gap_weight: The weight of the test case.
