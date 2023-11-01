@@ -2,7 +2,25 @@ from typing import Any, Dict, Sequence
 
 import pytest
 
-from gapper import param, problem, test_cases
+from gapper import param, problem, test_case, test_cases
+
+
+def test_error_in_test_param_when_invalid_gap_kwargs() -> None:
+    with pytest.raises(ValueError, match="Unknown gap keyword arguments:"):
+
+        @test_case([1], gap_hidden=True, gap_invalid_kwarg=1)
+        @problem()
+        def square(a: int) -> int:
+            return a**2
+
+
+def test_error_in_test_params_when_invalid_gap_kwargs() -> None:
+    with pytest.raises(ValueError, match="Unknown gap keyword arguments:"):
+
+        @test_cases.params([1], gap_hidden=True, gap_invalid_kwarg=1)
+        @problem()
+        def square(a: int) -> int:
+            return a**2
 
 
 def test_test_params_gap_kwargs_length_matching() -> None:

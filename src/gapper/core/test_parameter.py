@@ -74,9 +74,18 @@ class ParamInfo:
 
 
 class ParamExtractor:
-    def __init__(self, **kwargs: Any) -> None:
+    def __init__(self, kwargs: Dict[str, Any]) -> None:
         """Initialize the gap test parameter."""
-        self._param_info = type(self)._select_param_info(kwargs)
+        gap_params = {
+            k.value: kwargs.pop(k.value)
+            for k in GapReservedKeywords
+            if k.value in kwargs
+        }
+
+        if caught_residue := self.check_gap_kwargs_residue(kwargs):
+            raise ValueError(f"Unknown gap keyword arguments: {caught_residue}")
+
+        self._param_info = type(self)._select_param_info(gap_params)
 
     @property
     def param_info(self) -> ParamInfo:
@@ -195,17 +204,7 @@ class TestParam(ParamExtractor):
         :param kwargs: The keyword arguments for the test parameter, including kwargs.
         """
 
-        super().__init__(
-            **{
-                k.value: kwargs.pop(k.value)
-                for k in GapReservedKeywords
-                if k.value in kwargs
-            }
-        )
-
-        if caught_residue := self.check_gap_kwargs_residue(kwargs):
-            raise ValueError(f"Unknown keyword arguments: {caught_residue}")
-
+        super().__init__(kwargs)
         self._args = args
         self._kwargs = kwargs
 
@@ -395,6 +394,9 @@ class TestParamBundle:
             for kwd in GapReservedKeywords
             if kwd.value in kwargs
         }
+
+        if caught_residue := ParamExtractor.check_gap_kwargs_residue(kwargs):
+            raise ValueError(f"Unknown gap keyword arguments: {caught_residue}")
 
         if gap_params:
             self.final_params: List[TestParam] = type(self).parse_params(
