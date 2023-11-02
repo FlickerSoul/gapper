@@ -153,22 +153,20 @@ class ResultSynthesizer:
                         f"Test {res.name} has a negative score ({res.score})."
                     )
 
-                if res.extra_points is not None:
-                    raise InternalError(
-                        f"In test ({res.name}) extra score is ignored because a score is set through custom test check."
-                    )
-
-                continue
-
-            assert res.max_score is not None
-
-            # interpret score with pass status
-            if res.pass_status == "passed":
-                res.score = (
-                    res.max_score + 0 if res.extra_points is None else res.extra_points
-                )
+                if res.is_passed and res.extra_points is not None:
+                    res.score += res.extra_points
             else:
-                res.score = 0
+                assert (
+                    res.max_score is not None
+                ), f"TestResult has to have max_score set, but {res.rich_test_name} does not."
+
+                # interpret score with pass status
+                if res.pass_status == "passed":
+                    res.score = res.max_score + (
+                        0 if res.extra_points is None else res.extra_points
+                    )
+                else:
+                    res.score = 0
 
         return sum((res.score for res in self._results), 0.0)
 
