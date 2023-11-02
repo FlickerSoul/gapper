@@ -1,3 +1,4 @@
+"""The default variable definitions for the Gradescope autograder."""
 from pathlib import Path
 
 DEFAULT_TESTER_PICKLE_NAME = "tester.pckl"

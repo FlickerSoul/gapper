@@ -1,3 +1,4 @@
+"""A module to handle the autograder zip file generation."""
 import importlib.resources
 from pathlib import Path
 from sys import version_info

@@ -1,3 +1,4 @@
+"""This module defines the Problem class, which is the abstract representation of a assignment problem."""
 from __future__ import annotations
 
 from dataclasses import dataclass

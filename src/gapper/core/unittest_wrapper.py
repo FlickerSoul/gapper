@@ -1,3 +1,4 @@
+"""This module contains the TestCaseWrapper class, and related help definitions."""
 from __future__ import annotations
 
 from copy import deepcopy

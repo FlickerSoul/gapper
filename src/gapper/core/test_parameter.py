@@ -1,3 +1,4 @@
+"""This module contains the test case (parameter) support classes and functions."""
 from __future__ import annotations
 
 import warnings

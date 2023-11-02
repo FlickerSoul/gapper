@@ -1,3 +1,5 @@
+"""This module contains the error classes used in the framework."""
+
 import traceback
 from textwrap import indent
 from types import TracebackType

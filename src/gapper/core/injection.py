@@ -1,3 +1,8 @@
+"""Injection module.
+
+This module is used to inject reusable code into the
+problem definition script and be used in testing.
+"""
 import importlib.util
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -86,7 +91,8 @@ class InjectionHandler:
     def find_auto_injection(self, path: Path | None = None) -> None:
         """Find the auto injection folder.
 
-        :param path: The path to start searching from. If not specified, the current working directory will be used.
+        :param path: The path to start searching from.
+                     If not specified, the current working directory will be used.
         """
         path = path or Path.cwd()
 

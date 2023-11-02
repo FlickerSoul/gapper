@@ -1,3 +1,4 @@
+"""This module contains the definition of the tester class."""
 from __future__ import annotations
 
 from copy import deepcopy

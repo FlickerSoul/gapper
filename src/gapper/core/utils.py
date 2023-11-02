@@ -1,3 +1,4 @@
+"""Utility functions and classes for the core module."""
 from __future__ import annotations
 
 import importlib.util

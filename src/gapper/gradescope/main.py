@@ -1,3 +1,4 @@
+"""The main module for the Gradescope autograder."""
 from __future__ import annotations
 
 from pathlib import Path

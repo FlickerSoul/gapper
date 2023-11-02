@@ -1,3 +1,4 @@
+"""This module contains a class to synthesize the results from a tester."""
 from __future__ import annotations
 
 from pathlib import Path
