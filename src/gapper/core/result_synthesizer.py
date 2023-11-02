@@ -102,7 +102,8 @@ class ResultSynthesizer:
         self._results.extend(addition_test_results)
         return self
 
-    def synthesize_score(self) -> float:
+    @staticmethod
+    def synthesize_score_for(*, results: List[TestResult], total_score: float) -> float:
         """Synthesize the score from the results."""
         results_with_score = []
         results_with_weight = []
@@ -110,7 +111,7 @@ class ResultSynthesizer:
         max_score_sum = 0.0
         weight_sum = 0
 
-        for res in self._results:
+        for res in results:
             if res.max_score is None and res.weight is None:
                 raise InternalError(
                     "The max_score and weight of a test (result) cannot both be None."
@@ -133,20 +134,20 @@ class ResultSynthesizer:
                     f"but {res.rich_test_name} has both being None."
                 )
 
-        if max_score_sum > self.total_score:
+        if max_score_sum > total_score:
             raise InternalError(
                 f"The sum of the scores ({max_score_sum}) of all tests must be less than or equal to the "
-                f"total points for the assignment ({self.total_score}). This does not apply to the gap_extra_points."
+                f"total points for the assignment ({total_score}). This does not apply to the gap_extra_points."
             )
 
-        remaining_score = self.total_score - max_score_sum
+        remaining_score = total_score - max_score_sum
 
         for res in results_with_weight:
             assert res.weight is not None
             res.max_score = res.weight * remaining_score / weight_sum
             res.weight = None
 
-        for res in self._results:
+        for res in results:
             if res.score is not None:
                 if res.score < 0:
                     raise InternalError(
@@ -168,7 +169,13 @@ class ResultSynthesizer:
                 else:
                     res.score = 0
 
-        return sum((res.score for res in self._results), 0.0)
+        return sum((res.score for res in results), 0.0)
+
+    def synthesize_score(self) -> float:
+        """Synthesize the score from the results."""
+        return type(self).synthesize_score_for(
+            results=self._results, total_score=self.total_score
+        )
 
     def to_gradescope_json(
         self, save_path: Path | None = None, **kwargs
