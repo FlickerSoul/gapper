@@ -268,6 +268,7 @@ class TestParam(ParamExtractor):
         cls,
         **kwargs,
     ) -> partial[TestParam]:
+        """Bind the gap kwargs to the test case."""
         gap_kwargs = ParamExtractor.extra_gap_info(kwargs)
         return partial(cls, **gap_kwargs)
 
@@ -577,6 +578,7 @@ class TestParamBundle:
 
     @classmethod
     def bind(cls, **kwargs) -> partial[TestParamBundle]:
+        """Bind the gap kwargs to the test cases."""
         gap_kwargs = ParamExtractor.extra_gap_info(kwargs)
         return partial(cls, **gap_kwargs)
 

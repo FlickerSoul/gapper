@@ -43,7 +43,10 @@ class PostChecksFn(Protocol):
 
 
 def generate_custom_input(input_list: Iterable[str]) -> Callable[[Any], str]:
-    """Generate a custom input function for a test case."""
+    """Generate a custom input function for a test case.
+
+    :param input_list: The list of inputs to be used.
+    """
     _iterator = iter(input_list)
 
     def _custom_input(*args: Any) -> str:
@@ -64,7 +67,13 @@ def generate_custom_input(input_list: Iterable[str]) -> Callable[[Any], str]:
 
 
 class CaptureStdout:
+    """A context manager to capture stdout."""
+
     def __init__(self, capture: bool) -> None:
+        """Create a context manager to capture stdout.
+
+        :param capture: Whether to capture stdout.
+        """
         self._capture: bool = capture
         self._capture_device: redirect_stdout[StringIO] | None = None
         self._io_device: StringIO | None = None
@@ -83,6 +92,7 @@ class CaptureStdout:
 
     @property
     def value(self) -> str | None:
+        """The captured stdout."""
         if self._capture and self._io_device:
             return self._io_device.getvalue()
         else:
@@ -90,6 +100,8 @@ class CaptureStdout:
 
 
 class ModuleLoader:
+    """A mixin class to load modules from files."""
+
     @staticmethod
     def _load_module_spec_and_module(
         path: Path, name: str = "module", exec_mod: bool = False

@@ -57,7 +57,18 @@ def _stdout_cm_adder[
 
 
 class TestCaseWrapper(TestCase):
+    """A wrapper for the unittest.TestCase class.
+
+    This serves as a proxy for the testing process to get useful
+    information about the test and functions for testing
+    """
+
     def __init__(self, test_param: TestParam, problem: Problem) -> None:
+        """Create a test case wrapper.
+
+        :param test_param: The test parameter to be used in testing.
+        :param problem: The problem definition to be used in testing.
+        """
         super().__init__()
         self._test_param = test_param
         self._problem = problem
@@ -66,18 +77,22 @@ class TestCaseWrapper(TestCase):
 
     @property
     def test_param(self) -> TestParam:
+        """The test parameter to be used in testing."""
         return self._test_param
 
     @property
     def problem(self) -> Problem:
+        """The problem definition to be used in testing."""
         return self._problem
 
     @property
     def context(self) -> ContextManager | None:
+        """The context of the submission."""
         return self._context
 
     @property
     def metadata(self) -> GradescopeSubmissionMetadata | None:
+        """The metadata of the submission."""
         return self._metadata
 
     @_stdout_cm_adder
@@ -120,8 +135,8 @@ class TestCaseWrapper(TestCase):
     def run_test(self, submission: Any, result: TestResult) -> TestResult:
         """Run the test on the submission.
 
-        :submission: The submission to be tested.
-        :result: The result object to be used and written to.
+        :param submission: The submission to be tested.
+        :param result: The result object to be used and written to.
         :return: The result object passed to this method.
         """
         self._setup_test_result(result)
@@ -205,7 +220,11 @@ class TestCaseWrapper(TestCase):
             )
 
     def _run_test(self, submission: Any, result: TestResult) -> TestResult:
-        """Run the test on the submission."""
+        """Run the test on the submission.
+
+        :param submission: The submission to be tested.
+        :param result: The result object to be used and written to.
+        """
 
         if self.test_param.param_info.gap_override_test is not None:
             self.test_param.param_info.gap_override_test(
@@ -249,11 +268,17 @@ class TestCaseWrapper(TestCase):
         return result
 
     def load_context(self, context: ContextManager) -> Self:
-        """Load the context into the test case."""
+        """Load the context into the test case.
+
+        :param context: The context to load.
+        """
         self._context = deepcopy(context)
         return self
 
     def load_metadata(self, metadata: GradescopeSubmissionMetadata | None) -> Self:
-        """Load the metadata into the test case."""
+        """Load the metadata into the test case.
+
+        :param metadata: The metadata to load. The metadata could be None.
+        """
         self._metadata = metadata
         return self

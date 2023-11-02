@@ -17,6 +17,12 @@ def rich_print_test_check(
     test_check_result: Tuple[bool, Any, str | None] | None,
     expected_result: Tuple[Any, str | None],
 ) -> None:
+    """Print the test check result.
+
+    :param param_info: The parameter info of the test, serving as the title.
+    :param test_check_result: The test check result.
+    :param expected_result: The expected result of the test.
+    """
     if test_check_result is None:
         test_desc = "Skipped due to no gap_expect or gap_expect_stdout"
     else:

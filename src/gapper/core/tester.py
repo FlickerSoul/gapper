@@ -39,24 +39,32 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         self,
         problem: Problem[ProbInputType, ProbOutputType],
     ) -> None:
+        """Create a tester object.
+
+        :param problem: The problem to be tested.
+        """
         self._problem: Problem[ProbInputType, ProbOutputType] = problem
         self._submission: Any | None = None
         self._submission_context: ContextManager = ContextManager()
 
     @property
     def problem(self) -> Problem[ProbInputType, ProbOutputType]:
+        """The problem to be tested."""
         return self._problem
 
     @problem.setter
     def problem(self, prob: Problem) -> None:
+        """Set the problem to be tested."""
         self._problem = prob
 
     @property
     def submission(self) -> Any | None:
+        """The submission to be tested against."""
         return self._submission
 
     @property
     def submission_context(self) -> ContextManager:
+        """The context of captured from the submission."""
         return self._submission_context
 
     def _load_script_submission_from_path(
@@ -97,6 +105,12 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
                 return None
 
     def load_submission_from_path(self, path: Path) -> Self:
+        """Load the submission from a path.
+
+        :param path: The path to load the submission from. If the path is a directory, it will be searched recursively.
+        :raises NoSubmissionError: If no submission is found.
+        :raises MultipleSubmissionError: If multiple submissions are found.
+        """
         if self.problem.config.is_script:
             submission_list = list(self._load_script_submission_from_path(path))
         else:
@@ -112,6 +126,11 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         return self
 
     def load_context_from_module(self, md: ModuleType) -> Self:
+        """Load the context from a module.
+
+        :param md: The module to load the context from.
+        :raises MultipleContextValueError: If multiple context values are found.
+        """
         for context_value_name in self.problem.config.captured_context:
             try:
                 context_value = self._load_symbol_from_module(md, context_value_name)
@@ -126,6 +145,7 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         return self
 
     def check_context_completeness(self) -> None:
+        """Check if the context is complete against what's required in the problem."""
         for context_value_name in self.problem.config.captured_context:
             if context_value_name not in self.submission_context:
                 raise MissingContextValueError(context_value_name)
@@ -133,6 +153,10 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
     def run(
         self, metadata: GradescopeSubmissionMetadata | None = None
     ) -> List[TestResult]:
+        """Run the tests.
+
+        :param metadata: The metadata of the submission, which could be None.
+        """
         if self.problem is None:
             raise InternalError("No problem loaded.")
 
@@ -157,11 +181,19 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
 
     @classmethod
     def from_file(cls, path: Path) -> Tester:
+        """Load a tester from a file.
+
+        :param path: The path to load the tester from.
+        """
         with open(path, "rb") as f:
             tester = ProblemUnpickler(f).load()
 
         return tester
 
     def dump_to(self, path: Path | str) -> None:
+        """Dump the tester to a file.
+
+        :param path: The path to dump the tester to.
+        """
         with open(path, "wb") as f:
             dump(self, f)

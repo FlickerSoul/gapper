@@ -9,6 +9,10 @@ from gapper.core.tester import Tester
 
 class AutograderZipper:
     def __init__(self, tester: Tester) -> None:
+        """A class to generate the autograder zip file.
+
+        :param tester: The tester to generate the autograder for.
+        """
         self._tester = tester
         self.gs_setup_files = {
             "run_autograder",
@@ -19,6 +23,10 @@ class AutograderZipper:
         self.ignore_files = {".pyc"}
 
     def generate_zip(self, zip_file_path: Path) -> None:
+        """Generate the autograder zip file given a save path.
+
+        :param zip_file_path: The path to save the zip file.
+        """
         with ZipFile(zip_file_path, "w") as zip_file:
             self._copy_gap_package(zip_file)
             self._copy_gs_setup(zip_file)
@@ -44,6 +52,12 @@ class AutograderZipper:
             zip_file.write(path, arcname="tester.pckl")
 
     def zip_file_path(self, path: Path, zip_file: ZipFile, root: Path) -> None:
+        """Zip a file or folder.
+
+        :param path: The path to the file to be zipped into.
+        :param zip_file: The zip file to zip the file from <path> into.
+        :param root: The root path.
+        """
         if path.is_dir():
             if path.name in self.ignore_folder:
                 return None

@@ -17,6 +17,11 @@ class InjectionHandler:
     def setup(
         self, auto_inject: bool | Path, inject_module_paths: Sequence[Path]
     ) -> Self:
+        """Setup the injection handler.
+
+        :param auto_inject: Whether to auto inject the injection folder.
+        :param inject_module_paths: The paths to the modules to be injected.
+        """
         if auto_inject:
             self.find_auto_injection(
                 auto_inject if isinstance(auto_inject, Path) else None
@@ -40,6 +45,10 @@ class InjectionHandler:
         return True
 
     def create_injection_module(self) -> ModuleType:
+        """Create the injection module.
+
+        :raises ValueError: If the module already exists.
+        """
         import sys  # pylint: disable=import-outside-toplevel
 
         import gapper  # pylint: disable=import-outside-toplevel, cyclic-import
@@ -61,7 +70,11 @@ class InjectionHandler:
         return new_module
 
     def inject(self, mod: Optional[ModuleType] = None) -> None:
-        """Inject the specified files and those in dirs into the module."""
+        """Inject the specified files and those in dirs into the module.
+
+        :param mod: The module to inject into. If not specified, a new module will be created.
+        :raises ValueError: If no module to inject into.
+        """
         module: ModuleType | None = mod or self.create_injection_module()
 
         if not module:
@@ -71,7 +84,10 @@ class InjectionHandler:
             _inject_content(module, file_path)
 
     def find_auto_injection(self, path: Path | None = None) -> None:
-        """Find the auto injection folder."""
+        """Find the auto injection folder.
+
+        :param path: The path to start searching from. If not specified, the current working directory will be used.
+        """
         path = path or Path.cwd()
 
         self.content_to_be_injected.add(

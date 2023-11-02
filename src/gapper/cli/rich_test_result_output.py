@@ -22,7 +22,12 @@ def rich_print_test_results(
     score_obtained: float,
     total_score: float,
 ) -> None:
-    """Print a fancy summary of the problem."""
+    """Print a fancy summary of the problem.
+
+    :param results: The results of the problem.
+    :param score_obtained: The score obtained by the submissions.
+    :param total_score: The total score of all tests.
+    """
     rprint(
         Panel(
             "The following is the test results.",

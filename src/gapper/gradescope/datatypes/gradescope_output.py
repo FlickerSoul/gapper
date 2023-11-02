@@ -22,19 +22,17 @@ PassStateType = Literal["passed", "failed"]
 class GradescopeTestJson:
     """The JSON schema for a single Test.
 
-    Attributes
-    ----------
-    score : Optional[float]
+    :param score : Optional[float]
         The test's score. Required if no top-level score is set.
-    max_score : Optional[float]
+    :param max_score : Optional[float]
         The max score for the test.
-    name : Optional[str]
+    :param name : Optional[str]
         The test's name.
-    output : Optional[str]
+    :param output : Optional[str]
         Human-readable text output of the test.
-    tags : Optional[List[str]]
+    :param tags : Optional[List[str]]
         Tags for the test.
-    visibility : str
+    :param visibility : str
         The test's visibility. "hidden", "visible", "after_due_date", "after_published"
     """
 
@@ -77,17 +75,17 @@ class GradescopeJson:
 
     Attributes
     ----------
-    tests : List[_GradescopeJsonTest]
+    :param tests : List[_GradescopeJsonTest]
         The tests for the problem. Required if no global score provided.
-    score : Optional[float]
+    :param score : Optional[float]
         The overall score. Required if any test has no set score.
-    execution_time : Optional[int]
+    :param execution_time : Optional[int]
         The execution time of all the tests, in seconds.
-    output : Optional[str]
+    :param output : Optional[str]
         The top-level, human-readable text output for all the problems.
-    visibility : Optional[str]
+    :param visibility : Optional[str]
         The default visibility for each test. Overridden by test-specific settings.
-    stdout_visibility : Optional[str]
+    :param stdout_visibility : Optional[str]
         Whether to show stdout for the tests. Same options as for visibility.
     """
 
@@ -106,6 +104,13 @@ class GradescopeJson:
         save_path: Path | None = None,
         **kwargs,
     ) -> GradescopeJson:
+        """Convert a list of test results to Gradescope JSON.
+
+        :param results: The test results.
+        :param score: The score obtained from the submission.
+        :param save_path: The path to save the Gradescope JSON to.
+        :param kwargs: The keyword arguments to pass to the constructor.
+        """
         gs_json = cls(
             score=score,
             tests=[GradescopeTestJson.from_test_result(result) for result in results],

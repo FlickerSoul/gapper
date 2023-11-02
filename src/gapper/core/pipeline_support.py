@@ -15,6 +15,12 @@ class PipelineBase:
     def __init__(
         self, name: str, *args, _pipeline_replace: bool = False, **kwargs
     ) -> None:
+        """A pipeline base class.
+
+        :param name: The name of the attribute to be extracted from the piped object.
+        :param _pipeline_replace: Whether to replace the piped object with the result of the pipeline.
+        :param args: The arguments to pass to the attribute.
+        """
         self._replace = _pipeline_replace
         self._name = name
         self._args = args
@@ -22,6 +28,7 @@ class PipelineBase:
 
     @property
     def replace(self) -> bool:
+        """Whether to replace the piped object with the result of the pipeline action."""
         return self._replace
 
     def __call__(self, obj: Any) -> Any:
@@ -45,6 +52,8 @@ class PipelineFactory:
 
 
 class Constructor(PipelineFactory):
+    """A pipeline action factory generating __init__ calls."""
+
     class ConstructorEntry(PipelineBase):
         def __call__(self, obj: Type) -> Any:
             return obj(*self._args, **self._kwargs)
@@ -56,6 +65,8 @@ class Constructor(PipelineFactory):
 
 
 class Function(PipelineFactory):
+    """A pipeline action factory generating function calls."""
+
     class FunctionEntry(PipelineBase):
         def __call__(self, obj: Any) -> Any:
             caller = getattr(obj, self._name, None)
@@ -67,6 +78,8 @@ class Function(PipelineFactory):
 
 
 class Property(PipelineBase):
+    """A pipeline action factory generating property lookups."""
+
     def __init__(self, name: str) -> None:
         super().__init__(name)
 
