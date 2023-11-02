@@ -148,8 +148,8 @@ class TestCaseWrapper(TestCase):
         :return: True if the test passes, False if the test fails, None if the test is skipped.
         """
         if (
-            not self.test_param.param_info.gap_expect
-            and not self.test_param.param_info.gap_expect_stdout
+            self.test_param.param_info.gap_expect is None
+            and self.test_param.param_info.gap_expect_stdout is None
         ):
             return None
 
