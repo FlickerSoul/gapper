@@ -13,6 +13,9 @@ gap = "gapper.cli:app"
 gapper = "gapper.cli:app"
 gradescope-autograder-packer = "gapper.cli:app"
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
 [tool.coverage.report]
 exclude_also = [
     "if __name__ == .__main__.:",
@@ -21,9 +24,7 @@ exclude_also = [
 ]
 
 [tool.coverage.run]
-omit = [
-    "src/gap/gradescope/resources/*"
-]
+omit = ["src/gap/gradescope/resources/*"]
 
 [tool.isort]
 profile = "black"
