@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from gapper.core.problem import Problem
     from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
+__all__ = ["ResultSynthesizer", "PostTest", "post_test", "PostTestFn"]
+
 
 class PostTestFn(Protocol):
     def __call__(
@@ -27,6 +29,9 @@ class PostTest:
     def __call__(self, problem: Problem) -> Problem:
         problem.add_post_test(self)
         return problem
+
+
+post_test = PostTest
 
 
 class ResultSynthesizer:
