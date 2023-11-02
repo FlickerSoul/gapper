@@ -23,10 +23,19 @@ class PostTestFn(Protocol):
 
 class PostTest:
     def __init__(self, post_test_fn: PostTestFn, as_test_case: bool = True) -> None:
+        """A decorator for post tests.
+
+        :param post_test_fn: The function to be called after all tests are run.
+        :param as_test_case: Whether to treat the post test as a test case.
+        """
         self.post_test_fn = post_test_fn
         self.as_test_case = as_test_case
 
     def __call__(self, problem: Problem) -> Problem:
+        """Add the post test to the problem.
+
+        :param problem: The problem to add the post test to.
+        """
         problem.add_post_test(self)
         return problem
 
@@ -43,17 +52,31 @@ class ResultSynthesizer:
         metadata: GradescopeSubmissionMetadata | None = None,
         total_score: float | None = None,
     ) -> None:
+        """A class to synthesize the results from a tester.
+
+        :param results: The results of the tester.
+        :param post_tests: The post tests to run after all tests are run.
+        :param metadata: The metadata of the submission.
+        :param total_score: The total score of the assignment.
+        """
         self._results: List[TestResult] = results or []
         self._post_tests: List[PostTest] = post_tests or []
         self._metadata = metadata
         self._total_score = total_score
 
     @property
+    def results(self) -> List[TestResult]:
+        """The results of the tester."""
+        return self._results
+
+    @property
     def metadata(self):
+        """The metadata of the submission."""
         return self._metadata
 
     @property
     def total_score(self) -> float:
+        """The total score of the assignment."""
         if self._metadata is None and self._total_score is None:
             raise ValueError("metadata and total_score are not set")
 
@@ -63,19 +86,23 @@ class ResultSynthesizer:
             return self._total_score
 
     def run_post_tests(self) -> Self:
-        for post_test in self._post_tests:
-            if post_test.as_test_case:
-                result_proxy = TestResult(post_test.post_test_fn.__name__)
+        """Run the post tests."""
+        addition_test_results = []
+        for post_test_case in self._post_tests:
+            if post_test_case.as_test_case:
+                result_proxy = TestResult(post_test_case.post_test_fn.__name__)
             else:
                 result_proxy = None
-            post_test.post_test_fn(self, result_proxy)
+            post_test_case.post_test_fn(self, result_proxy)
 
             if result_proxy is not None:
-                self._results.append(result_proxy)
+                addition_test_results.append(result_proxy)
 
+        self._results.extend(addition_test_results)
         return self
 
     def synthesize_score(self) -> float:
+        """Synthesize the score from the results."""
         results_with_score = []
         results_with_weight = []
 
@@ -147,6 +174,11 @@ class ResultSynthesizer:
     def to_gradescope_json(
         self, save_path: Path | None = None, **kwargs
     ) -> GradescopeJson:
+        """Convert the results to Gradescope JSON.
+
+        :param save_path: The path to save the Gradescope JSON to.
+        :param kwargs: The keyword arguments to pass to the GradescopeJson constructor.
+        """
         score = self.run_post_tests().synthesize_score()
         return GradescopeJson.from_test_results(
             self._results, score, save_path, **kwargs
