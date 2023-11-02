@@ -3,14 +3,15 @@ from typing import Annotated, List, Optional
 
 import typer
 
+from gapper.cli.rich_test_check_output import rich_print_test_check
 from gapper.cli.rich_test_result_output import rich_print_test_results
 from gapper.core.file_handlers import AutograderZipper
 from gapper.core.injection import InjectionHandler
 from gapper.core.problem import Problem
 from gapper.core.result_synthesizer import ResultSynthesizer
 from gapper.core.tester import Tester
-from gapper.gradescope import run_autograder
 from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+from gapper.gradescope.main import run_autograder
 from gapper.gradescope.vars import (
     AUTOGRADER_METADATA,
     AUTOGRADER_OUTPUT,
@@ -99,23 +100,14 @@ def check(
     try:
         for test in problem.generate_tests():
             checked_result = test.check_test()
-            if checked_result is None:
-                test_desc = "skipped due to no gap_expect or gap_expect_stdout"
-            else:
-                pass_flag, result, output = checked_result
-                test_desc = f"passed: {pass_flag}"
-                if not pass_flag:
-                    test_desc += (
-                        f"\n"
-                        f"  result: {result}\n"
-                        f"  expected result: {test.test_param.param_info.gap_expect}"
-                    )
-                    test_desc += (
-                        f"\n"
-                        f"  output: {output}\n"
-                        f"  expected output: {test.test_param.param_info.gap_expect_stdout}"
-                    )
-            typer.echo(f"Test {test.test_param.format()} {test_desc}")
+            rich_print_test_check(
+                test.test_param.format(),
+                checked_result,
+                (
+                    test.test_param.param_info.gap_expect,
+                    test.test_param.param_info.gap_expect_stdout,
+                ),
+            )
     except Exception as e:
         typer.echo(f"Error: {e}")
         raise typer.Exit(code=1)

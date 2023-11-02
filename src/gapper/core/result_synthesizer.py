@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List, Protocol, Self
+from typing import TYPE_CHECKING, List, Protocol, Self
 
 from gapper.core.errors import InternalError
-from gapper.core.problem import Problem
 from gapper.core.test_result import TestResult
-from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
+
+if TYPE_CHECKING:
+    from gapper.core.problem import Problem
+    from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
 class PostTestFn(Protocol):
