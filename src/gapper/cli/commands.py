@@ -7,10 +7,10 @@ from gapper.cli.rich_test_result_output import rich_print_test_results
 from gapper.core.file_handlers import AutograderZipper
 from gapper.core.injection import InjectionHandler
 from gapper.core.problem import Problem
+from gapper.core.result_synthesizer import ResultSynthesizer
 from gapper.core.tester import Tester
 from gapper.gradescope import run_autograder
 from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
-from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
 from gapper.gradescope.vars import (
     AUTOGRADER_METADATA,
     AUTOGRADER_OUTPUT,
@@ -161,7 +161,13 @@ def run(
     problem = Problem.from_path(path)
     tester = Tester(problem)
     test_results = tester.load_submission_from_path(submission).run(metadata)
-    score_obtained = GradescopeJson.synthesize_score(test_results, total_score)
+    score_obtained = (
+        ResultSynthesizer(
+            results=test_results, post_tests=problem.post_tests, total_score=total_score
+        )
+        .run_post_tests()
+        .synthesize_score()
+    )
     rich_print_test_results(test_results, score_obtained, total_score)
 
 

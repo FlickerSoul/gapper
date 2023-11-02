@@ -2,15 +2,25 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import (TYPE_CHECKING, Callable, Generator, Generic, Iterable,
-                    List, Optional, ParamSpec, TypeVar, overload)
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Generator,
+    Generic,
+    Iterable,
+    List,
+    Optional,
+    ParamSpec,
+    TypeVar,
+    overload,
+)
 
-from gapper.core.errors import (MultipleProblemsDefinedError,
-                                NoProblemDefinedError)
+from gapper.core.errors import MultipleProblemsDefinedError, NoProblemDefinedError
 from gapper.core.unittest_wrapper import TestCaseWrapper
 from gapper.core.utils import ModuleLoader
 
 if TYPE_CHECKING:
+    from gapper.core.result_synthesizer import PostTest
     from gapper.core.test_parameter import TestParam
 
 ProbInputType = ParamSpec("ProbInputType")
@@ -35,6 +45,7 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         self._config: ProblemConfig = config
         self._solution = solution
         self._test_params: List[TestParam] = []
+        self._post_tests: List[PostTest] = []
 
     @property
     def config(self) -> ProblemConfig:
@@ -49,11 +60,18 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         return self._solution
 
     @property
+    def post_tests(self) -> List[PostTest]:
+        return self._post_tests
+
+    @property
     def expected_submission_name(self) -> str:
         return self.solution.__name__
 
     def add_test_parameter(self, test_param: TestParam) -> None:
         self._test_params.append(test_param)
+
+    def add_post_test(self, post_test: PostTest) -> None:
+        self._post_tests.append(post_test)
 
     def __call__(
         self, *args: ProbInputType.args, **kwargs: ProbInputType.kwargs

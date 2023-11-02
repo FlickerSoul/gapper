@@ -10,7 +10,6 @@ from gapper.core.errors import InternalError
 
 if TYPE_CHECKING:
     from gapper.core.test_result import TestResult
-    from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
 VisibilityType = Literal["hidden", "after_due_date", "after_published", "visible"]
@@ -99,87 +98,14 @@ class GradescopeJson:
     visibility: VisibilityType = "visible"
     stdout_visibility: Optional[str] = None
 
-    @staticmethod
-    def synthesize_score(results: List[TestResult], total_score: float) -> float:
-        results_with_score = []
-        results_with_weight = []
-
-        max_score_sum = 0.0
-        weight_sum = 0
-
-        for res in results:
-            if res.max_score is None and res.weight is None:
-                raise InternalError(
-                    "The max_score and weight of a test (result) cannot both be None."
-                )
-
-            if res.max_score is not None and res.weight is not None:
-                raise InternalError(
-                    "The max_score and weight of a test (result) cannot both be set."
-                )
-
-            if res.max_score is not None:
-                results_with_score.append(res)
-                max_score_sum += res.max_score
-            elif res.weight is not None:
-                results_with_weight.append(res)
-                weight_sum += res.weight
-            else:
-                raise InternalError(
-                    f"The max_score and weight of a test (result) cannot both be None, "
-                    f"but {res.rich_test_name} has both being None."
-                )
-
-        if max_score_sum > total_score:
-            raise InternalError(
-                f"The sum of the scores ({max_score_sum}) of all tests must be less than or equal to the "
-                f"total points for the assignment ({total_score})."
-            )
-
-        remaining_score = total_score - max_score_sum
-
-        for res in results_with_weight:
-            assert res.weight is not None
-            res.max_score = res.weight * remaining_score / weight_sum
-            res.weight = None
-
-        for res in results:
-            if res.score is not None:
-                if res.score < 0:
-                    raise InternalError(
-                        f"Test {res.name} has a negative score ({res.score})."
-                    )
-
-                if res.extra_points is not None:
-                    raise InternalError(
-                        f"In test ({res.name}) extra score is ignored because a score is set through custom test check."
-                    )
-
-                continue
-
-            assert res.max_score is not None
-
-            # interpret score with pass status
-            if res.pass_status == "passed":
-                res.score = (
-                    res.max_score + 0 if res.extra_points is None else res.extra_points
-                )
-            else:
-                res.score = 0
-
-        return sum((res.score for res in results), 0.0)
-
     @classmethod
     def from_test_results(
         cls,
         results: List[TestResult],
-        metadata: GradescopeSubmissionMetadata,
+        score: float,
         save_path: Path | None = None,
         **kwargs,
     ) -> GradescopeJson:
-        # this has to be calculated first
-        # so that we can use it to calculate the score
-        score = cls.synthesize_score(results, metadata.assignment.total_points)
         gs_json = cls(
             score=score,
             tests=[GradescopeTestJson.from_test_result(result) for result in results],
