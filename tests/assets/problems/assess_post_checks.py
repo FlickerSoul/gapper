@@ -2,7 +2,7 @@ import ast
 import inspect
 from typing import Any, Tuple
 
-from gapper import problem, test_case
+from gapper import problem, test_case, test_cases
 from gapper.core.test_result import TestResult
 from gapper.core.unittest_wrapper import TestCaseWrapper
 
@@ -33,6 +33,10 @@ def recursive_check(
         )
 
 
+# @test_cases.params(
+#     20, 30, gap_post_checks=[recursive_check]
+# )  # this is expected to not work
+@test_cases.singular_params(0, 1, 5, gap_post_checks=recursive_check)
 @test_case(10, gap_post_checks=[recursive_check])
 @problem()
 def fib(n: int) -> int:
