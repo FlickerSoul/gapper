@@ -16,7 +16,9 @@ if TYPE_CHECKING:
 class CustomTestFn(Protocol):
     def __call__[
         T
-    ](self, param: TestCaseWrapper, proxy: TestResult, expected: T, actual: T) -> None:
+    ](
+        self, param: TestCaseWrapper, result_proxy: TestResult, expected: T, actual: T
+    ) -> None:
         ...
 
 
@@ -31,7 +33,7 @@ class PostChecksFn(Protocol):
     ](
         self,
         param: TestCaseWrapper,
-        proxy: TestResult,
+        result_proxy: TestResult,
         solution: T,
         submission: T,
         expected_results: Tuple[Any, str | None],
