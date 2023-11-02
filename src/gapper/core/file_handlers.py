@@ -5,6 +5,7 @@ from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 
 from gapper.core.tester import Tester
+from gapper.gradescope.vars import DEFAULT_TESTER_PICKLE_NAME
 
 
 class AutograderZipper:
@@ -47,9 +48,9 @@ class AutograderZipper:
 
     def _copy_tester_pickle(self, zip_file: ZipFile) -> None:
         with TemporaryDirectory() as temp_dir:
-            path = Path(temp_dir) / "tester.pckl"
+            path = Path(temp_dir) / DEFAULT_TESTER_PICKLE_NAME
             self._tester.dump_to(path)
-            zip_file.write(path, arcname="tester.pckl")
+            zip_file.write(path, arcname=DEFAULT_TESTER_PICKLE_NAME)
 
     def zip_file_path(self, path: Path, zip_file: ZipFile, root: Path) -> None:
         """Zip a file or folder.
