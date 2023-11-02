@@ -310,6 +310,10 @@ class TestParamBundle:
         | Sequence[CustomEqualityCheckFn]
         | None = None,
         gap_override_test: CustomTestFn | Sequence[CustomTestFn] | None = None,
+        gap_post_checks: List[List[PostChecksFn]]
+        | List[PostChecksFn]
+        | PostChecksFn
+        | None = None,
         gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
         gap_is_pipeline: bool | Sequence[bool] = False,
         gap_max_score: float | Sequence[float] | None = None,
@@ -338,6 +342,10 @@ class TestParamBundle:
         | Sequence[CustomEqualityCheckFn]
         | None = None,
         gap_override_test: CustomTestFn | Sequence[CustomTestFn] | None = None,
+        gap_post_checks: List[List[PostChecksFn]]
+        | List[PostChecksFn]
+        | PostChecksFn
+        | None = None,
         gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
         gap_is_pipeline: bool | Sequence[bool] = False,
         gap_weight: float | Sequence[float] | None = None,
