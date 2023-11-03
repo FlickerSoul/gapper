@@ -104,7 +104,11 @@ class ResultSynthesizer:
 
     @staticmethod
     def synthesize_score_for(*, results: List[TestResult], total_score: float) -> float:
-        """Synthesize the score from the results."""
+        """Synthesize the score from the results.
+
+        :param results: The results to synthesize the score from.
+        :param total_score: The total score of the assignment.
+        """
         results_with_score = []
         results_with_weight = []
 
@@ -112,14 +116,10 @@ class ResultSynthesizer:
         weight_sum = 0
 
         for res in results:
-            if res.max_score is None and res.weight is None:
-                raise InternalError(
-                    "The max_score and weight of a test (result) cannot both be None."
-                )
-
             if res.max_score is not None and res.weight is not None:
                 raise InternalError(
-                    "The max_score and weight of a test (result) cannot both be set."
+                    "The max_score and weight of a test (result) cannot both be set. "
+                    f"But {res.rich_test_name} has both being None."
                 )
 
             if res.max_score is not None:
@@ -130,8 +130,8 @@ class ResultSynthesizer:
                 weight_sum += res.weight
             else:
                 raise InternalError(
-                    f"The max_score and weight of a test (result) cannot both be None, "
-                    f"but {res.rich_test_name} has both being None."
+                    f"The max_score and weight of a test (result) cannot both be None. "
+                    f"But {res.rich_test_name} has both being None."
                 )
 
         if max_score_sum > total_score:
@@ -151,7 +151,7 @@ class ResultSynthesizer:
             if res.score is not None:
                 if res.score < 0:
                     raise InternalError(
-                        f"Test {res.name} has a negative score ({res.score})."
+                        f"Test {res.rich_test_name} has a negative score ({res.score})."
                     )
 
                 if res.is_passed and res.extra_points is not None:
