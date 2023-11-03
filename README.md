@@ -26,4 +26,3 @@ Please refer to the [Wiki page](https://github.com/FlickerSoul/gapper/wiki) of t
 ## TODO: 
 
 - [ ] Add support debug support 
-- [ ] Dev Documentation/Wiki
