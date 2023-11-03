@@ -159,7 +159,7 @@ class TestCaseWrapper(TestCase):
         return result
 
     def check_test(self) -> Tuple[bool, Any, str] | None:
-        """Check if the test passes.
+        """Check if the test passes against the gap_expect and gap_expect_stdout.
 
         :return: True if the test passes, False if the test fails, None if the test is skipped.
         """
@@ -269,7 +269,7 @@ class TestCaseWrapper(TestCase):
         return result
 
     def load_context(self, context: ContextManager) -> Self:
-        """Load the context into the test case.
+        """Load the submission context into the test case.
 
         :param context: The context to load.
         """
@@ -277,7 +277,7 @@ class TestCaseWrapper(TestCase):
         return self
 
     def load_metadata(self, metadata: GradescopeSubmissionMetadata | None) -> Self:
-        """Load the metadata into the test case.
+        """Load the submission metadata into the test case.
 
         :param metadata: The metadata to load. The metadata could be None.
         """

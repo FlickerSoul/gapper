@@ -23,8 +23,16 @@ class PostTestFn(Protocol):
 
 
 class PostTest:
+    """A decorator for post tests. Will be used as @post_test() decorator."""
+
     def __init__(self, post_test_fn: PostTestFn, as_test_case: bool = True) -> None:
-        """A decorator for post tests.
+        """A decorator for specifying post tests. Will be used as @post_test().
+
+            from gapper import post_test, problem
+
+            @post_test()
+            @problem()
+            ...
 
         :param post_test_fn: The function to be called after all tests are run.
         :param as_test_case: Whether to treat the post test as a test case.

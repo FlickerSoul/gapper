@@ -77,6 +77,8 @@ class ParamInfo:
 
 
 class ParamExtractor:
+    """A class to extract the gap test parameter."""
+
     def __init__(self, kwargs: Dict[str, Any]) -> None:
         """Initialize the gap test parameter."""
         gap_params = type(self).extra_gap_info(kwargs)
@@ -142,6 +144,11 @@ class ParamExtractor:
 
 
 class TestParam(ParamExtractor):
+    """A class to represent a test case (parameter). Will be used as @test_case() decorator.
+
+    :cvar pipeline: specify test case using pipeline actions.
+    """
+
     pipeline: ClassVar[partial[TestParam]]
 
     @overload
@@ -293,6 +300,16 @@ test_case.pipeline = partial(TestParam, gap_is_pipeline=True)
 
 
 class TestParamBundle:
+    """A class to represent a test parameter bundle (test_cases). Will be used as @test_cases() decorator.
+
+    :cvar params: specify test cases using parameters.
+    :cvar param_iter: specify test cases using parameter iterators.
+    :cvar singular_params: specify test cases using singular parameters.
+    :cvar singular_param_iter: specify test cases using singular parameter iterators.
+    :cvar zip: specify test cases using zip.
+    :cvar product: specify test cases using product.
+    """
+
     params: ClassVar[partial[TestParamBundle]]
     param_iter: ClassVar[partial[TestParamBundle]]
     zip: ClassVar[partial[TestParamBundle]]
