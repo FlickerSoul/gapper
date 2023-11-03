@@ -23,18 +23,12 @@ PassStateType = Literal["passed", "failed"]
 class GradescopeTestJson:
     """The JSON schema for a single Test.
 
-    :param score : Optional[float]
-        The test's score. Required if no top-level score is set.
-    :param max_score : Optional[float]
-        The max score for the test.
-    :param name : Optional[str]
-        The test's name.
-    :param output : Optional[str]
-        Human-readable text output of the test.
-    :param tags : Optional[List[str]]
-        Tags for the test.
-    :param visibility : str
-        The test's visibility. "hidden", "visible", "after_due_date", "after_published"
+    :param score: The test's score. Required if no top-level score is set.
+    :param max_score: The max score for the test.
+    :param name: The test's name.
+    :param output: Human-readable text output of the test.
+    :param tags: Tags for the test.
+    :param visibility: The test's visibility. "hidden", "visible", "after_due_date", "after_published"
     """
 
     score: Optional[float] = field(default=None)
@@ -74,20 +68,12 @@ class GradescopeJson:
     schema. Those are documented on the autograder documentation, here:
     <https://gradescope-autograders.readthedocs.io/en/latest/specs/>.
 
-    Attributes
-    ----------
-    :param tests : List[_GradescopeJsonTest]
-        The tests for the problem. Required if no global score provided.
-    :param score : Optional[float]
-        The overall score. Required if any test has no set score.
-    :param execution_time : Optional[int]
-        The execution time of all the tests, in seconds.
-    :param output : Optional[str]
-        The top-level, human-readable text output for all the problems.
-    :param visibility : Optional[str]
-        The default visibility for each test. Overridden by test-specific settings.
-    :param stdout_visibility : Optional[str]
-        Whether to show stdout for the tests. Same options as for visibility.
+    :param tests: The tests for the problem. Required if no global score provided.
+    :param score: The overall score. Required if any test has no set score.
+    :param execution_time: The execution time of all the tests, in seconds.
+    :param output: The top-level, human-readable text output for all the problems.
+    :param visibility: The default visibility for each test. Overridden by test-specific settings.
+    :param stdout_visibility: Whether to show stdout for the tests. Same options as for visibility.
     """
 
     score: Optional[float] = None

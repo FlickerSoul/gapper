@@ -17,24 +17,15 @@ from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
 class GradescopeAssignmentMetadata:
     """The JSON schema for Gradescope's assignment settings.
 
-    :param due_date : datetime
-        The assignment's due date.
-    :param group_size : Optional[int]
-        The maximum group size on a group assignment.
-    :param group_submission : bool
-        Whether group submission is allowed.
-    :param id : int
-        The assignment's ID.
-    :param course_id : int
-        The course's ID.
-    :param late_due_date : Optional[datetime]
-        The late due date, or None if late submission disallowed.
-    :param release_date : datetime
-        The assignment's release date.
-    :param title : str
-        The assignment's title.
-    :param total_points : float
-        The total point value of the assignment.
+    :param due_date: The assignment's due date.
+    :param group_size: The maximum group size on a group assignment.
+    :param group_submission: Whether group submission is allowed.
+    :param id: The assignment's ID.
+    :param course_id: The course's ID.
+    :param late_due_date: The late due date, or None if late submission disallowed.
+    :param release_date: The assignment's release date.
+    :param title: The assignment's title.
+    :param total_points: The total point value of the assignment.
     """
 
     due_date: datetime = field(
@@ -71,12 +62,9 @@ class GradescopeAssignmentMetadata:
 class GradescopeAssignmentUser:
     """The JSON schema for a 'user' (submitter) of a Gradescope assignment.
 
-    :param email : str
-        The submitter's email.
-    :param id : int
-        The submitter's ID.
-    :param name : str
-        The submitter's name.
+    :param email: The submitter's email.
+    :param id: The submitter's ID.
+    :param name: The submitter's name.
     """
 
     email: str
@@ -89,12 +77,9 @@ class GradescopeAssignmentUser:
 class GradescopePreviousSubmission:
     """The JSON schema for a previous submission record.
 
-    :param submission_time : datetime
-        The time of the previous submission.
-    :param score : float
-        The previous submission's score.
-    :param results : GradescopeJson
-        The results.json file from the previous submission.
+    :param submission_time: The time of the previous submission.
+    :param score: The previous submission's score.
+    :param results: The results.json file from the previous submission.
     """
 
     submission_time: datetime = field(
@@ -114,18 +99,12 @@ class GradescopeSubmissionMetadata:
     """The JSON schema for Gradescope's submission metadata.
 
     See Also https://gradescope-autograders.readthedocs.io/en/latest/submission_metadata/
-    :param id : int
-        The submission's ID.
-    :param created_at : datetime
-        The time the submission was created.
-    :param assignment : GradescopeAssignmentMetadata
-        The assignment's metadata.
-    :param submission_method : Literal["upload", "GitHub", "Bitbucket"]
-        The submission method.
-    :param users : List[GradescopeAssignmentUser]
-        The submitters' metadata.
-    :param previous_submissions : List[GradescopePreviousSubmission]
-        The previous submissions' metadata.
+    :param id: The submission's ID.
+    :param created_at: The time the submission was created.
+    :param assignment: The assignment's metadata.
+    :param submission_method: The submission method.
+    :param users: The submitters' metadata.
+    :param previous_submissions: The previous submissions' metadata.
     """
 
     id: int
