@@ -1,6 +1,8 @@
 # @test_case(s) -- `TestParam` and `TestParamBundle`
 
-Note that 
+## Note
+
+`test_case` and `param` are aliases of `TestParam`, and `test_cases` is a alias of `TestParamBundle` respectively.
 
 ```python
 from gapper import test_case, param
