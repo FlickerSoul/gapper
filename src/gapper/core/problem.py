@@ -10,7 +10,6 @@ from typing import (
     Generic,
     Iterable,
     List,
-    Optional,
     ParamSpec,
     TypeVar,
     overload,
@@ -166,8 +165,8 @@ def problem(
 def problem(
     *,
     is_script: bool = False,
-    check_stdout: Optional[bool] = None,
-    mock_input: Optional[bool] = None,
+    check_stdout: bool = False,
+    mock_input: bool = False,
     context: Iterable[str] = (),
 ) -> Callable[
     [Callable[ProbInputType, ProbOutputType]], Problem[ProbInputType, ProbOutputType]
@@ -187,9 +186,6 @@ def problem(
         config = ProblemConfig(True, True)
 
     else:
-        check_stdout = bool(check_stdout) or False
-        mock_input = bool(mock_input) or False
-
         config = ProblemConfig(check_stdout, mock_input)
 
     config.captured_context = context
