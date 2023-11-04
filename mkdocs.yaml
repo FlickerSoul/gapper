@@ -1,7 +1,8 @@
 site_name: gapper API Reference
 site_description: The API Reference for gapper module, a Python autograder generator for Gradescope.
 repo_url: https://github.com/FlickerSoul/gapper
-site_dir: docs
+site_dir: site
+docs_dir: docs
 copyright: Copyright &copy; 2023 Larry Zeng and Contributors
 
 nav:
