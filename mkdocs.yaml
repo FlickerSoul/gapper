@@ -45,6 +45,9 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
 
+extra_css:
+  - css/api-styling.css
+
 plugins:
   - search
   - mkdocstrings:
@@ -59,3 +62,4 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
       use_pygments: true
+  - pymdownx.superfences

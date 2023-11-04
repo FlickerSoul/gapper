@@ -1,0 +1,38 @@
+h2.doc-heading>code {
+    font-size: inherit;
+}
+
+h3.doc-heading {
+    margin-bottom: 0;
+}
+
+div.doc-contents > p {
+    margin-block-start: 0.25em;
+}
+
+h2.doc-heading:before {
+    content: url("doc-icon.svg");
+    display: inline-block;
+    height: 32px;
+    width: 32px;
+    vertical-align: -15%;
+}
+
+@media (prefers-color-scheme: dark) {
+    h2.doc-heading:before {
+        content: url("doc-icon-dark.svg");
+    }
+}
+
+div.doc-contents:not(.first) {
+    border-left-color: rgb(55, 60, 62);
+}
+
+div.doc-contents:not(.first) {
+    padding-left: 15px;
+    border-left: 1px solid rgba(230, 230, 230);
+}
+
+div.doc-class>div.doc-contents {
+    border-left-width: 2px;
+}
