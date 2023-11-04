@@ -29,7 +29,13 @@ ProbOutputType = TypeVar("ProbOutputType")
 
 @dataclass
 class ProblemConfig:
-    """Problem configuration."""
+    """Problem configuration.
+
+    :param check_stdout: Whether to check the stdout of the solution.
+    :param mock_input: Whether to mock the input of the solution.
+    :param captured_context: The context to capture from the submission.
+    :param is_script: Whether this problem is a script.
+    """
 
     check_stdout: bool = False
     mock_input: bool = False

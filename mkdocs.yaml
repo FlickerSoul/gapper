@@ -13,8 +13,8 @@ nav:
     - API/test_result.md
     - API/test_case_wrapper.md
     - API/pipeline_support.md
-    - API/tester.md
     - API/result_synthesizer.md
+    - API/tester.md
     - API/gradescope_data_types.md
     - API/errors.md
 
