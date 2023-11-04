@@ -190,16 +190,18 @@ def problem(
         if check_stdout is not None or mock_input is not None:
             raise ValueError("Cannot specify check_stdout or mock_input for a script.")
 
-        config = ProblemConfig(True, True)
+        check_stdout, mock_input = True, True
 
     else:
         check_stdout = bool(check_stdout) or False
         mock_input = bool(mock_input) or False
 
-        config = ProblemConfig(check_stdout, mock_input)
-
-    config.captured_context = context
-    config.is_script = is_script
+    config = ProblemConfig(
+        check_stdout=check_stdout,
+        mock_input=mock_input,
+        captured_context=context,
+        is_script=is_script,
+    )
 
     def _wrapper(
         fn: Callable[ProbInputType, ProbOutputType]
