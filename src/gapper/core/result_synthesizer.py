@@ -60,8 +60,8 @@ class ResultSynthesizer:
     def __init__(
         self,
         *,
-        results: List[TestResult] = None,
-        post_tests: List[PostTest] = None,
+        results: List[TestResult] | None = None,
+        post_tests: List[PostTest] | None = None,
         metadata: GradescopeSubmissionMetadata | None = None,
         total_score: float | None = None,
     ) -> None:

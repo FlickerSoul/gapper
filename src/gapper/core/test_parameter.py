@@ -339,8 +339,6 @@ class TestParamBundle:
         gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
         gap_is_pipeline: bool | Sequence[bool] = False,
         gap_max_score: float | Sequence[float] | None = None,
-        gap_product: bool = False,
-        gap_zip: bool = False,
         gap_params: bool = False,
         gap_param_iter: bool = False,
         gap_singular_params: bool = False,
@@ -371,8 +369,6 @@ class TestParamBundle:
         gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
         gap_is_pipeline: bool | Sequence[bool] = False,
         gap_weight: float | Sequence[float] | None = None,
-        gap_product: bool = False,
-        gap_zip: bool = False,
         gap_params: bool = False,
         gap_param_iter: bool = False,
         gap_singular_params: bool = False,
@@ -396,12 +392,20 @@ class TestParamBundle:
 
         :param args: The arguments for the test parameter bundle.
         :param gap_product: Whether to take the cartesian product of the arguments.
+            .. deprecated::
+                Use params, param_iter, singular_params, singular_param_iter instead.
         :param gap_zip: Whether to zip the arguments.
+            .. deprecated::
+                Use params, param_iter, singular_params, singular_param_iter instead.
         :param gap_params: Whether to parse the arguments as parameters.
         :param gap_param_iter: Whether to parse the argument as parameter iterators.
         :param gap_singular_params: Whether to parse the arguments as singular parameters.
         :param gap_singular_param_iter: Whether to parse the arguments as singular parameter iterators.
         :param kwargs: The keyword arguments for the test parameter bundle.
+            .. seealso::
+                :class:`gapper.core.test_parameter.TestParam`
+               seealso::
+                :class:`gapper.core.test_parameter.ParamExtractor`
         """
         if (
             gap_params
