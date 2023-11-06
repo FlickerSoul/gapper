@@ -37,7 +37,7 @@ class CustomTestFn(Protocol):
             .. seealso:: :class:`gapper.core.test_result.TestResult` for more details.
         :param solution: The expected result, which will be the solution under the @problem decorator
         :param submission: The actual result, which will be the submission from the student
-        :raises AssertionError: It should raise assertion error if it fails.
+        :raises AssertionError: It should raise assertion error if test fails.
         """
         ...
 
@@ -51,7 +51,7 @@ class CustomEqualityCheckFn(Protocol):
         :param expected: The expected result, which will be executed result of the solution
         :param actual: The actual result, which will be the executed result of the submission
         :param msg: The message to be printed if the equality check fails.
-        :raises AssertionError: It should raise assertion error if it tails
+        :raises AssertionError: It should raise assertion error if the equality check tails
         """
         ...
 
@@ -84,6 +84,7 @@ class PostChecksFn(Protocol):
             It is a tuple of expected execution result and expected stdout result.
         :param actual_results: The actual results of the test case.
             It is a tuple of actual execution result and actual stdout result.
+        :raises AssertionError: It should raise assertion error if the post check fails.
         """
         ...
 
