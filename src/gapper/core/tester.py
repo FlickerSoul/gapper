@@ -131,9 +131,9 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         )
 
         if len(submission_list) == 0:
-            raise NoSubmissionError()
+            raise NoSubmissionError(self.problem.expected_submission_name)
         elif len(submission_list) > 1:
-            raise MultipleSubmissionError()
+            raise MultipleSubmissionError(self.problem.expected_submission_name)
 
         self._submission = submission_list[0]
         self._logger.debug("Submission loaded")

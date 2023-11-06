@@ -92,7 +92,7 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
     @property
     def expected_submission_name(self) -> str:
         """The expected name of the submission."""
-        return getattr(self.solution, "__name__", None) or "unnamed_submission"
+        return getattr(self.solution, "__name__", None) or "<unnamed_submission>"
 
     def add_test_parameter(self, test_param: TestParam) -> None:
         """Add a test parameter to the problem.
