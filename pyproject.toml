@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "gapper"
 version = "0.5.2"
-description = "Gradescope Assignment Packer"
+description = "Gradescope Autograder Packer"
 authors = ["Heyuan Zeng <hi@universe.observer>"]
 license = "MIT"
 readme = "README.md"
