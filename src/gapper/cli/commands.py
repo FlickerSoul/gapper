@@ -144,6 +144,9 @@ def gen(
     save_path: SavePathOpt,
     auto_inject: AutoInjectOpt,
     inject: InjectOpt,
+    confirm_overwrite: Annotated[
+        bool, typer.Option("--confirm-overwrite", "-y", is_flag=True)
+    ] = False,
     verbose: VerboseOpt = False,
 ) -> None:
     """Generate the autograder for a problem."""
@@ -161,7 +164,7 @@ def gen(
     if save_path.is_dir():
         save_path = save_path / f"{problem.expected_submission_name}.zip"
 
-    if typer.confirm(
+    if confirm_overwrite or typer.confirm(
         f"File {save_path.absolute()} already exists. Overwrite?", default=True
     ):
         typer.echo("Overwriting...")

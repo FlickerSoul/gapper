@@ -75,6 +75,7 @@ def test_problem_gen(prob: Path, verbose: bool, tmp_path: Path) -> None:
         str(prob.absolute()),
         "-s",
         str(tmp_path.absolute()),
+        "-y",
     ]
 
     if verbose:
