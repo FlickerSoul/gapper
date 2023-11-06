@@ -94,7 +94,7 @@ def check(
     path: ProblemPathArg,
     auto_inject: AutoInjectOpt,
     inject: InjectOpt,
-    verbose: VerboseOpt,
+    verbose: VerboseOpt = False,
 ) -> None:
     """Check if the problem is defined correctly again the gap_check fields."""
     setup_root_logger(verbose)
@@ -128,7 +128,7 @@ def gen(
     save_path: SavePathOpt,
     auto_inject: AutoInjectOpt,
     inject: InjectOpt,
-    verbose: VerboseOpt,
+    verbose: VerboseOpt = False,
 ) -> None:
     """Generate the autograder for a problem."""
     setup_root_logger(verbose)
@@ -155,7 +155,7 @@ def run(
     metadata_path: MetadataOpt,
     auto_inject: AutoInjectOpt,
     inject: InjectOpt,
-    verbose: VerboseOpt,
+    verbose: VerboseOpt = False,
     total_score: float = 20,
 ) -> None:
     """Run the autograder on an example submission."""
@@ -198,7 +198,6 @@ def run(
 
 @app.command()
 def run_in_prod(
-    debug: VerboseOpt,
     tester_path: Annotated[
         Path,
         typer.Argument(help="The path to the tester pickle file."),
@@ -217,9 +216,10 @@ def run_in_prod(
         Path,
         typer.Argument(help="The path to the output file."),
     ] = AUTOGRADER_OUTPUT,
+    verbose: VerboseOpt = False,
 ) -> None:
     """Run the autograder in production mode."""
-    setup_root_logger(debug)
+    setup_root_logger(verbose)
 
     cli_logger.debug("Autograder run in production mode")
     run_autograder(tester_path, submission_dir, metadata_file, output_file)
