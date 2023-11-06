@@ -233,7 +233,7 @@ def run_in_prod(
         Path,
         typer.Argument(help="The path to the output file."),
     ] = AUTOGRADER_OUTPUT,
-    verbose: VerboseOpt = False,
+    verbose: VerboseOpt = True,
 ) -> None:
     """Run the autograder in production mode."""
     setup_root_logger(verbose)
