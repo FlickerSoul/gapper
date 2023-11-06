@@ -45,10 +45,14 @@ def run_autograder(
             save_path=output_file
         )
     except InternalError as e:
-        _autograder_main_logger.error(f"Internal error happened during execution: {e}")
+        _autograder_main_logger.error(
+            f"Internal error happened during execution: {e.format()}"
+        )
         error = InternalError(e)
     except StudentError as e:
-        _autograder_main_logger.error(f"Student error happened during execution: {e}")
+        _autograder_main_logger.error(
+            f"Student error happened during execution: {e.format()}"
+        )
         error = e
     except Exception as e:
         _autograder_main_logger.error(f"Unknown error occurred: {e}.")
