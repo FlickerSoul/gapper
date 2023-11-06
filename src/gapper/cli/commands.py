@@ -187,7 +187,7 @@ def run(
     cli_logger.debug("Test results generated from tester")
 
     score_obtained = ResultSynthesizer(
-        results=test_results, post_tests=problem.post_tests, total_score=total_score
+        results=test_results, total_score=total_score
     ).synthesize_score()
     cli_logger.debug(f"Score obtained from synthesizer {score_obtained}")
 
