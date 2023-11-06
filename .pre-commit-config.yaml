@@ -25,7 +25,7 @@ repos:
           - pre-push
       - id: pytest-check-without-integration
         name: pytest-check-without-integration
-        entry: poetry run pytest --ignore=tests/integration_tests.py
+        entry: poetry run pytest --ignore-glob=*integration_test.py
         language: system
         pass_filenames: false
         always_run: true
