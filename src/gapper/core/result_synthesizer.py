@@ -3,24 +3,18 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, List, Protocol, Self
+from typing import TYPE_CHECKING, List, Self
 
 from gapper.core.errors import InternalError
 from gapper.core.test_result import TestResult
+from gapper.core.utils import PostTestFn
 from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
 
 if TYPE_CHECKING:
     from gapper.core.problem import Problem
     from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
-__all__ = ["ResultSynthesizer", "PostTest", "post_test", "PostTestFn"]
-
-
-class PostTestFn(Protocol):
-    def __call__(
-        self, synthesizer: ResultSynthesizer, result_proxy: TestResult | None
-    ) -> None:
-        ...
+__all__ = ["ResultSynthesizer", "PostTest", "post_test"]
 
 
 class PostTest:
@@ -37,6 +31,11 @@ class PostTest:
 
         :param post_test_fn: The function to be called after all tests are run.
         :param as_test_case: Whether to treat the post test as a test case.
+            If this is set to True, the post test will incur a TestResult instance to be created
+            and be added to the pool of all test results after the post testing phrase is completed.
+            The test result will then be used to synthesize the score.
+
+            If this is set to False, the post test will not incur a TestResult instance.
         """
         self.post_test_fn = post_test_fn
         self.as_test_case = as_test_case

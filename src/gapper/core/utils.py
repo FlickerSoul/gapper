@@ -9,26 +9,57 @@ from pathlib import Path
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Protocol, Self, Tuple
 
+from gapper.core.result_synthesizer import ResultSynthesizer
+
 if TYPE_CHECKING:
     from gapper.core.test_result import TestResult
     from gapper.core.unittest_wrapper import TestCaseWrapper
 
 
 class CustomTestFn(Protocol):
+    """The custom test function protocol."""
+
     def __call__[
         T
     ](
-        self, param: TestCaseWrapper, result_proxy: TestResult, expected: T, actual: T
+        self,
+        param: TestCaseWrapper,
+        result_proxy: TestResult,
+        solution: T,
+        submission: T,
     ) -> None:
+        """The function type to be called for custom tests.
+
+        :param param: The TestCaseWrapper instance.
+            It contains the test case information, including the test case name, the test case
+            parameters, etc.
+        :param result_proxy: The TestResult instance of this custom test to be used as a proxy.
+            You can use this proxy to affect the test result of this test case. See
+            .. seealso:: :class:`gapper.core.test_result.TestResult` for more details.
+        :param solution: The expected result, which will be the solution under the @problem decorator
+        :param submission: The actual result, which will be the submission from the student
+        :raises AssertionError: It should raise assertion error if it fails.
+        """
         ...
 
 
 class CustomEqualityCheckFn(Protocol):
+    """The custom equality check function protocol."""
+
     def __call__[T](self, expected: T, actual: T, msg: str | None = None) -> None:
+        """The function type to be called for custom equality checks.
+
+        :param expected: The expected result, which will be executed result of the solution
+        :param actual: The actual result, which will be the executed result of the submission
+        :param msg: The message to be printed if the equality check fails.
+        :raises AssertionError: It should raise assertion error if it tails
+        """
         ...
 
 
 class PostChecksFn(Protocol):
+    """The post check function protocol."""
+
     def __call__[
         T
     ](
@@ -40,6 +71,39 @@ class PostChecksFn(Protocol):
         expected_results: Tuple[Any, str | None],
         actual_results: Tuple[Any, str | None],
     ) -> None:
+        """The function type to be called for post checks all the equality check of a test case.
+
+        :param param: The TestCaseWrapper instance.
+            It contains the test case information, including the test case name, the test case
+            parameters, etc.
+        :param result_proxy: The TestResult instance of this custom test to be used as a proxy.
+            You can use this proxy to affect the test result of this test case. See
+            .. seealso:: :class:`gapper.core.test_result.TestResult` for more details.
+        :param solution: The expected result, which will be the solution under the @problem decorator
+        :param submission: The actual result, which will be the submission from the student
+        :param expected_results: The expected results of the test case.
+            It is a tuple of expected execution result and expected stdout result.
+        :param actual_results: The actual results of the test case.
+            It is a tuple of actual execution result and actual stdout result.
+        """
+        ...
+
+
+class PostTestFn(Protocol):
+    def __call__(
+        self, synthesizer: ResultSynthesizer, result_proxy: TestResult | None
+    ) -> None:
+        """The function type to be called after all tests are run.
+
+        :param synthesizer: The ResultSynthesizer instance.
+            You can access the tested test case results from this. Note that,
+            the number of results will remain the same through the post testing phrase,
+            even though you have post tests with as_test_case set to True.
+            The results from post tests will not be added until the post testing phrase
+            is completed.
+        :param result_proxy: The TestResult instance of this post test to be used as a proxy.
+            If the post_test's as_test_case is set to False, this will be None.
+        """
         ...
 
 
