@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import Annotated, List, Optional
 
@@ -18,8 +19,11 @@ from gapper.gradescope.vars import (
     AUTOGRADER_SUBMISSION,
     AUTOGRADER_TESTER_PICKLE,
 )
+from gapper.logger_utils import setup_root_logger
 
 app = typer.Typer()
+
+cli_logger = logging.getLogger("gapper.cli")
 
 ProblemPathArg = Annotated[
     Path, typer.Argument(help="The path to the problem python file.")
@@ -47,13 +51,12 @@ SavePathOpt = Annotated[
         file_okay=False,
     ),
 ]
-DebugOpt = Annotated[
+VerboseOpt = Annotated[
     bool,
     typer.Option(
-        "--debug",
-        "-d",
-        help="Whether to run in debug mode.",
-        default_factory=lambda: False,
+        "--verbose",
+        "-v",
+        help="Whether to run in verbose mode.",
     ),
 ]
 MetadataOpt = Annotated[
@@ -89,14 +92,20 @@ InjectOpt = Annotated[
 @app.command()
 def check(
     path: ProblemPathArg,
-    debug: DebugOpt,
     auto_inject: AutoInjectOpt,
     inject: InjectOpt,
+    verbose: VerboseOpt,
 ) -> None:
     """Check if the problem is defined correctly again the gap_check fields."""
+    setup_root_logger(verbose)
+
     InjectionHandler().setup(auto_inject, inject).inject()
+    cli_logger.debug("Injection setup")
 
     problem = Problem.from_path(path)
+    cli_logger.debug("Problem loaded")
+
+    cli_logger.debug("Start test checking")
     try:
         for test in problem.generate_tests():
             checked_result = test.check_test()
@@ -119,40 +128,62 @@ def gen(
     save_path: SavePathOpt,
     auto_inject: AutoInjectOpt,
     inject: InjectOpt,
-    debug: DebugOpt,
+    verbose: VerboseOpt,
 ) -> None:
     """Generate the autograder for a problem."""
+    setup_root_logger(verbose)
+
     InjectionHandler().setup(auto_inject, inject).inject()
+    cli_logger.debug("Injection setup")
 
     problem = Problem.from_path(path)
+    cli_logger.debug("Problem loaded")
+
     tester = Tester(problem)
+    cli_logger.debug("Tester generated from problem")
+
     AutograderZipper(tester).generate_zip(
         save_path / f"{problem.expected_submission_name}.zip"
     )
+    cli_logger.debug("Autograder zip generated")
 
 
 @app.command()
 def run(
     path: ProblemPathArg,
     submission: SubmissionPathArg,
-    debug: DebugOpt,
     metadata_path: MetadataOpt,
     auto_inject: AutoInjectOpt,
     inject: InjectOpt,
+    verbose: VerboseOpt,
     total_score: float = 20,
 ) -> None:
     """Run the autograder on an example submission."""
+    setup_root_logger(verbose)
+
+    cli_logger.debug(f"Try loading metadata from {metadata_path.absolute()}")
     metadata = (
         None
         if metadata_path is None
         else GradescopeSubmissionMetadata.from_file(metadata_path)
     )
+    cli_logger.debug(f"Metadata loaded: {metadata}")
+
     total_score = metadata.assignment.total_points if metadata else total_score
+    cli_logger.debug(f"Total score is set to: {total_score}")
+
     InjectionHandler().setup(auto_inject, inject).inject()
+    cli_logger.debug("Injection setup")
 
     problem = Problem.from_path(path)
+    cli_logger.debug("Problem loaded")
+
     tester = Tester(problem)
+    cli_logger.debug("Tester generated from problem")
+
     test_results = tester.load_submission_from_path(submission).run(metadata)
+    cli_logger.debug("Test results generated from tester")
+
     score_obtained = (
         ResultSynthesizer(
             results=test_results, post_tests=problem.post_tests, total_score=total_score
@@ -160,12 +191,14 @@ def run(
         .run_post_tests()
         .synthesize_score()
     )
+    cli_logger.debug(f"Score obtained from synthesizer {score_obtained}")
+
     rich_print_test_results(test_results, score_obtained, total_score)
 
 
 @app.command()
 def run_in_prod(
-    debug: DebugOpt,
+    debug: VerboseOpt,
     tester_path: Annotated[
         Path,
         typer.Argument(help="The path to the tester pickle file."),
@@ -186,7 +219,11 @@ def run_in_prod(
     ] = AUTOGRADER_OUTPUT,
 ) -> None:
     """Run the autograder in production mode."""
+    setup_root_logger(debug)
+
+    cli_logger.debug("Autograder run in production mode")
     run_autograder(tester_path, submission_dir, metadata_file, output_file)
+    cli_logger.debug("Autograder run finished")
 
 
 __all__ = ["app"]

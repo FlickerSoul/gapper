@@ -30,7 +30,3 @@ pip install -e gapper
 ### Usage 
 
 Please refer to the [Wiki page](https://github.com/FlickerSoul/gapper/wiki) of this repository for detailed usage. For API reference, please visit [here](https://gapper.universe.observer).
-
-## TODO: 
-
-- [ ] Add support debug support 

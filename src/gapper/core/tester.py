@@ -1,6 +1,7 @@
 """This module contains the definition of the tester class."""
 from __future__ import annotations
 
+import logging
 from copy import deepcopy
 from pathlib import Path
 from types import ModuleType
@@ -22,6 +23,9 @@ from gapper.core.utils import ModuleLoader
 
 if TYPE_CHECKING:
     from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+
+
+_tester_logger = logging.getLogger("gapper.tester")
 
 
 class ProblemUnpickler(Unpickler):
@@ -47,6 +51,9 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         self._problem: Problem[ProbInputType, ProbOutputType] = problem
         self._submission: Any | None = None
         self._submission_context: ContextManager = ContextManager()
+        self._logger = _tester_logger.getChild(
+            f"Tester_{problem and problem.expected_submission_name}"
+        )
 
     @property
     def problem(self) -> Problem[ProbInputType, ProbOutputType]:
@@ -113,9 +120,15 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         :raises MultipleSubmissionError: If multiple submissions are found.
         """
         if self.problem.config.is_script:
+            self._logger.debug("Loading script submission")
             submission_list = list(self._load_script_submission_from_path(path))
         else:
+            self._logger.debug("Loading object submission")
             submission_list = list(self._load_object_submission_from_path(path))
+
+        self._logger.debug(
+            f"Found {len(submission_list)} submissions: {submission_list}"
+        )
 
         if len(submission_list) == 0:
             raise NoSubmissionError()
@@ -123,6 +136,7 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
             raise MultipleSubmissionError()
 
         self._submission = submission_list[0]
+        self._logger.debug("Submission loaded")
 
         return self
 
@@ -142,6 +156,9 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
                 raise MultipleContextValueError(context_value_name)
 
             self.submission_context[context_value_name] = context_value
+            self._logger.debug(
+                f"Loaded context value for {context_value_name} from {md}"
+            )
 
         return self
 
@@ -150,6 +167,8 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         for context_value_name in self.problem.config.captured_context:
             if context_value_name not in self.submission_context:
                 raise MissingContextValueError(context_value_name)
+
+        self._logger.debug("Context completeness check passed")
 
     def run(
         self, metadata: GradescopeSubmissionMetadata | None = None
@@ -169,6 +188,8 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         test_results: List[TestResult] = []
 
         for test in self.problem.generate_tests():
+            self._logger.debug(f"Running test {test.test_param.format()}")
+
             test_results.append(
                 test.load_metadata(metadata)
                 .load_context(self.submission_context)
@@ -189,6 +210,8 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         with open(path, "rb") as f:
             tester = ProblemUnpickler(f).load()
 
+        _tester_logger.debug(f"Tester loaded from path {path.absolute()}")
+
         return tester
 
     def dump_to(self, path: Path | str) -> None:
@@ -198,3 +221,5 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         """
         with open(path, "wb") as f:
             dump(self, f)
+
+        _tester_logger.debug(f"Tester dumped to path {path.absolute()}")

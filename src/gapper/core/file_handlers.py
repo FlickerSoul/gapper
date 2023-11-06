@@ -1,5 +1,6 @@
 """A module to handle the autograder zip file generation."""
 import importlib.resources
+import logging
 from pathlib import Path
 from sys import version_info
 from tempfile import TemporaryDirectory
@@ -7,6 +8,8 @@ from zipfile import ZipFile
 
 from gapper.core.tester import Tester
 from gapper.gradescope.vars import DEFAULT_TESTER_PICKLE_NAME
+
+_zip_logger = logging.getLogger("gapper.zip")
 
 
 class AutograderZipper:
@@ -34,6 +37,10 @@ class AutograderZipper:
             self._copy_gs_setup(zip_file)
             self._copy_tester_pickle(zip_file)
 
+        _zip_logger.debug(
+            f"Completed autograder zip file at {zip_file_path.absolute()}."
+        )
+
     def _copy_gs_setup(self, zip_file: ZipFile) -> None:
         with importlib.resources.as_file(
             importlib.resources.files("gapper.gradescope.resources")
@@ -47,11 +54,15 @@ class AutograderZipper:
                 if file.name in self.gs_setup_files:
                     self.zip_file_path(file, zip_file, resource_folder)
 
+            _zip_logger.debug("Copied gs setup files into zip file.")
+
     def _copy_tester_pickle(self, zip_file: ZipFile) -> None:
         with TemporaryDirectory() as temp_dir:
             path = Path(temp_dir) / DEFAULT_TESTER_PICKLE_NAME
             self._tester.dump_to(path)
             zip_file.write(path, arcname=DEFAULT_TESTER_PICKLE_NAME)
+
+        _zip_logger.debug("Copied tester pickle into zip file.")
 
     def zip_file_path(self, path: Path, zip_file: ZipFile, root: Path) -> None:
         """Zip a file or folder.
@@ -77,3 +88,5 @@ class AutograderZipper:
             importlib.resources.files("gapper")
         ) as package_path:
             self.zip_file_path(package_path, zip_file, package_path.parent)
+
+        _zip_logger.debug("Copied gapper package into zip file.")

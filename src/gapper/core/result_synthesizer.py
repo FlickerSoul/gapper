@@ -1,6 +1,7 @@
 """This module contains a class to synthesize the results from a tester."""
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, List, Protocol, Self
 
@@ -48,6 +49,9 @@ class PostTest:
         problem.add_post_test(self)
         return problem
 
+    def __repr__(self) -> str:
+        return f"PostTest(post_test_fn={self.post_test_fn}, as_test_case={self.as_test_case})"
+
 
 post_test = PostTest
 
@@ -72,6 +76,14 @@ class ResultSynthesizer:
         self._post_tests: List[PostTest] = post_tests or []
         self._metadata = metadata
         self._total_score = total_score
+        self._logger = logging.getLogger("ResultSynthesizer")
+        self._logger.debug(
+            f"ResultSynthesizer created with results with "
+            f"total score {total_score}, "
+            f"{len(self._results)} tests, "
+            f"{len(self._post_tests)} post tests, "
+            f"and metadata {metadata}"
+        )
 
     @property
     def results(self) -> List[TestResult]:
@@ -102,12 +114,17 @@ class ResultSynthesizer:
                 result_proxy = TestResult(post_test_case.post_test_fn.__name__)
             else:
                 result_proxy = None
+
+            self._logger.debug(f"Running post test {post_test_case}")
             post_test_case.post_test_fn(self, result_proxy)
+            self._logger.debug(f"Post test {post_test_case} completed")
 
             if result_proxy is not None:
                 addition_test_results.append(result_proxy)
 
         self._results.extend(addition_test_results)
+        self._logger.debug("Post tests completed and results added")
+
         return self
 
     @staticmethod
@@ -193,7 +210,10 @@ class ResultSynthesizer:
         :param save_path: The path to save the Gradescope JSON to.
         :param kwargs: The keyword arguments to pass to the GradescopeJson constructor.
         """
+        self._logger.debug("Converting results to Gradescope JSON")
         score = self.run_post_tests().synthesize_score()
+        self._logger.debug(f"Score obtained: {score} | Total score: {self.total_score}")
+
         return GradescopeJson.from_test_results(
             self._results, score, save_path, **kwargs
         )

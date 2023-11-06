@@ -1,6 +1,7 @@
 """This module contains the TestCaseWrapper class, and related help definitions."""
 from __future__ import annotations
 
+import logging
 from copy import deepcopy
 from typing import (
     TYPE_CHECKING,
@@ -25,6 +26,8 @@ if TYPE_CHECKING:
     from gapper.core.test_parameter import TestParam
     from gapper.core.utils import CustomEqualityCheckFn
     from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+
+_test_wrapper_logger = logging.getLogger("gapper.test_wrapper")
 
 
 class ContextManager(dict):
@@ -75,6 +78,7 @@ class TestCaseWrapper(TestCase):
         self._problem = problem
         self._context: ContextManager | None = None
         self._metadata: GradescopeSubmissionMetadata | None = None
+        self._logger = _test_wrapper_logger.getChild(self.test_param.format())
 
     @property
     def test_param(self) -> TestParam:
@@ -163,10 +167,13 @@ class TestCaseWrapper(TestCase):
 
         :return: True if the test passes, False if the test fails, None if the test is skipped.
         """
+
+        self._logger.debug(f"Checking test")
         if (
             self.test_param.param_info.gap_expect is None
             and self.test_param.param_info.gap_expect_stdout is None
         ):
+            self._logger.debug(f"Test skipped")
             return None
 
         if self.test_param.param_info.gap_override_test is not None:
@@ -179,7 +186,11 @@ class TestCaseWrapper(TestCase):
             else:
                 check_fn = self.assertEqual  # type: ignore
 
+            self._logger.debug(f"Checking test equality with fn {check_fn.__name__}")
+
             eval_fn: EvalFn = self._select_eval_fn()
+
+            self._logger.debug(f"Selected evaluation fn {eval_fn.__name__}")
 
             actual_result, actual_out = eval_fn(self.problem.solution, self.test_param)
 
@@ -189,12 +200,19 @@ class TestCaseWrapper(TestCase):
                 try:
                     check_fn(actual_result, self.test_param.param_info.gap_expect)
                 except AssertionError:
+                    self._logger.debug(
+                        f"Check failed because it does not meet gap_expect"
+                    )
                     flag = False
 
             if self.test_param.param_info.gap_expect_stdout is not None:
-                flag = flag & (
-                    actual_out == self.test_param.param_info.gap_expect_stdout
-                )
+                try:
+                    assert actual_out == self.test_param.param_info.gap_expect_stdout
+                except AssertionError:
+                    self._logger.debug(
+                        f"Check failed because it does not meet gap_expect_stdout"
+                    )
+                    flag = False
 
             return flag, actual_result, actual_out
 
@@ -220,14 +238,18 @@ class TestCaseWrapper(TestCase):
                 )
             )
 
+        self._logger.debug(f"Test result initialized: {result}")
+
     def _run_test(self, submission: Any, result: TestResult) -> TestResult:
         """Run the test on the submission.
 
         :param submission: The submission to be tested.
         :param result: The result object to be used and written to.
         """
+        self._logger.debug(f"Running test on submission {submission}")
 
         if self.test_param.param_info.gap_override_test is not None:
+            self._logger.debug("Handing testing to gap_override_test")
             self.test_param.param_info.gap_override_test(
                 self, result, self.problem.solution, submission
             )
@@ -239,7 +261,11 @@ class TestCaseWrapper(TestCase):
             else:
                 check_fn = self.assertEqual  # type: ignore
 
+            self._logger.debug(f"Checking test equality with fn {check_fn.__name__}")
+
             eval_fn: EvalFn = self._select_eval_fn()
+
+            self._logger.debug(f"Selected evaluation fn {eval_fn.__name__}")
 
             expected_result, expected_out = eval_fn(
                 self.problem.solution, self.test_param
@@ -251,6 +277,8 @@ class TestCaseWrapper(TestCase):
                 check_fn(expected_out, actual_out)
 
             if self.test_param.param_info.gap_post_checks is not None:
+                self._logger.debug(f"Running post checks")
+
                 if not isinstance(self.test_param.param_info.gap_post_checks, Sequence):
                     post_checks = [self.test_param.param_info.gap_post_checks]
                 else:
@@ -266,6 +294,8 @@ class TestCaseWrapper(TestCase):
                         (actual_result, actual_out),
                     )
 
+        self._logger.debug("Test completed")
+
         return result
 
     def load_context(self, context: ContextManager) -> Self:
@@ -274,6 +304,7 @@ class TestCaseWrapper(TestCase):
         :param context: The context to load.
         """
         self._context = deepcopy(context)
+        self._logger.debug(f"Context loaded: {self._context}")
         return self
 
     def load_metadata(self, metadata: GradescopeSubmissionMetadata | None) -> Self:
@@ -282,4 +313,5 @@ class TestCaseWrapper(TestCase):
         :param metadata: The metadata to load. The metadata could be None.
         """
         self._metadata = metadata
+        self._logger.debug(f"Metadata loaded: {self._metadata}")
         return self

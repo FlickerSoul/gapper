@@ -1,6 +1,7 @@
 """This module defines the Problem class, which is the abstract representation of a assignment problem."""
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import (
@@ -26,6 +27,8 @@ if TYPE_CHECKING:
 
 ProbInputType = ParamSpec("ProbInputType")
 ProbOutputType = TypeVar("ProbOutputType")
+
+_problem_logger = logging.getLogger("gapper.problem")
 
 
 @dataclass
@@ -62,6 +65,9 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         self._solution = solution
         self._test_params: List[TestParam] = []
         self._post_tests: List[PostTest] = []
+        self._logger = _problem_logger.getChild(self.expected_submission_name)
+
+        self._logger.debug(f"Problem created with config: {self._config}")
 
     @property
     def config(self) -> ProblemConfig:
@@ -86,13 +92,14 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
     @property
     def expected_submission_name(self) -> str:
         """The expected name of the submission."""
-        return self.solution.__name__
+        return getattr(self.solution, "__name__", None) or "unnamed_submission"
 
     def add_test_parameter(self, test_param: TestParam) -> None:
         """Add a test parameter to the problem.
 
         :param test_param: The test parameter to add.
         """
+        self._logger.debug(f"Adding test parameter {test_param.format()}")
         self._test_params.append(test_param)
 
     def add_post_test(self, post_test: PostTest) -> None:
@@ -100,6 +107,7 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
 
         :param post_test: The post test to add.
         """
+        self._logger.debug(f"Adding post test {post_test}")
         self._post_tests.append(post_test)
 
     def __call__(
@@ -115,18 +123,23 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
     def _search_problem(cls, path: Path) -> Generator[Problem, None, None]:
         if path.is_dir():
             if path.name == "__pycache__":
+                _problem_logger.debug("Skipping __pycache__ directory")
                 return
 
             for sub_path in path.iterdir():
                 yield from cls._search_problem(sub_path)
         else:
             if path.suffix != ".py":
+                _problem_logger.warning(
+                    f"Skipping {path.absolute()} as it is not a python file"
+                )
                 return
 
             spec, mod = cls._load_module_spec_and_module(path, exec_mod=True)
 
             for val in mod.__dict__.values():
                 if isinstance(val, Problem):
+                    _problem_logger.debug(f"Found problem {val} in {path.absolute()}")
                     yield val
 
     @classmethod
@@ -137,6 +150,7 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
                      But only one problem can be defined in a directory.
         """
         problems = list(cls._search_problem(path))
+        _problem_logger.debug(f"Found {len(problems)} problems in {path}")
 
         if len(problems) == 0:
             raise NoProblemDefinedError()

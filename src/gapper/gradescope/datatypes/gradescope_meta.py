@@ -1,6 +1,7 @@
 """The JSON schemas for Gradescope's metadata."""
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -10,6 +11,8 @@ from dataclasses_json import config, dataclass_json
 from marshmallow import fields
 
 from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
+
+_gradescope_meta_logger = logging.getLogger("gapper.gradescope_meta")
 
 
 @dataclass_json
@@ -126,4 +129,9 @@ class GradescopeSubmissionMetadata:
 
         :param path: The path to load the submission metadata from.
         """
-        return cls.from_json(path.read_text())  # type: ignore
+
+        obj = cls.from_json(path.read_text())  # type: ignore
+        _gradescope_meta_logger.debug(
+            f"Submission metadata loaded from {path.absolute()}"
+        )
+        return obj

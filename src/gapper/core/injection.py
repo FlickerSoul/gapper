@@ -4,12 +4,13 @@ This module is used to inject reusable code into the
 problem definition script and be used in testing.
 """
 import importlib.util
+import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import ModuleType
 from typing import Optional, Self, Sequence, Set
 
-import typer
+_injection_logger = logging.getLogger("gapper.injection")
 
 
 @dataclass
@@ -27,6 +28,10 @@ class InjectionHandler:
         :param auto_inject: Whether to auto inject the injection folder.
         :param inject_module_paths: The paths to the modules to be injected.
         """
+        _injection_logger.debug(
+            f"Injection is setup with auto_inject={auto_inject}, and inject_module_paths={inject_module_paths}."
+        )
+
         if auto_inject:
             self.find_auto_injection(
                 auto_inject if isinstance(auto_inject, Path) else None
@@ -81,11 +86,13 @@ class InjectionHandler:
         :raises ValueError: If no module to inject into.
         """
         module: ModuleType | None = mod or self.create_injection_module()
+        _injection_logger.debug(f"Injecting into module {module}.")
 
         if not module:
             raise ValueError("No module to inject into.")
 
         for file_path in self.content_to_be_injected:
+            _injection_logger.debug(f"Injecting {file_path.absolute()} into {module}.")
             _inject_content(module, file_path)
 
     def find_auto_injection(self, path: Path | None = None) -> None:
@@ -95,9 +102,15 @@ class InjectionHandler:
                      If not specified, the current working directory will be used.
         """
         path = path or Path.cwd()
+        _injection_logger.debug(
+            f"Start searching for auto injection folder from {path.absolute()}."
+        )
 
         self.content_to_be_injected.add(
             _find_injection_dir(self.auto_injected_folder_name, path)
+        )
+        _injection_logger.debug(
+            f"Content to be injected updated to {self.content_to_be_injected}"
         )
 
 
@@ -111,12 +124,18 @@ def _grab_user_defined_properties(module: ModuleType) -> Set[str]:
 
 def _inject_content(module: Optional[ModuleType], content_path: Path) -> None:
     if content_path.is_dir():
+        _injection_logger.debug(
+            "Path {content_path} is a directory, injecting recursively."
+        )
+
         for sub_content in content_path.iterdir():
             _inject_content(module, sub_content)
     elif content_path.is_file():
+        _injection_logger.debug(f"Path {content_path.absolute()} is a file, injecting.")
+
         if content_path.suffix != ".py":
-            typer.secho(
-                f"Skipping {content_path} as it is not a python file", fg="yellow"
+            _injection_logger.warning(
+                f"Skipping {content_path.absolute()} as it is not a python file"
             )
             return
 
@@ -134,6 +153,9 @@ def _inject_content(module: Optional[ModuleType], content_path: Path) -> None:
 
         for wanted_property in wanted_properties:
             setattr(module, wanted_property, getattr(temp_module, wanted_property))
+            _injection_logger.debug(
+                f"Injected {wanted_property} from {content_path} into {module}"
+            )
 
 
 def _find_injection_dir(injection_dir: str, starting_dir: Optional[Path]) -> Path:
@@ -145,6 +167,10 @@ def _find_injection_dir(injection_dir: str, starting_dir: Optional[Path]) -> Pat
         if (target_folder := current_path / injection_dir).exists():
             break
 
+        _injection_logger.debug(
+            f"Did not find {injection_dir} in {current_path.absolute()}."
+        )
+
         current_path = current_path.parent
 
     if not target_folder.exists():
@@ -153,6 +179,9 @@ def _find_injection_dir(injection_dir: str, starting_dir: Optional[Path]) -> Pat
         )
 
     if not target_folder.is_dir():
-        raise ValueError(f"Injection directory ({target_folder}) is not a directory")
+        raise ValueError(
+            f"Injection directory ({target_folder.absolute()}) is not a directory"
+        )
 
+    _injection_logger.debug(f"Found injection directory at {target_folder.absolute()}.")
     return target_folder
