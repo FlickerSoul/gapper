@@ -161,7 +161,9 @@ def run(
     """Run the autograder on an example submission."""
     setup_root_logger(verbose)
 
-    cli_logger.debug(f"Try loading metadata from {metadata_path.absolute()}")
+    cli_logger.debug(
+        f"Try loading metadata from {metadata_path and metadata_path.absolute()}"
+    )
     metadata = (
         None
         if metadata_path is None
