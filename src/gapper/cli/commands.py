@@ -1,5 +1,7 @@
 import logging
+from functools import wraps
 from pathlib import Path
+from time import time
 from typing import Annotated, List, Optional
 
 import typer
@@ -89,7 +91,20 @@ InjectOpt = Annotated[
 ]
 
 
+def _timed[T](fn: T) -> T:
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        start = time()
+        result = fn(*args, **kwargs)
+        end = time()
+        cli_logger.debug(f"Time elapsed: {end - start}s")
+        return result
+
+    return wrapper
+
+
 @app.command()
+@_timed
 def check(
     path: ProblemPathArg,
     auto_inject: AutoInjectOpt,
@@ -123,6 +138,7 @@ def check(
 
 
 @app.command()
+@_timed
 def gen(
     path: ProblemPathArg,
     save_path: SavePathOpt,
@@ -150,6 +166,7 @@ def gen(
 
 
 @app.command()
+@_timed
 def run(
     path: ProblemPathArg,
     submission: SubmissionPathArg,
@@ -196,6 +213,7 @@ def run(
 
 
 @app.command()
+@_timed
 def run_in_prod(
     tester_path: Annotated[
         Path,
