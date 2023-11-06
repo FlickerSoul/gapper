@@ -517,7 +517,10 @@ class TestParamBundle:
         gap_zip: bool = False,
         **kwargs: Any,
     ) -> List[TestParam]:
-        """Parse parameters for zip or product."""
+        """Parse parameters for zip or product.
+
+        :deprecated: Use params, param_iter, singular_params, singular_param_iter instead.
+        """
         if not gap_zip ^ gap_product:
             raise ValueError("exactly one of gap_zip or gap_product must be True")
         combinator = product if gap_product else zip

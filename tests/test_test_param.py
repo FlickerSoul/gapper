@@ -3,7 +3,7 @@ from typing import Any, Dict, Sequence
 
 import pytest
 
-from gapper import param, problem, test_case, test_cases
+from gapper import param, test_case, test_cases
 
 
 def test_weight_and_max_score_cannot_be_specified_both() -> None:
@@ -15,38 +15,32 @@ def test_weight_and_max_score_cannot_be_specified_both() -> None:
 
 def test_error_in_test_param_when_invalid_gap_kwargs() -> None:
     with pytest.raises(ValueError, match="Unknown gap keyword arguments:"):
-
-        @test_case([1], gap_hidden=True, gap_invalid_kwarg=1)
-        @problem()
-        def square(a: int) -> int:
-            return a**2
+        test_case([1], gap_hidden=True, gap_invalid_kwarg=1)
 
 
 def test_error_in_test_params_when_invalid_gap_kwargs() -> None:
     with pytest.raises(ValueError, match="Unknown gap keyword arguments:"):
-
-        @test_cases.params([1], gap_hidden=True, gap_invalid_kwarg=1)
-        @problem()
-        def square(a: int) -> int:
-            return a**2
+        test_cases.params([1], gap_hidden=True, gap_invalid_kwarg=1)
 
 
 def test_test_params_gap_kwargs_length_matching() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "all gap_ keyword args must have the same length as the test cases,"
+        ),
+    ):
+        test_cases.params([1], [2], [3], gap_hidden=[True, False])
 
-        @test_cases.params([1], [2], [3], gap_hidden=[True, False])
-        @problem()
-        def square(a: int) -> int:
-            return a**2
-
-    with pytest.raises(ValueError):
-
-        @test_cases.params(
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "all gap_ keyword args must have the same length as the test cases,"
+        ),
+    ):
+        test_cases.params(
             [1], [2], [3], gap_hidden=[True, False, False], gap_max_score=[1, 2]
         )
-        @problem()
-        def square(a: int) -> int:
-            return a**2
 
 
 @pytest.mark.parametrize(
