@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, List, Literal, Optional
 
 from dataclasses_json import dataclass_json
 
-from gapper.core.errors import InternalError
+from gapper.core.errors import InternalError, StudentError
 
 if TYPE_CHECKING:
     from gapper.core.test_result import TestResult
@@ -102,6 +102,22 @@ class GradescopeJson:
             score=score,
             tests=[GradescopeTestJson.from_test_result(result) for result in results],
             **kwargs,
+        )
+
+        if save_path is not None:
+            with open(save_path, "w") as f:
+                f.write(gs_json.to_json())  # type: ignore
+
+        return gs_json
+
+    @classmethod
+    def from_error(
+        cls, error: InternalError | StudentError, save_path: Path | None = None
+    ) -> GradescopeJson:
+        gs_json = cls(
+            score=0,
+            tests=[],
+            output=error.format(),
         )
 
         if save_path is not None:

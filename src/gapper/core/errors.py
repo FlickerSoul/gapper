@@ -46,6 +46,10 @@ class ErrorFormatter(Exception):
         raise NotImplementedError
 
 
+class StudentError(ErrorFormatter):
+    pass
+
+
 class TestFailedError(ErrorFormatter):
     """Raised when a test fails."""
 
@@ -53,7 +57,7 @@ class TestFailedError(ErrorFormatter):
         return f"Test Assertion Failed. The reason is following: \n{self.format_args(indent_num=2)}\n"
 
 
-class SubmissionSyntaxError(ErrorFormatter):
+class SubmissionSyntaxError(StudentError):
     """Raised when a submission has syntax errors."""
 
     def format(self) -> str:
@@ -69,34 +73,34 @@ class InternalError(ErrorFormatter):
             "  ",
         )
         return (
-            f"Internal Error. "
+            f"Internal Error. Please report this to the developers. \n"
             f"The reason is following: \n{self.format_args(indent_num=2)}\n"
             f"Stack Trace: \n{tb_info}"
         )
 
 
-class NoSubmissionError(ErrorFormatter):
+class NoSubmissionError(StudentError):
     """Raised when no submission is loaded."""
 
     def format(self) -> str:
         return "No submission {} is found."
 
 
-class MultipleSubmissionError(ErrorFormatter):
+class MultipleSubmissionError(StudentError):
     def format(self) -> str:
         return "Multiple submissions are found."
 
 
-class MissingContextValueError(ErrorFormatter):
+class MissingContextValueError(StudentError):
     def __init__(self, value_name: str):
         super().__init__()
         self.value_name = value_name
 
     def format(self) -> str:
-        return f"Cannot find variable {self.value_name} in the context."
+        return f"Cannot find variable {self.value_name} in the submission context."
 
 
-class MultipleContextValueError(ErrorFormatter):
+class MultipleContextValueError(StudentError):
     def __init__(self, value_name: str):
         super().__init__()
         self.value_name = value_name
@@ -105,12 +109,12 @@ class MultipleContextValueError(ErrorFormatter):
         return f"Multiple values for variable {self.value_name} in the context."
 
 
-class NoProblemDefinedError(ErrorFormatter):
+class NoProblemDefinedError(InternalError):
     def format(self) -> str:
         return "No problem is defined."
 
 
-class MultipleProblemsDefinedError(ErrorFormatter):
+class MultipleProblemsDefinedError(InternalError):
     def __init__(self, names: Iterable[str]):
         super().__init__()
         self.names = names
