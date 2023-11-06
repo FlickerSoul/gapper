@@ -4,8 +4,9 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gapper)
 ![PyPI - License](https://img.shields.io/pypi/l/gapper)
 ![GitHub Build Workflow Status](https://img.shields.io/github/actions/workflow/status/flickersoul/gapper/python-package.yml)
-![Wiki Badge](https://img.shields.io/badge/Wiki-blue?link=https%3A%2F%2Fgithub.com%2FFlickerSoul%2Fgapper%2Fwiki)
-![API Badge](https://img.shields.io/badge/API_Reference-blue?link=https%3A%2F%2Fgapper.universe.observer)
+[<img src="https://img.shields.io/badge/Wiki-blue?link=https%3A%2F%2Fgithub.com%2FFlickerSoul%2Fgapper%2Fwiki">](https://github.com/FlickerSoul/gapper/wiki)
+[<img src="https://img.shields.io/badge/API_Reference-blue?link=https%3A%2F%2Fgapper.universe.observer">](https://gapper.universe.observer)
+![Code Style Badge](https://img.shields.io/badge/Code_Style-Black-blue)
 
 
 ## What's gapper? 
