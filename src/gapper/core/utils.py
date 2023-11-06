@@ -9,9 +9,8 @@ from pathlib import Path
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Protocol, Self, Tuple
 
-from gapper.core.result_synthesizer import ResultSynthesizer
-
 if TYPE_CHECKING:
+    from gapper.core.result_synthesizer import ResultSynthesizer
     from gapper.core.test_result import TestResult
     from gapper.core.unittest_wrapper import TestCaseWrapper
 
