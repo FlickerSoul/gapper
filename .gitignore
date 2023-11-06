@@ -4,3 +4,5 @@ tmp/
 .pytest_cache
 .mypy_cache
 dist/
+.coverage
+htmlcov/
