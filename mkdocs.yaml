@@ -11,8 +11,9 @@ nav:
     - API/problem.md
     - API/test_cases.md
     - API/test_result.md
-    - API/test_case_wrapper.md
+    - API/utils.md
     - API/pipeline_support.md
+    - API/test_case_wrapper.md
     - API/result_synthesizer.md
     - API/tester.md
     - API/gradescope_data_types.md
