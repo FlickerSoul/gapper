@@ -199,7 +199,39 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
                 )
             )
 
+        self.run_post_tests(results=test_results, metadata=metadata)
+
         return test_results
+
+    def run_post_tests(
+        self,
+        *,
+        results: List[TestResult],
+        metadata: GradescopeSubmissionMetadata | None,
+    ) -> List[TestResult]:
+        """Run the post tests.
+
+        :param results: The results of the tests.
+        :param metadata: The metadata of the submission, which could be None.
+        """
+        addition_test_results = []
+        for post_test_case in self.problem.post_tests:
+            if post_test_case.as_test_case:
+                result_proxy = TestResult(post_test_case.post_test_fn.__name__)
+            else:
+                result_proxy = None
+
+            self._logger.debug(f"Running post test {post_test_case}")
+            post_test_case.post_test_fn(results, result_proxy, metadata)
+            self._logger.debug(f"Post test {post_test_case} completed")
+
+            if result_proxy is not None:
+                addition_test_results.append(result_proxy)
+
+        results.extend(addition_test_results)
+        self._logger.debug("Post tests completed and results added")
+
+        return results
 
     @classmethod
     def from_file(cls, path: Path) -> Tester:

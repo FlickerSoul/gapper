@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, List, Self
+from typing import TYPE_CHECKING, List
 
 from gapper.core.errors import InternalError
 from gapper.core.test_result import TestResult
@@ -60,19 +60,16 @@ class ResultSynthesizer:
         self,
         *,
         results: List[TestResult] | None = None,
-        post_tests: List[PostTest] | None = None,
         metadata: GradescopeSubmissionMetadata | None = None,
         total_score: float | None = None,
     ) -> None:
         """A class to synthesize the results from a tester.
 
         :param results: The results of the tester.
-        :param post_tests: The post tests to run after all tests are run.
         :param metadata: The metadata of the submission.
         :param total_score: The total score of the assignment.
         """
         self._results: List[TestResult] = results or []
-        self._post_tests: List[PostTest] = post_tests or []
         self._metadata = metadata
         self._total_score = total_score
         self._logger = logging.getLogger("ResultSynthesizer")
@@ -80,7 +77,6 @@ class ResultSynthesizer:
             f"ResultSynthesizer created with results with "
             f"total score {total_score}, "
             f"{len(self._results)} tests, "
-            f"{len(self._post_tests)} post tests, "
             f"and metadata {metadata}"
         )
 
@@ -104,27 +100,6 @@ class ResultSynthesizer:
             return self._metadata.assignment.total_points
         else:
             return self._total_score
-
-    def run_post_tests(self) -> Self:
-        """Run the post tests."""
-        addition_test_results = []
-        for post_test_case in self._post_tests:
-            if post_test_case.as_test_case:
-                result_proxy = TestResult(post_test_case.post_test_fn.__name__)
-            else:
-                result_proxy = None
-
-            self._logger.debug(f"Running post test {post_test_case}")
-            post_test_case.post_test_fn(self, result_proxy)
-            self._logger.debug(f"Post test {post_test_case} completed")
-
-            if result_proxy is not None:
-                addition_test_results.append(result_proxy)
-
-        self._results.extend(addition_test_results)
-        self._logger.debug("Post tests completed and results added")
-
-        return self
 
     @staticmethod
     def synthesize_score_for(*, results: List[TestResult], total_score: float) -> float:
@@ -210,7 +185,7 @@ class ResultSynthesizer:
         :param kwargs: The keyword arguments to pass to the GradescopeJson constructor.
         """
         self._logger.debug("Converting results to Gradescope JSON")
-        score = self.run_post_tests().synthesize_score()
+        score = self.synthesize_score()
         self._logger.debug(f"Score obtained: {score} | Total score: {self.total_score}")
 
         return GradescopeJson.from_test_results(

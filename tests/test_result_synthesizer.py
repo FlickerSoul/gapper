@@ -3,10 +3,8 @@ import re
 import pytest
 
 from gapper.core.errors import InternalError
-from gapper.core.problem import Problem
-from gapper.core.result_synthesizer import PostTest, ResultSynthesizer
+from gapper.core.result_synthesizer import ResultSynthesizer
 from gapper.core.test_result import TestResult
-from tests.conftest import _make_problem_name
 
 
 def test_too_many_max_scores() -> None:
@@ -44,37 +42,6 @@ def test_not_allow_negative_score() -> None:
         match=re.escape("Test dummy result has a negative score (-1)."),
     ):
         ResultSynthesizer.synthesize_score_for(results=results, total_score=1)
-
-
-def test_post_test(request: pytest.FixtureRequest) -> None:
-    problem: Problem = request.getfixturevalue(
-        _make_problem_name("assess_post_tests.py")
-    )
-    results = [
-        TestResult("test result", pass_status="passed", max_score=1, score=1)
-        for _ in range(10)
-    ]
-    old_len = len(results)
-    old_score = sum(result.score for result in results)
-    syn = ResultSynthesizer(
-        results=results, post_tests=problem.post_tests, total_score=10
-    ).run_post_tests()
-
-    assert len(results) == old_len + 1
-    assert syn.synthesize_score() == old_score + 5
-
-
-def test_post_test_without_as_test_case() -> None:
-    post_tests = [
-        PostTest(lambda x, y: None, as_test_case=False),
-        PostTest(lambda x, y: None, as_test_case=True),
-    ]
-
-    result_syn = ResultSynthesizer(results=[], post_tests=post_tests, total_score=10)
-
-    assert len(result_syn.results) == 0
-    result_syn.run_post_tests()
-    assert len(result_syn.results) == 1
 
 
 def test_invalid_total_score() -> None:

@@ -12,6 +12,7 @@ from tests.conftest import (
     SINGLE_SUBMISSION_FOLDER,
     TEST_SUBMISSIONS_FOLDER,
     _make_problem_name,
+    _make_tester_name,
     preset_problem_paths,
 )
 
@@ -81,4 +82,15 @@ def test_dump_and_load(tmp_path: Path, tester_fixture: Tester, name: str) -> Non
     assert (
         restored_tester.submission_context.keys()
         == tester_fixture.submission_context.keys()
+    )
+
+
+def test_post_test(request: pytest.FixtureRequest) -> None:
+    prob_name = "assess_post_tests.py"
+    tester: Tester = request.getfixturevalue(_make_tester_name(prob_name))
+    results = tester.load_submission_from_path(
+        TEST_SUBMISSIONS_FOLDER / prob_name
+    ).run()
+    assert len(tester.problem.test_cases) + len(tester.problem.post_tests) == len(
+        results
     )

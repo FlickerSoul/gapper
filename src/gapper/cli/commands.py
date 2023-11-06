@@ -186,13 +186,9 @@ def run(
     test_results = tester.load_submission_from_path(submission).run(metadata)
     cli_logger.debug("Test results generated from tester")
 
-    score_obtained = (
-        ResultSynthesizer(
-            results=test_results, post_tests=problem.post_tests, total_score=total_score
-        )
-        .run_post_tests()
-        .synthesize_score()
-    )
+    score_obtained = ResultSynthesizer(
+        results=test_results, post_tests=problem.post_tests, total_score=total_score
+    ).synthesize_score()
     cli_logger.debug(f"Score obtained from synthesizer {score_obtained}")
 
     rich_print_test_results(test_results, score_obtained, total_score)

@@ -7,12 +7,12 @@ from importlib.machinery import ModuleSpec
 from io import StringIO
 from pathlib import Path
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, Callable, Iterable, Protocol, Self, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Iterable, List, Protocol, Self, Tuple
 
 if TYPE_CHECKING:
-    from gapper.core.result_synthesizer import ResultSynthesizer
     from gapper.core.test_result import TestResult
     from gapper.core.unittest_wrapper import TestCaseWrapper
+    from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
 class CustomTestFn(Protocol):
@@ -90,18 +90,21 @@ class PostChecksFn(Protocol):
 
 class PostTestFn(Protocol):
     def __call__(
-        self, synthesizer: ResultSynthesizer, result_proxy: TestResult | None
+        self,
+        results: List[TestResult],
+        current_result_proxy: TestResult | None,
+        metadata: GradescopeSubmissionMetadata | None,
     ) -> None:
         """The function type to be called after all tests are run.
 
-        :param synthesizer: The ResultSynthesizer instance.
-            You can access the tested test case results from this. Note that,
-            the number of results will remain the same through the post testing phrase,
-            even though you have post tests with as_test_case set to True.
-            The results from post tests will not be added until the post testing phrase
-            is completed.
-        :param result_proxy: The TestResult instance of this post test to be used as a proxy.
+        :param results: A list of test results from tested test cases.
+            Note that, the number of results will remain the same through
+            the post testing phrase, even though you have post tests with as_test_case
+            set to True. The results from post tests will not be added until the
+            post testing phrase is completed.
+        :param current_result_proxy: The TestResult instance of this post test to be used as a proxy.
             If the post_test's as_test_case is set to False, this will be None.
+        :param metadata: The metadata of the submission.
         """
         ...
 
