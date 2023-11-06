@@ -72,6 +72,12 @@ for _prob_path in preset_problem_paths():
     generate_problem_fixtures(_prob_path)
 
 
+def preset_submission_paths() -> Generator[Path, None, None]:
+    for sub_path in TEST_SUBMISSIONS_FOLDER.iterdir():
+        if sub_path.is_file() and sub_path.suffix == ".py":
+            yield sub_path
+
+
 @pytest.fixture()
 def problem_fixture(request: pytest.FixtureRequest) -> Problem[Any, Any]:
     partial_prob_name: Path = request.param
