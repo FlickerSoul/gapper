@@ -18,6 +18,12 @@ nav:
     - API/gradescope_data_types.md
     - API/errors.md
 
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/FlickerSoul/gapper
+    - icon: fontawesome/brands/telegram
+      link: https://t.me/the_universe_observer
 
 theme:
   name: material
@@ -25,6 +31,7 @@ theme:
     - content.code.annotate
     - content.code.copy
     - navigation.top
+    - navigation.footer
     - search.highlight
     - search.suggest
     - toc.follow
