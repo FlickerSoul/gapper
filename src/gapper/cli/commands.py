@@ -142,10 +142,11 @@ def gen(
     tester = Tester(problem)
     cli_logger.debug("Tester generated from problem")
 
-    AutograderZipper(tester).generate_zip(
-        save_path / f"{problem.expected_submission_name}.zip"
-    )
-    cli_logger.debug("Autograder zip generated")
+    if save_path.is_dir():
+        save_path = save_path / f"{problem.expected_submission_name}.zip"
+
+    AutograderZipper(tester).generate_zip(save_path)
+    cli_logger.info(f"Autograder zip generated successfully at {save_path.absolute()}")
 
 
 @app.command()
