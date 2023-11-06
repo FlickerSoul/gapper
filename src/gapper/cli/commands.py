@@ -161,8 +161,14 @@ def gen(
     if save_path.is_dir():
         save_path = save_path / f"{problem.expected_submission_name}.zip"
 
-    AutograderZipper(tester).generate_zip(save_path)
-    cli_logger.info(f"Autograder zip generated successfully at {save_path.absolute()}")
+    if typer.confirm(
+        f"File {save_path.absolute()} already exists. Overwrite?", default=True
+    ):
+        typer.echo("Overwriting...")
+        AutograderZipper(tester).generate_zip(save_path)
+        typer.echo(f"Autograder zip generated successfully at {save_path.absolute()}")
+    else:
+        typer.echo("Aborted.")
 
 
 @app.command()
