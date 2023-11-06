@@ -13,3 +13,13 @@ repos:
     hooks:
       - id: autoflake
         args: [--remove-all-unused-imports, --in-place]
+  - repo: local
+    hooks:
+      - id: pytest-check
+        name: pytest-check
+        entry: poetry run pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages:
+          - pre-push
