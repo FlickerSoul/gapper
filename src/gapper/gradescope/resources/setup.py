@@ -22,4 +22,11 @@ setup(
     name="gapper",
     version=get_version(),
     install_requires=parse_requirements("requirements.txt"),
+    entry_points={
+        "console_scripts": [
+            "gapper = gapper.cli:main",
+            "gap = gapper.cli:main",
+            "gradescope-autograder-packer = gapper.cli:main",
+        ]
+    },
 )
