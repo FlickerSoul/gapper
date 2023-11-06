@@ -3,16 +3,16 @@ from typing import Any
 
 import pytest
 
+from gapper.core.errors import InternalError, MultipleSubmissionError, NoSubmissionError
 from gapper.core.problem import Problem
-from gapper.core.errors import NoSubmissionError, MultipleSubmissionError, InternalError
 from gapper.core.tester import Tester
 from tests.conftest import (
-    preset_problem_paths,
+    MULTIPLE_SUBMISSIONS_FOLDER,
+    NO_SUBMISSION_FOLDER,
+    SINGLE_SUBMISSION_FOLDER,
     TEST_SUBMISSIONS_FOLDER,
     _make_problem_name,
-    SINGLE_SUBMISSION_FOLDER,
-    NO_SUBMISSION_FOLDER,
-    MULTIPLE_SUBMISSIONS_FOLDER,
+    preset_problem_paths,
 )
 
 

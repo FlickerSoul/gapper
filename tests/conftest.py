@@ -1,7 +1,7 @@
 import importlib.util
 import sys
 from pathlib import Path
-from typing import Any, List, Generator
+from typing import Any, Generator, List
 
 import pytest
 
