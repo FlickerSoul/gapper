@@ -1,9 +1,9 @@
 # Gradescope Autograder Packer (gapper)
 
-![PyPI - Version](https://img.shields.io/pypi/v/gapper)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gapper)
+[<img src="https://img.shields.io/pypi/v/gapper">](https://pypi.org/project/gapper/)
+[<img src="https://img.shields.io/pypi/pyversions/gapper">](https://pypi.org/project/gapper/)
 ![PyPI - License](https://img.shields.io/pypi/l/gapper)
-![GitHub Build Workflow Status](https://img.shields.io/github/actions/workflow/status/flickersoul/gapper/python-package.yml)
+[<img src="https://img.shields.io/github/actions/workflow/status/flickersoul/gapper/python-package.yml">](https://github.com/FlickerSoul/gapper/actions/workflows/python-package.yml)
 [<img src="https://img.shields.io/badge/Wiki-blue?link=https%3A%2F%2Fgithub.com%2FFlickerSoul%2Fgapper%2Fwiki">](https://github.com/FlickerSoul/gapper/wiki)
 [<img src="https://img.shields.io/badge/API_Reference-blue?link=https%3A%2F%2Fgapper.universe.observer">](https://gapper.universe.observer)
 ![Code Style Badge](https://img.shields.io/badge/Code_Style-Black-blue)
