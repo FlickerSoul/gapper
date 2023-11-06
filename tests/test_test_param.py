@@ -1,8 +1,16 @@
+import re
 from typing import Any, Dict, Sequence
 
 import pytest
 
 from gapper import param, problem, test_case, test_cases
+
+
+def test_weight_and_max_score_cannot_be_specified_both() -> None:
+    with pytest.raises(
+        ValueError, match=re.escape("Cannot specify both gap_max_score and gap_weight.")
+    ):
+        test_case([1], gap_weight=1, gap_max_score=1)
 
 
 def test_error_in_test_param_when_invalid_gap_kwargs() -> None:
