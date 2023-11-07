@@ -19,7 +19,12 @@ from unittest.mock import patch
 from gapper.core.errors import InternalError, SubmissionSyntaxError, TestFailedError
 from gapper.core.pipeline_support import PipelineBase
 from gapper.core.test_result import TestResult
-from gapper.core.utils import CaptureStdout, generate_custom_input
+from gapper.core.utils import (
+    CaptureStdout,
+    CustomTestFn,
+    apply_context_on_fn,
+    generate_custom_input,
+)
 
 if TYPE_CHECKING:
     from gapper.core.problem import Problem
@@ -250,9 +255,18 @@ class TestCaseWrapper(TestCase):
 
         if self.test_param.param_info.gap_override_test is not None:
             self._logger.debug("Handing testing to gap_override_test")
-            self.test_param.param_info.gap_override_test(
-                self, result, self.problem.solution, submission
-            )
+            if (
+                self.problem.config.easy_context
+                or self.test_param.param_info.gap_easy_context
+            ):
+                self._logger.debug("Using easy context")
+                self.gap_override_test_with_context(
+                    self, result, self.problem.solution, submission
+                )
+            else:
+                self.test_param.param_info.gap_override_test(
+                    self, result, self.problem.solution, submission
+                )
         else:
             if self.test_param.param_info.gap_override_check:
                 check_fn: CustomEqualityCheckFn = (
@@ -297,6 +311,12 @@ class TestCaseWrapper(TestCase):
         self._logger.debug("Test completed")
 
         return result
+
+    @property
+    def gap_override_test_with_context(self) -> CustomTestFn:
+        return apply_context_on_fn(
+            self.test_param.param_info.gap_override_test, self.context
+        )
 
     def load_context(self, context: ContextManager) -> Self:
         """Load the submission context into the test case.

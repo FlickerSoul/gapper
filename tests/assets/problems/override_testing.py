@@ -50,4 +50,5 @@ __problem_config__ = {
     "check_stdout": False,
     "mock_input": False,
     "captured_context": ["StandardMiddleware"],
+    "easy_context": False,
 }

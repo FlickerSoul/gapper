@@ -49,6 +49,7 @@ class GapReservedKeywords(Enum):
     gap_max_score = "gap_max_score"
     gap_extra_points = "gap_extra_points"
     gap_override_check = "gap_override_check"
+    gap_easy_context = "gap_easy_context"
     gap_override_test = "gap_override_test"
     gap_post_checks = "gap_post_checks"
     gap_description = "gap_description"
@@ -63,6 +64,7 @@ class ParamInfo:
     gap_name: str | None = None
     gap_extra_points: float | None = None
     gap_override_check: CustomEqualityCheckFn | None = None
+    gap_easy_context: bool = False
     gap_override_test: CustomTestFn | None = None
     gap_post_checks: List[PostChecksFn] | PostChecksFn | None = None
     gap_description: str | Iterable[str] | None = None
@@ -161,6 +163,7 @@ class TestParam(ParamExtractor):
         gap_name: str | None = None,
         gap_extra_points: float | None = None,
         gap_override_check: CustomEqualityCheckFn | None = None,
+        gap_easy_context: bool = False,
         gap_override_test: CustomTestFn | None = None,
         gap_post_checks: List[PostChecksFn] | PostChecksFn | None = None,
         gap_description: str | Iterable[str] | None = None,
@@ -177,6 +180,7 @@ class TestParam(ParamExtractor):
         :param gap_name: The name of the test case.
         :param gap_extra_points: The extra credit of the test case.
         :param gap_override_check: The custom equality check function.
+        :param gap_easy_context: Whether to use context directly in gap override tests.
         :param gap_override_test: The custom test function.
         :param gap_post_checks: The custom post check functions.
         :param gap_description: The description of the test case.
@@ -195,6 +199,7 @@ class TestParam(ParamExtractor):
         gap_name: str | None = None,
         gap_extra_points: float | None = None,
         gap_override_check: CustomEqualityCheckFn | None = None,
+        gap_easy_context: bool = False,
         gap_override_test: CustomTestFn | None = None,
         gap_post_checks: List[PostChecksFn] | PostChecksFn | None = None,
         gap_description: str | Iterable[str] | None = None,
@@ -211,6 +216,7 @@ class TestParam(ParamExtractor):
         :param gap_name: The name of the test case.
         :param gap_extra_points: The extra credit of the test case.
         :param gap_override_check: The custom equality check function.
+        :param gap_easy_context: Whether to use context directly in gap override tests.
         :param gap_override_test: The custom test function.
         :param gap_post_checks: The custom post check functions.
         :param gap_description: The description of the test case.
@@ -331,6 +337,7 @@ class TestParamBundle:
         gap_override_check: CustomEqualityCheckFn
         | Sequence[CustomEqualityCheckFn]
         | None = None,
+        gap_easy_context: bool | Sequence[bool] = False,
         gap_override_test: CustomTestFn | Sequence[CustomTestFn] | None = None,
         gap_post_checks: List[List[PostChecksFn]]
         | List[PostChecksFn]
@@ -361,6 +368,7 @@ class TestParamBundle:
         gap_override_check: CustomEqualityCheckFn
         | Sequence[CustomEqualityCheckFn]
         | None = None,
+        gap_easy_context: bool | Sequence[bool] = False,
         gap_override_test: CustomTestFn | Sequence[CustomTestFn] | None = None,
         gap_post_checks: List[List[PostChecksFn]]
         | List[PostChecksFn]

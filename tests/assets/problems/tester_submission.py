@@ -11,4 +11,5 @@ __problem_config__ = {
     "check_stdout": False,
     "mock_input": False,
     "captured_context": (),
+    "easy_context": False,
 }

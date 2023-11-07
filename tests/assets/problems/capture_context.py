@@ -1,4 +1,4 @@
-from typing import Any, Type
+from typing import Type
 
 from gapper import problem, test_case
 from gapper.core.test_result import TestResult
@@ -32,4 +32,5 @@ __problem_config__ = {
     "check_stdout": False,
     "mock_input": False,
     "captured_context": ("GasStation",),
+    "easy_context": False,
 }

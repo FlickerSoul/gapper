@@ -2,17 +2,33 @@
 from __future__ import annotations
 
 import importlib.util
+import logging
 from contextlib import redirect_stdout
+from copy import copy
+from functools import update_wrapper
 from importlib.machinery import ModuleSpec
 from io import StringIO
 from pathlib import Path
-from types import ModuleType
-from typing import TYPE_CHECKING, Any, Callable, Iterable, List, Protocol, Self, Tuple
+from types import FunctionType, ModuleType
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Protocol,
+    Self,
+    Tuple,
+)
 
 if TYPE_CHECKING:
     from gapper.core.test_result import TestResult
     from gapper.core.unittest_wrapper import TestCaseWrapper
     from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+
+
+_util_logger = logging.getLogger("gapper.core.utils")
 
 
 class CustomTestFn(Protocol):
@@ -194,3 +210,60 @@ class ModuleLoader:
     @staticmethod
     def _load_symbol_from_module(md: ModuleType, symbol: str) -> Any:
         return getattr(md, symbol)
+
+
+def apply_context_on_fn[T: FunctionType](f: T, context: dict[str, Any]) -> T:
+    """Apply a context on a function.
+
+    :param f: The function to apply context on.
+    :param context: The context to be applied.
+    """
+    if isinstance(f, FunctionType):
+        _util_logger.debug(f"Applying context {context} on function {f}")
+
+        # update closure with context
+        _util_logger.debug(f"Gathering closure with context")
+        closure_mod: Dict[str, int] = {}
+        if f.__closure__ is not None:
+            for context_var_name in context.keys():
+                try:
+                    closure_pos = f.__code__.co_freevars.index(context_var_name)
+                    _util_logger.debug(
+                        f"Found closure variable {context_var_name} at position {closure_pos}"
+                    )
+                    closure_mod[context_var_name] = closure_pos
+                except ValueError:
+                    _util_logger.debug(
+                        f'Cannot find closure variable "{context_var_name}, skipped"'
+                    )
+
+        g = FunctionType(
+            f.__code__,
+            {
+                **f.__globals__,
+                **{
+                    c_name: c_val
+                    for c_name, c_val in context.items()
+                    if c_name not in closure_mod
+                },
+            },  # copy globals and update with context
+            name=f.__name__,
+            argdefs=f.__defaults__,
+            closure=f.__closure__,
+        )
+        g = update_wrapper(g, f)
+        g.__kwdefaults__ = copy(f.__kwdefaults__)
+
+        _util_logger.debug(f"Function {f} copied")
+
+        for c_name, c_pos in closure_mod.items():
+            _util_logger.debug(
+                f"Updating closure variable {c_name} at position {c_pos}"
+            )
+            g.__closure__[c_pos].cell_contents = context[c_name]
+
+        _util_logger.debug("Closure updated")
+
+        return g
+    else:
+        raise TypeError(f"Cannot apply context on {f} because it is not a function")

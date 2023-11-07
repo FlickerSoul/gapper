@@ -39,11 +39,13 @@ class ProblemConfig:
     :param mock_input: Whether to mock the input of the solution.
     :param captured_context: The context to capture from the submission.
     :param is_script: Whether this problem is a script.
+    :param easy_context: Whether to use context directly in gap override tests.
     """
 
     check_stdout: bool = False
     mock_input: bool = False
     captured_context: Iterable[str] = ()
+    easy_context: bool = False
     is_script: bool = False
 
 
@@ -165,7 +167,7 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
 
 @overload
 def problem(
-    *, is_script: bool = False, context: Iterable[str] = ()
+    *, is_script: bool = False, context: Iterable[str] = (), easy_context: bool = False
 ) -> Callable[
     [Callable[ProbInputType, ProbOutputType]], Problem[ProbInputType, ProbOutputType]
 ]:
@@ -175,7 +177,11 @@ def problem(
 
 @overload
 def problem(
-    *, check_stdout: bool = False, mock_input: bool = False, context: Iterable[str] = ()
+    *,
+    check_stdout: bool = False,
+    mock_input: bool = False,
+    context: Iterable[str] = (),
+    easy_context: bool = False,
 ) -> Callable[
     [Callable[ProbInputType, ProbOutputType]], Problem[ProbInputType, ProbOutputType]
 ]:
@@ -189,6 +195,7 @@ def problem(
     check_stdout: Optional[bool] = None,
     mock_input: Optional[bool] = None,
     context: Iterable[str] = (),
+    easy_context: bool = False,
 ) -> Callable[
     [Callable[ProbInputType, ProbOutputType]], Problem[ProbInputType, ProbOutputType]
 ]:
@@ -198,6 +205,7 @@ def problem(
     :param check_stdout: Whether to check the stdout of the solution.
     :param mock_input: Whether to mock the input of the solution.
     :param context: The context to capture from the submission.
+    :param easy_context: Whether to use context directly in gap override tests.
     """
 
     if is_script:
@@ -215,6 +223,7 @@ def problem(
         mock_input=mock_input,
         captured_context=context,
         is_script=is_script,
+        easy_context=easy_context,
     )
 
     def _wrapper(
