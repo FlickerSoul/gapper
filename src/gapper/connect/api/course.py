@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import datetime
+import json
 from dataclasses import dataclass
-from typing import Any, Dict, Literal
+from typing import Any, Dict, List, Literal, TypedDict
 
 from bs4 import BeautifulSoup
 from requests import Session
@@ -8,7 +11,25 @@ from requests_toolbelt import MultipartEncoder
 
 from gapper.connect.api.assignment import GSAssignment
 from gapper.connect.api.mixins import SessionHolder
-from gapper.connect.api.utils import DATE_TIME_FORMAT
+from gapper.connect.api.utils import SUBMIT_DATE_TIME_FORMAT
+
+
+class SubmissionWindow(TypedDict):
+    release_date: str
+    due_date: str
+    hard_due_date: str | None
+    time_limit: str | None
+
+
+class CourseInfo(TypedDict):
+    id: str
+    url: str
+    title: str
+    total_points: str
+    is_published: bool
+    num_active_submissions: int
+    grading_progress: float
+    submission_window: SubmissionWindow
 
 
 @dataclass
@@ -43,32 +64,39 @@ class GSCourse(SessionHolder):
         self.assignments.clear()
 
         assignment_resp = self._session.get(
-            "https://www.gradescope.com/courses/" + self.cid + "/assignments"
+            f"https://www.gradescope.com/courses/{self.cid}/assignments"
         )
         parsed_assignment_resp = BeautifulSoup(assignment_resp.text, "html.parser")
 
-        assignment_table = []
-        for assignment_row in parsed_assignment_resp.findAll(
-            "tr", class_="js-assignmentTableAssignmentRow"
-        ):
-            row = []
-            for td in assignment_row.findAll("td"):
-                row.append(td)
-            assignment_table.append(row)
+        table_data_div = parsed_assignment_resp.find(
+            attrs={"data-react-class": "AssignmentsTable"}
+        )
 
-        for row in assignment_table:
-            name = row[0].text
-            aid = row[0].find("a").get("href").rsplit("/", 1)[1]
-            points = row[1].text
-            # TODO: (released,due) = parse(row[2])
-            submissions = row[3].text
-            percent_graded = row[4].text
-            complete = (
-                True if "workflowCheck-complete" in row[5].get("class") else False
-            )
-            regrades_on = False if row[6].text == "OFF" else True
+        table_prop_data: List[CourseInfo] = json.loads(
+            table_data_div.get("data-react-props")
+        )["table_data"]
+
+        for row in table_prop_data:
+            name = row["title"]
+            aid = row["url"].rsplit("/", 1)[-1]
+            points = row["total_points"]
+            release_date = row["submission_window"]["release_date"]
+            due_date = row["submission_window"]["due_date"]
+            hard_due_date = row["submission_window"]["hard_due_date"]
+            submissions = str(row["num_active_submissions"])
+            percent_graded = str(row["grading_progress"])
+            published = row["is_published"]
+
             self.collect_assignment(
-                name, aid, points, submissions, percent_graded, complete, regrades_on
+                name,
+                aid,
+                points,
+                submissions,
+                percent_graded,
+                published,
+                release_date,
+                due_date,
+                hard_due_date,
             )
 
     def add_assignment(
@@ -99,8 +127,10 @@ class GSCourse(SessionHolder):
             "assignment[total_points]": points,
             "assignment[manual_grading": "0",
             "assignment[student_submission]": "1",
-            "assignment[release_date_string]": release_date.strftime(DATE_TIME_FORMAT),
-            "assignment[due_date_string]": due_date.strftime(DATE_TIME_FORMAT),
+            "assignment[release_date_string]": release_date.strftime(
+                SUBMIT_DATE_TIME_FORMAT
+            ),
+            "assignment[due_date_string]": due_date.strftime(SUBMIT_DATE_TIME_FORMAT),
             "assignment[allow_late_submissions]": "0",
             "assignment[group_submission]": "0",
             "assignment[leaderboard_enabled]": "0",
@@ -109,7 +139,7 @@ class GSCourse(SessionHolder):
         if late_submission_date is not None:
             assignment_dict["assignment[allow_late_submissions]"] = "1"
             assignment_dict["assignment[hard_due_date_string]"] = (
-                late_submission_date.strftime(DATE_TIME_FORMAT),
+                late_submission_date.strftime(SUBMIT_DATE_TIME_FORMAT),
             )
 
         if group_size is not None:
@@ -141,18 +171,22 @@ class GSCourse(SessionHolder):
         points: str,
         submissions: str,
         percent_graded: str,
-        complete: bool,
-        regrades_on: bool,
+        published: bool,
+        release_date: str,
+        due_date: str,
+        hard_due_date: str | None = None,
     ):
-        self.assignments[name] = GSAssignment(
+        self.assignments[aid] = GSAssignment(
             name,
             aid,
             points,
             submissions,
             percent_graded,
-            complete,
-            regrades_on,
-            self._session,
+            published,
+            release_date,
+            due_date,
+            hard_due_date,
+            self,
         )
 
     def __eq__(self, other: Any) -> bool:

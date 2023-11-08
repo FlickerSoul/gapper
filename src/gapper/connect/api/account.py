@@ -33,7 +33,7 @@ class GSAccount(SessionHolder):
         self.email = email
         self.password = password
         self.cookies = cookies
-        self.courses = []
+        self.courses: Dict[str, GSCourse] = {}
         self._logger = logging.getLogger(
             f"gapper.connect.api.account.GSAccount_{self.email}"
         )
@@ -146,10 +146,8 @@ class GSAccount(SessionHolder):
         assignment_count: str,
         inactive: bool,
     ) -> None:
-        self.courses.append(
-            GSCourse(
-                cid, name, shortname, year, assignment_count, inactive, self._session
-            )
+        self.courses[cid] = GSCourse(
+            cid, name, shortname, year, assignment_count, inactive, self._session
         )
 
     @staticmethod

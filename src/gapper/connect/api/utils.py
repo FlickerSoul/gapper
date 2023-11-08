@@ -1,3 +1,6 @@
+import enum
+from typing import NamedTuple
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -15,4 +18,16 @@ def get_authenticity_token(session: requests.Session) -> str:
     raise ValueError("Could not find authenticity token")
 
 
-DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M"
+SUBMIT_DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M"
+PARSE_DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S%:z"
+
+
+class ImageChoice(NamedTuple):
+    image: str
+    id: int
+
+
+class OSChoices(enum.Enum):
+    UbuntuV1804 = ImageChoice("gradescope/autograder-base:ubuntu-18.04", 1)
+    UbuntuV2004 = ImageChoice("gradescope/autograder-base:ubuntu-20.04", 2)
+    UbuntuV2204 = ImageChoice("gradescope/autograder-base:ubuntu-22.04", 3)
