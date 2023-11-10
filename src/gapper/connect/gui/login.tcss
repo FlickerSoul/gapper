@@ -1,0 +1,31 @@
+#login_area {
+    height: 100%;
+    grid-size: 1 4;
+    grid-rows: 2fr 1fr 1fr;
+    grid-columns: 1fr;
+    content-align: center middle;
+}
+
+#login_area .inputs {
+    height: auto;
+    margin: 1 0;
+    padding: 1 2;
+    layout: grid;
+    grid-size: 2 2;
+    grid-rows: 3;
+    grid-columns: 15 1fr;
+    content-align: center middle;
+}
+
+#login_area .buttons,.options {
+    height: auto;
+    margin: 3 0;
+    layout: horizontal;
+}
+
+Button {
+    height: auto;
+    padding: 0 2;
+    margin-right: 3;
+    margin-left: 1;
+}

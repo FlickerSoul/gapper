@@ -1,0 +1,8 @@
+.hidden {
+    visibility: hidden;
+}
+
+CourseCardBackground {
+    content-align: center middle;
+    height: auto;
+}

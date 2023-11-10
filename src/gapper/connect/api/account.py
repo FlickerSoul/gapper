@@ -11,6 +11,7 @@ import requests
 import yaml
 from bs4 import BeautifulSoup, Tag
 
+from gapper.connect.api.assignment import GSAssignment
 from gapper.connect.api.course import GSCourse
 from gapper.connect.api.mixins import SessionHolder
 from gapper.connect.api.utils import get_authenticity_token
@@ -21,27 +22,30 @@ class GSAccount(SessionHolder):
     email: str
     password: str
     cookies: Optional[Dict[str, str]]
+    courses: Dict[str, GSCourse]
 
     def __init__(
         self,
         email: str,
         password: str,
         cookies: Dict[str, str] = None,
+        courses: Dict[str, GSCourse] | None = None,
         session: requests.Session = None,
     ) -> None:
         super().__init__(session)
         self.email = email
         self.password = password
         self.cookies = cookies
-        self.courses: Dict[str, GSCourse] = {}
+        self.courses: Dict[str, GSCourse] = courses or {}
         self._logger = logging.getLogger(
             f"gapper.connect.api.account.GSAccount_{self.email}"
         )
 
-    def login(self, remember_me: bool = True) -> Self:
+    async def login(self, remember_me: bool = True) -> Self:
         """Login to Gradescope.
 
         :param remember_me: Whether to remember the login session.
+        :raises ValueError: If login fails.
         """
         if self.cookies is not None and self.cookies:
             self.load_cookie(self.cookies)
@@ -98,7 +102,7 @@ class GSAccount(SessionHolder):
 
         return False
 
-    def get_admin_courses(self) -> None:
+    async def get_admin_courses(self) -> None:
         """Get the list of courses the account is administrating."""
         # Get account page and parse it using bs4
         account_resp = self._session.get("https://www.gradescope.com/account")
@@ -192,7 +196,9 @@ class GSAccount(SessionHolder):
             data = yaml.safe_load(f)
 
         return dacite.from_dict(
-            data_class=cls, data=data, config=dacite.Config(cast=[GSAccount])
+            data_class=cls,
+            data=data,
+            config=dacite.Config(cast=[GSAccount, GSCourse, GSAssignment]),
         )
 
     def to_yaml(self, path: Path | None = None) -> str:

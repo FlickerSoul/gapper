@@ -37,28 +37,30 @@ class GSCourse(SessionHolder):
     cid: str
     name: str
     shortname: str
-    year: str
+    term: str
     assignment_count: str
     inactive: bool
+    assignments: Dict[str, GSAssignment]
 
     def __init__(
         self,
         cid: str,
         name: str,
         shortname: str,
-        year: str,
+        term: str,
         assignment_count: str,
         inactive: bool,
+        assignments: Dict[str, GSAssignment] | None = None,
         session: Session | None = None,
     ) -> None:
         super().__init__(session)
         self.cid = cid
         self.name = name
         self.shortname = shortname
-        self.year = year
+        self.term = term
         self.assignment_count = assignment_count
         self.inactive = inactive
-        self.assignments: Dict[str, GSAssignment] = {}
+        self.assignments: Dict[str, GSAssignment] = assignments or {}
 
     def get_assignments(self) -> None:
         self.assignments.clear()
