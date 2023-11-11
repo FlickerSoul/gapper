@@ -3,9 +3,11 @@ from __future__ import annotations
 import datetime
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, List, Literal, TypedDict
+from typing import Any, Dict, List, Literal, Self, TypedDict
 
+import requests
 from bs4 import BeautifulSoup
+from dataclasses_json import dataclass_json
 from requests import Session
 from requests_toolbelt import MultipartEncoder
 
@@ -32,12 +34,14 @@ class CourseInfo(TypedDict):
     submission_window: SubmissionWindow
 
 
+@dataclass_json
 @dataclass
 class GSCourse(SessionHolder):
     cid: str
     name: str
     shortname: str
     term: str
+    year: str
     assignment_count: str
     inactive: bool
     assignments: Dict[str, GSAssignment]
@@ -48,9 +52,11 @@ class GSCourse(SessionHolder):
         name: str,
         shortname: str,
         term: str,
+        year: str,
         assignment_count: str,
         inactive: bool,
         assignments: Dict[str, GSAssignment] | None = None,
+        *,
         session: Session | None = None,
     ) -> None:
         super().__init__(session)
@@ -58,11 +64,12 @@ class GSCourse(SessionHolder):
         self.name = name
         self.shortname = shortname
         self.term = term
+        self.year = year
         self.assignment_count = assignment_count
         self.inactive = inactive
         self.assignments: Dict[str, GSAssignment] = assignments or {}
 
-    def get_assignments(self) -> None:
+    async def get_assignments(self) -> None:
         self.assignments.clear()
 
         assignment_resp = self._session.get(
@@ -179,6 +186,7 @@ class GSCourse(SessionHolder):
         hard_due_date: str | None = None,
     ):
         self.assignments[aid] = GSAssignment(
+            self.cid,
             name,
             aid,
             points,
@@ -188,8 +196,15 @@ class GSCourse(SessionHolder):
             release_date,
             due_date,
             hard_due_date,
-            self,
+            session=self._session,
         )
+
+    def load_session(self, session: requests.Session) -> Self:
+        super().load_session(session)
+        for assignment in self.assignments.values():
+            assignment.load_session(session)
+
+        return self
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, GSCourse):

@@ -2,21 +2,21 @@ from __future__ import annotations
 
 import logging
 import urllib.parse
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Optional, Self
 
-import dacite
 import requests
 import yaml
 from bs4 import BeautifulSoup, Tag
+from dataclasses_json import dataclass_json
 
-from gapper.connect.api.assignment import GSAssignment
 from gapper.connect.api.course import GSCourse
 from gapper.connect.api.mixins import SessionHolder
 from gapper.connect.api.utils import get_authenticity_token
 
 
+@dataclass_json
 @dataclass
 class GSAccount(SessionHolder):
     email: str
@@ -30,7 +30,8 @@ class GSAccount(SessionHolder):
         password: str,
         cookies: Dict[str, str] = None,
         courses: Dict[str, GSCourse] | None = None,
-        session: requests.Session = None,
+        *,
+        session: requests.Session | None = None,
     ) -> None:
         super().__init__(session)
         self.email = email
@@ -116,7 +117,7 @@ class GSAccount(SessionHolder):
         for course_header in instructor_courses.find_all(  # type: Tag
             "div", class_="courseList--term"
         ):
-            year = course_header.text
+            term, year = course_header.text.split(" ", 1)
 
             course_container: Tag = course_header.findNext(
                 "div", class_="courseList--coursesForTerm"
@@ -138,7 +139,7 @@ class GSAccount(SessionHolder):
                 )
 
                 self.collect_course(
-                    cid, name, shortname, year, assignment_count, inactive
+                    cid, name, shortname, term, year, assignment_count, inactive
                 )
 
     def collect_course(
@@ -146,12 +147,20 @@ class GSAccount(SessionHolder):
         cid: str,
         name: str,
         shortname: str,
+        term: str,
         year: str,
         assignment_count: str,
         inactive: bool,
     ) -> None:
         self.courses[cid] = GSCourse(
-            cid, name, shortname, year, assignment_count, inactive, self._session
+            cid,
+            name,
+            shortname,
+            term,
+            year,
+            assignment_count,
+            inactive,
+            session=self._session,
         )
 
     @staticmethod
@@ -189,20 +198,31 @@ class GSAccount(SessionHolder):
 
         return str(urllib.parse.urlencode(login_params))
 
+    def load_session(self, session: requests.Session) -> Self:
+        super().load_session(session)
+        for course in self.courses.values():
+            course.load_session(session)
+
+        return self
+
+    def spawn_session(self) -> Self:
+        super().spawn_session()
+        self.load_session(self._session)
+
+        return self
+
     @classmethod
     def from_yaml(cls, path: Path) -> GSAccount:
         """Load the account manager from a yaml file."""
         with open(path, "r") as f:
             data = yaml.safe_load(f)
 
-        return dacite.from_dict(
-            data_class=cls,
-            data=data,
-            config=dacite.Config(cast=[GSAccount, GSCourse, GSAssignment]),
-        )
+        return cls.from_dict(data, infer_missing=True)
 
     def to_yaml(self, path: Path | None = None) -> str:
-        yaml_data = yaml.dump(asdict(self))
+        yaml_data = yaml.dump(self.to_dict())
+        path.parent.mkdir(exist_ok=True, parents=True)
+
         with open(path, "w") as f:
             f.write(yaml_data)
 

@@ -1,17 +1,20 @@
-from typing import Dict, Self
+from dataclasses import dataclass, field
+from typing import Dict, Optional, Self
 
 import requests
+from dataclasses_json import config, dataclass_json
 from requests.utils import cookiejar_from_dict, dict_from_cookiejar
 
 
+@dataclass_json
+@dataclass
 class SessionHolder:
-    def __init__(self, session: requests.Session = None) -> None:
+    _session: Optional[requests.Session] = field(
+        metadata=config(exclude=lambda x: True), init=False, default=None
+    )
+
+    def __init__(self, session: requests.Session | None = None) -> None:
         self._session = session
-
-        if self._session is None:
-            self.spawn_session()
-
-        self.require_verify()
 
     def load_session(self, session: requests.Session) -> Self:
         self._session = session

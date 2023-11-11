@@ -2,16 +2,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, TypedDict
+from typing import Any, Dict, TypedDict
 
 import requests
 from bs4 import BeautifulSoup
+from dataclasses_json import dataclass_json
 from requests_toolbelt import MultipartEncoder
 
+from gapper.connect.api.mixins import SessionHolder
 from gapper.connect.api.utils import OSChoices
-
-if TYPE_CHECKING:
-    from gapper.connect.api.course import GSCourse
 
 
 class DockerStatusJson(TypedDict):
@@ -25,8 +24,10 @@ class DockerStatusJson(TypedDict):
     updated_at: str
 
 
+@dataclass_json
 @dataclass
-class GSAssignment:
+class GSAssignment(SessionHolder):
+    cid: str
     name: str
     aid: str
     points: str
@@ -39,6 +40,7 @@ class GSAssignment:
 
     def __init__(
         self,
+        cid: str,
         name: str,
         aid: str,
         points: str,
@@ -48,8 +50,11 @@ class GSAssignment:
         release_date: str,
         due_date: str,
         hard_due_date: str | None,
-        course: GSCourse,
-    ):
+        *,
+        session: requests.Session | None = None,
+    ) -> None:
+        super().__init__(session)
+        self.cid = cid
         self.name = name
         self.aid = aid
         self.points = points
@@ -59,7 +64,6 @@ class GSAssignment:
         self.release_date = release_date
         self.due_date = due_date
         self.hard_due_date = hard_due_date
-        self.course = course
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, GSAssignment):
@@ -75,9 +79,9 @@ class GSAssignment:
         if not path.is_file() or not path.suffix == ".zip":
             raise ValueError(f"File {path} is not a zip file")
 
-        autograder_config = self.course._session.get(
+        autograder_config = self._session.get(
             "https://www.gradescope.com/courses/"
-            + self.course.cid
+            + self.cid
             + "/assignments/"
             + self.aid
             + "/configure_autograder"
@@ -102,8 +106,8 @@ class GSAssignment:
 
         multipart = MultipartEncoder(fields=autograder_dict)
 
-        response = self.course._session.post(
-            f"https://www.gradescope.com/courses/{self.course.cid}/assignments/{self.aid}/",
+        response = self._session.post(
+            f"https://www.gradescope.com/courses/{self.cid}/assignments/{self.aid}/",
             data=multipart,
             headers={"Content-Type": multipart.content_type},
         )
@@ -112,9 +116,9 @@ class GSAssignment:
             raise ValueError(f"Upload failed with status code {response.status_code}")
 
     def get_active_docker_id(self) -> str | None:
-        autograder_config = self.course._session.get(
+        autograder_config = self._session.get(
             "https://www.gradescope.com/courses/"
-            + self.course.cid
+            + self.cid
             + "/assignments/"
             + self.aid
             + "/configure_autograder"
@@ -136,6 +140,6 @@ class GSAssignment:
         if docker_id is None:
             return None
 
-        return self.course._session.get(
-            f"https://www.gradescope.com/courses/{self.course.cid}/assignments/{self.aid}/docker_images/{docker_id}.json"
+        return self._session.get(
+            f"https://www.gradescope.com/courses/{self.cid}/assignments/{self.aid}/docker_images/{docker_id}.json"
         ).json()
