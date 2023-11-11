@@ -19,13 +19,13 @@
 
 #login_area .buttons,.options {
     height: auto;
+    max-height: 3;
     margin: 3 0;
     layout: horizontal;
 }
 
 Button {
     height: auto;
-    padding: 0 2;
     margin-right: 3;
     margin-left: 1;
 }

@@ -1,7 +1,9 @@
+import traceback
+
 import yaml
 from textual import on
 from textual.app import ComposeResult
-from textual.containers import Container
+from textual.containers import Container, ScrollableContainer
 from textual.css.query import NoMatches
 from textual.message import Message
 from textual.reactive import var
@@ -54,7 +56,7 @@ class LoginArea(Static):
         yield Container(
             Label("Please input your email and password to login."),
             Label("Alternatively, you can load your login info from a file."),
-            Container(id="login_help_info"),
+            ScrollableContainer(id="login_help_info"),
         )
 
     @on(Button.Pressed, selector="#load_login_info_btn")
@@ -64,27 +66,34 @@ class LoginArea(Static):
 
         account_save_path = DEFAULT_LOGIN_SAVE_PATH
 
-        if account_save_path.exists():
-            try:
-                self.account = GSAccount.from_yaml(account_save_path)
-                self.get_widget_by_id("email_input").value = self.account.email
-                self.get_widget_by_id("password_input").value = self.account.password
-                self.get_widget_by_id("remember_me").value = True
-            except FileExistsError as e:
-                await info_section.mount(
-                    Label("Cannot load login info because the file does not exist."),
-                    Pretty(e),
-                )
-            except yaml.YAMLError as e:
-                await info_section.mount(
-                    Label("Cannot load login info because the file is invalid."),
-                    Pretty(e),
-                )
-            except Exception as e:
-                await info_section.mount(
-                    Label("Cannot load login info because of an unknown error."),
-                    Pretty(e),
-                )
+        try:
+            self.account = GSAccount.from_yaml(account_save_path)
+            self.account.spawn_session()
+            self.get_widget_by_id("email_input").value = self.account.email
+            self.get_widget_by_id("password_input").value = self.account.password
+            self.get_widget_by_id("remember_me").value = True
+        except FileNotFoundError as e:
+            await info_section.mount(
+                Label("Cannot load login info because the file does not exist."),
+                Pretty(e),
+                Pretty(traceback.format_tb(e.__traceback__)),
+            )
+        except yaml.YAMLError as e:
+            await info_section.mount(
+                Label("Cannot load login info because the file is invalid."),
+                Label("You can try remove old login info my using"),
+                Label(f"rm {DEFAULT_LOGIN_SAVE_PATH.absolute()}"),
+                Pretty(e),
+                Pretty(traceback.format_tb(e.__traceback__)),
+            )
+        except Exception as e:
+            await info_section.mount(
+                Label("Cannot load login info because of an unknown error."),
+                Label("You can try remove old login info my using"),
+                Label(f"rm {DEFAULT_LOGIN_SAVE_PATH.absolute()}"),
+                Pretty(e),
+                Pretty(traceback.format_tb(e.__traceback__)),
+            )
 
     @on(Button.Pressed, selector="#login_btn")
     async def handle_login(self) -> None:
@@ -102,7 +111,7 @@ class LoginArea(Static):
         no_verify = self.get_widget_by_id("no_verify").value
 
         if self.account is None:
-            self.account = GSAccount(email, password)
+            self.account = GSAccount(email, password).spawn_session()
 
         if no_verify:
             self.account.no_verify()
