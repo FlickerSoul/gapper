@@ -1,11 +1,11 @@
-from typing import Any
+from typing import Any, Tuple
 
 import pytest
 
 from gapper import problem
 from gapper.core.errors import MultipleProblemsDefinedError, NoProblemDefinedError
 from gapper.core.injection import InjectionHandler
-from gapper.core.problem import Problem
+from gapper.core.problem import GSConnectConfig, Problem, build_connect_config
 from tests.conftest import (
     INJECTION_PROBLEM_FOLDER,
     NO_PROBLEM_FILE_FOLDER,
@@ -131,3 +131,34 @@ def test_load_auto_inject() -> None:
     )
     injection_handle.inject()
     Problem.from_path(INJECTION_PROBLEM_FOLDER / "auto_inject.py")
+
+
+@pytest.mark.parametrize(
+    "inputs, expected",
+    [
+        [("112358", "2468"), GSConnectConfig("112358", "2468")],
+        [("112358", None), None],
+        [
+            (
+                "https://www.gradescope.com/courses/112358/assignments/2468/review_grades",
+                None,
+            ),
+            GSConnectConfig("112358", "2468"),
+        ],
+        [
+            (
+                "https://www.gradescope.com/courses/112358/assignments/2468/review_grades",
+                "112358",
+            ),
+            None,
+        ],
+    ],
+)
+def test_build_connect_config(
+    inputs: Tuple[str, str | None], expected: GSConnectConfig | None
+) -> None:
+    if expected:
+        assert build_connect_config(*inputs) == expected
+    else:
+        with pytest.raises(ValueError):
+            build_connect_config(*inputs)
