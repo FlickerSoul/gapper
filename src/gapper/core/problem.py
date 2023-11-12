@@ -242,7 +242,7 @@ def problem(
     return _wrapper
 
 
-def build_connect_arguments(url_or_cid: str, aid: str | None = None) -> GSConnectConfig:
+def build_connect_config(url_or_cid: str, aid: str | None = None) -> GSConnectConfig:
     """Build the connect arguments.
 
     :param url_or_cid: The url when aid is not specified, or the course id of the Gradescope assignment.
@@ -266,6 +266,10 @@ def build_connect_arguments(url_or_cid: str, aid: str | None = None) -> GSConnec
         raise ValueError(
             "Must specify both cid and aid at the same time. Or specify a url."
         )
+    if (
+        not cid.isdigit() or not aid.isdigit()
+    ):  # not perfect for 0-9 checking but it's fine
+        raise ValueError("cid and aid must be digits.")
 
     return GSConnectConfig(cid=cid, aid=aid)
 
@@ -302,7 +306,7 @@ def connect[
     :param aid: The assignment id of the Gradescope assignment.
 
     """
-    gs_connect_config = build_connect_arguments(url_or_cid, aid)
+    gs_connect_config = build_connect_config(url_or_cid, aid)
 
     def _wrapper(prob: T) -> T:
         prob.config.gs_connect = gs_connect_config

@@ -17,7 +17,7 @@ from gapper.connect.gui.upload_app_ui import AutograderUploadApp
 from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH, add_debug_to_app
 from gapper.core.file_handlers import AutograderZipper
 from gapper.core.injection import InjectionHandler
-from gapper.core.problem import Problem, build_connect_arguments
+from gapper.core.problem import Problem, build_connect_config
 from gapper.core.result_synthesizer import ResultSynthesizer
 from gapper.core.tester import Tester
 from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
@@ -263,10 +263,10 @@ def upload(
     else:
         if url:
             typer.echo("Using url to upload. Ignoring cid and aid.")
-            connect_config = build_connect_arguments(url)
+            connect_config = build_connect_config(url)
         else:
             typer.echo("Using cid and aid to upload.")
-            connect_config = build_connect_arguments(cid, aid)
+            connect_config = build_connect_config(cid, aid)
 
         _upload_with_connect_details(
             connect_config.cid, connect_config.aid, login_save_path, autograder_path
