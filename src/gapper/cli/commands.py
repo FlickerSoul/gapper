@@ -14,7 +14,7 @@ from gapper.connect.api.account import GSAccount
 from gapper.connect.api.assignment import GSAssignmentEssential
 from gapper.connect.gui.app_ui import GradescopeConnect
 from gapper.connect.gui.upload_app_ui import AutograderUploadApp
-from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH
+from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH, add_debug_to_app
 from gapper.core.file_handlers import AutograderZipper
 from gapper.core.injection import InjectionHandler
 from gapper.core.problem import Problem, build_connect_arguments
@@ -64,6 +64,14 @@ VerboseOpt = Annotated[
     typer.Option(
         "--verbose",
         "-v",
+        help="Whether to run in verbose mode.",
+    ),
+]
+UIDebugOpt = Annotated[
+    bool,
+    typer.Option(
+        "--ui-debug",
+        "-d",
         help="Whether to run in verbose mode.",
     ),
 ]
@@ -225,6 +233,7 @@ def _upload_with_connect_details(
 
 
 @app.command()
+@_timed
 def upload(
     autograder_path: Annotated[
         Path,
@@ -244,14 +253,19 @@ def upload(
     aid: Annotated[
         Optional[str], typer.Option("--aid", "-a", help="The assignment id.")
     ] = None,
+    ui_debug: UIDebugOpt = False,
 ) -> None:
-    """Upload the autograder to Gradescope."""
+    """Upload an autograder to Gradescope."""
+    add_debug_to_app(ui_debug)
+
     if use_ui:
         _upload_with_gui(login_save_path, autograder_path)
     else:
         if url:
+            typer.echo("Using url to upload. Ignoring cid and aid.")
             connect_config = build_connect_arguments(url)
         else:
+            typer.echo("Using cid and aid to upload.")
             connect_config = build_connect_arguments(cid, aid)
 
         _upload_with_connect_details(
@@ -260,14 +274,18 @@ def upload(
 
 
 @app.command()
+@_timed
 def login(
     confirm_store: Annotated[
         bool, typer.Option("--confirm-store", "-s", is_flag=True)
     ] = False,
     confirm_overwrite: OverwriteConfirmOpt = False,
     login_save_path: LoginSavePath = DEFAULT_LOGIN_SAVE_PATH,
+    verbose: VerboseOpt = False,
 ) -> None:
     """Login to Gradescope."""
+    setup_root_logger(verbose)
+
     email = typer.prompt("Enter your gradescope email")
     password = typer.prompt("Enter your gradescope password", hide_input=True)
     account = GSAccount(email, password).spawn_session()
@@ -300,8 +318,10 @@ def gen(
     upload_flag: UploadOpt = False,
     use_ui: UseGUIOpt = False,
     login_save_path: LoginSavePath = DEFAULT_LOGIN_SAVE_PATH,
+    ui_debug: UIDebugOpt = False,
 ) -> None:
     """Generate the autograder for a problem."""
+    add_debug_to_app(ui_debug)
     setup_root_logger(verbose)
 
     InjectionHandler().setup(auto_inject, inject).inject()
@@ -347,6 +367,7 @@ def gen(
                     "No Gradescope connection info found in problem config. "
                     "Please use @gapper.connect() decorator, or use the --gui flag."
                 )
+                raise typer.Exit(code=1)
 
 
 @app.command()
