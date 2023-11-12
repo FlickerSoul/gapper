@@ -11,8 +11,8 @@ from tests.conftest import (
     NO_SUBMISSION_FOLDER,
     SINGLE_SUBMISSION_FOLDER,
     TEST_SUBMISSIONS_FOLDER,
-    _make_problem_name,
-    _make_tester_name,
+    make_problem_name,
+    make_tester_name,
     preset_problem_paths,
 )
 
@@ -31,7 +31,7 @@ def test_tester_run(tester_fixture: Tester[Any, Any], path: Path) -> None:
 
 
 def test_load_submission(request: pytest.FixtureRequest) -> None:
-    prob = request.getfixturevalue(_make_problem_name("tester_submission.py"))
+    prob = request.getfixturevalue(make_problem_name("tester_submission.py"))
     tester = Tester(problem=prob)
 
     # the following two should run ok
@@ -40,7 +40,7 @@ def test_load_submission(request: pytest.FixtureRequest) -> None:
 
 
 def test_no_submission_loading_error(request: pytest.FixtureRequest) -> None:
-    prob = request.getfixturevalue(_make_problem_name("tester_submission.py"))
+    prob = request.getfixturevalue(make_problem_name("tester_submission.py"))
     tester = Tester(problem=prob)
 
     # the following two should run ok
@@ -49,7 +49,7 @@ def test_no_submission_loading_error(request: pytest.FixtureRequest) -> None:
 
 
 def test_multiple_submissions_loading_error(request: pytest.FixtureRequest) -> None:
-    prob = request.getfixturevalue(_make_problem_name("tester_submission.py"))
+    prob = request.getfixturevalue(make_problem_name("tester_submission.py"))
     tester = Tester(problem=prob)
 
     # the following two should run ok
@@ -87,7 +87,7 @@ def test_dump_and_load(tmp_path: Path, tester_fixture: Tester, name: str) -> Non
 
 def test_post_test(request: pytest.FixtureRequest) -> None:
     prob_name = "assess_post_tests.py"
-    tester: Tester = request.getfixturevalue(_make_tester_name(prob_name))
+    tester: Tester = request.getfixturevalue(make_tester_name(prob_name))
     results = tester.load_submission_from_path(
         TEST_SUBMISSIONS_FOLDER / prob_name
     ).run()

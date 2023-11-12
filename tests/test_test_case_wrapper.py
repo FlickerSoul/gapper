@@ -6,7 +6,7 @@ from gapper.core.problem import Problem
 from gapper.core.test_parameter import TestParam
 from gapper.core.test_result import TestResult
 from gapper.core.unittest_wrapper import TestCaseWrapper
-from tests.conftest import _make_problem_name
+from tests.conftest import make_problem_name
 
 
 @pytest.mark.parametrize(
@@ -62,7 +62,7 @@ def test_result_init(dummy_problem, test_param: TestParam) -> None:
 
 def test_gap_check(request: pytest.FixtureRequest) -> None:
     gap_check_tester: Problem = request.getfixturevalue(
-        _make_problem_name("sanity_check_with_gap_expect.py")
+        make_problem_name("sanity_check_with_gap_expect.py")
     )
 
     for test in gap_check_tester.generate_tests():

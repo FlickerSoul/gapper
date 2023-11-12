@@ -23,11 +23,11 @@ MULTIPLE_SUBMISSIONS_FOLDER = TEST_ASSET_FOLDER / "multiple_submissions_defined"
 PROBLEM_CONFIG_VAR_NAME = "__problem_config__"
 
 
-def _make_problem_name(name: str) -> str:
+def make_problem_name(name: str) -> str:
     return f"preset_problem_{name}"
 
 
-def _make_tester_name(name: str) -> str:
+def make_tester_name(name: str) -> str:
     return f"preset_tester_for_problem_{name}"
 
 
@@ -43,8 +43,8 @@ def _get_problem_config(problem_path: Path) -> dict[str, Any]:
 
 
 def generate_problem_fixtures(problem_path: Path) -> None:
-    problem_name = _make_problem_name(problem_path.name)
-    tester_name = _make_tester_name(problem_path.name)
+    problem_name = make_problem_name(problem_path.name)
+    tester_name = make_tester_name(problem_path.name)
 
     @pytest.fixture(scope="session", name=problem_name)
     def _problem_wrapper() -> Problem[Any, Any]:
@@ -81,19 +81,19 @@ def preset_submission_paths() -> Generator[Path, None, None]:
 @pytest.fixture()
 def problem_fixture(request: pytest.FixtureRequest) -> Problem[Any, Any]:
     partial_prob_name: Path = request.param
-    return request.getfixturevalue(_make_problem_name(partial_prob_name.name))
+    return request.getfixturevalue(make_problem_name(partial_prob_name.name))
 
 
 @pytest.fixture()
 def tester_fixture(request: pytest.FixtureRequest) -> Problem[Any, Any]:
     partial_prob_name: Path = request.param
-    return request.getfixturevalue(_make_tester_name(partial_prob_name.name))
+    return request.getfixturevalue(make_tester_name(partial_prob_name.name))
 
 
 @pytest.fixture()
 def all_preset_problems(request) -> List[Problem[Any, Any]]:
     return [
-        request.getfixturevalue(_make_problem_name(prob_name.name))
+        request.getfixturevalue(make_problem_name(prob_name.name))
         for prob_name in preset_problem_paths()
     ]
 
