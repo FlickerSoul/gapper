@@ -10,7 +10,11 @@ from textual.containers import Container, ScrollableContainer
 from textual.screen import Screen
 from textual.widgets import Button, Footer, Header, Label, Select
 
-from gapper.connect.api.assignment import DockerStatusJson, GSAssignment
+from gapper.connect.api.assignment import (
+    DockerStatusJson,
+    GSAssignment,
+    GSAssignmentEssential,
+)
 from gapper.connect.api.utils import OSChoices
 
 
@@ -26,22 +30,37 @@ class AutograderUpload(Screen):
     CSS_PATH = "autograder_upload_ui.tcss"
 
     def __init__(
-        self, *args, assignment: GSAssignment, autograder_path: Path, **kwargs
+        self,
+        *args,
+        assignment: GSAssignment | GSAssignmentEssential,
+        autograder_path: Path,
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.assignment = assignment
         self.autograder_path = autograder_path
         self.upload_info_timer: Timer | None = None
 
+    @property
+    def assignment_name(self) -> str:
+        if self.assignment:
+            name = getattr(self.assignment, "name", None)
+            if name is not None:
+                return name
+            return self.assignment.aid
+        return "No Assignment"
+
+    @property
+    def full_autograder_path(self) -> Path | None:
+        return self.autograder_path and self.autograder_path.absolute()
+
     def compose(self) -> ComposeResult:
         """Compose the autograder upload screen."""
         yield Header()
         yield Container(
             Label("Uploading Autograder For"),
-            Label(f"Assignment: {self.assignment and self.assignment.name}"),
-            Label(
-                f"Autograder Path: {self.autograder_path and self.autograder_path.absolute()}"
-            ),
+            Label(f"Assignment: '{self.assignment_name}'"),
+            Label(f"Autograder Path: '{self.full_autograder_path}'"),
         )
         yield Container(
             Label("Autograder OS:"),

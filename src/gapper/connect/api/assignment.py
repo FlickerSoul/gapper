@@ -35,56 +35,24 @@ class DockerStatusJson(TypedDict):
 
 @dataclass_json
 @dataclass
-class GSAssignment(SessionHolder):
+class GSAssignmentEssential(SessionHolder):
     cid: str
-    name: str
     aid: str
-    points: str
-    submissions: str
-    percent_graded: str
-    published: bool
-    release_date: str
-    due_date: str
-    hard_due_date: str | None
     docker_id: str | None
 
     def __init__(
         self,
         cid: str,
-        name: str,
         aid: str,
-        points: str,
-        submissions: str,
-        percent_graded: str,
-        published: bool,
-        release_date: str,
-        due_date: str,
-        hard_due_date: str | None,
         docker_id: str | None = None,
         *,
         session: requests.Session | None = None,
     ) -> None:
         super().__init__(session)
         self.cid = cid
-        self.name = name
         self.aid = aid
-        self.points = points
-        self.submissions = submissions
-        self.percent_graded = percent_graded
-        self.published = published
-        self.release_date = release_date
-        self.due_date = due_date
-        self.hard_due_date = hard_due_date
         self.docker_id = docker_id
-        self._logger = _assignment_logger.getChild(f"GSAssignment_{self.aid}")
-
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, GSAssignment):
-            return self.aid == other.aid
-        return False
-
-    def __hash__(self) -> int:
-        return hash(self.aid)
+        self._logger = _assignment_logger.getChild(f"GSAssignmentEssential_{self.aid}")
 
     async def upload_autograder(self, path: Path, os_choice: OSChoices) -> None:
         if not path.exists():
@@ -171,3 +139,51 @@ class GSAssignment(SessionHolder):
         return self._session.get(
             f"https://www.gradescope.com/courses/{self.cid}/assignments/{self.aid}/docker_images/{docker_id}.json"
         ).json()
+
+
+@dataclass_json
+@dataclass
+class GSAssignment(GSAssignmentEssential):
+    name: str
+    points: str
+    submissions: str
+    percent_graded: str
+    published: bool
+    release_date: str
+    due_date: str
+    hard_due_date: str | None
+
+    def __init__(
+        self,
+        cid: str,
+        name: str,
+        aid: str,
+        points: str,
+        submissions: str,
+        percent_graded: str,
+        published: bool,
+        release_date: str,
+        due_date: str,
+        hard_due_date: str | None,
+        docker_id: str | None = None,
+        *,
+        session: requests.Session | None = None,
+    ) -> None:
+        super().__init__(cid, aid, docker_id, session=session)
+        self.name = name
+        self.points = points
+        self.submissions = submissions
+        self.percent_graded = percent_graded
+        self.published = published
+        self.release_date = release_date
+        self.due_date = due_date
+        self.hard_due_date = hard_due_date
+        self._logger = _assignment_logger.getChild(f"GSAssignment_{self.aid}")
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, GSAssignment):
+            return self.aid == other.aid
+        return False
+
+    def __hash__(self) -> int:
+        return hash(self.aid)
