@@ -1,4 +1,5 @@
 import traceback
+from typing import cast
 
 import yaml
 from textual import on
@@ -48,7 +49,8 @@ class LoginArea(Static):
             classes="options",
         )
         yield Container(
-            Button("Load Login Info", id="load_login_info_btn"),
+            Button("Load Saved and Login", id="load_saved_and_login_btn"),
+            Button("Load Saved", id="load_saved_btn"),
             Button("Login", id="login_btn"),
             classes="buttons",
         )
@@ -59,8 +61,13 @@ class LoginArea(Static):
             ScrollableContainer(id="login_help_info"),
         )
 
-    @on(Button.Pressed, selector="#load_login_info_btn")
-    async def handle_load_login_info(self) -> None:
+    @on(Button.Pressed, selector="#load_saved_and_login_btn")
+    async def handle_load_saved_and_login(self) -> None:
+        await self.handle_load_saved()
+        await self.handle_login()
+
+    @on(Button.Pressed, selector="#load_saved_btn")
+    async def handle_load_saved(self) -> None:
         info_section = self.get_widget_by_id("login_help_info")
         await info_section.remove_children()
 
@@ -105,10 +112,10 @@ class LoginArea(Static):
         except NoMatches:
             pass
 
-        email = self.get_widget_by_id("email_input").value
-        password = self.get_widget_by_id("password_input").value
-        remember_me = self.get_widget_by_id("remember_me").value
-        no_verify = self.get_widget_by_id("no_verify").value
+        email = cast(Input, self.get_widget_by_id("email_input")).value
+        password = cast(Input, self.get_widget_by_id("password_input")).value
+        remember_me = cast(Checkbox, self.get_widget_by_id("remember_me")).value
+        no_verify = cast(Checkbox, self.get_widget_by_id("no_verify")).value
 
         if self.account is None:
             self.account = GSAccount(email, password).spawn_session()
@@ -131,7 +138,7 @@ class LoginArea(Static):
 
 
 class LoginScreen(Screen):
-    CSS_PATH = "login.tcss"
+    CSS_PATH = "login_ui.tcss"
 
     def compose(self) -> ComposeResult:
         yield Header()

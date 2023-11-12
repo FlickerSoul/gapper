@@ -13,7 +13,7 @@ from textual.widgets import Footer, Header, Label, Static
 
 from gapper.connect.api.account import GSAccount
 from gapper.connect.api.course import GSCourse
-from gapper.connect.gui.assignments import AssignmentArea
+from gapper.connect.gui.assignments_ui import AssignmentArea
 from gapper.connect.gui.messages import AccountSave
 
 
@@ -110,7 +110,7 @@ class CourseDisplay(Static):
 
 
 class CourseScreen(Screen):
-    CSS_PATH = "courses.tcss"
+    CSS_PATH = "courses_assignment_ui.tcss"
     BINDINGS = [
         ("ctrl+r", "refresh_course", "Refresh Course List"),
     ]
