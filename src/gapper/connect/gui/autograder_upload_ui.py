@@ -25,7 +25,7 @@ class Repeat(Timer):
 
 
 class AutograderUpload(Screen):
-    BINDINGS = [("ctrl+b", "go_back", "Go Back")]
+    BINDINGS = [("ctrl+b", "go_back", "Go Back"), ("ctrl+q", "quit", "Quit")]
 
     CSS_PATH = "autograder_upload_ui.tcss"
 
@@ -111,6 +111,13 @@ class AutograderUpload(Screen):
             self.upload_info_timer.cancel()
 
         await self.app.action_pop_screen()
+
+    async def action_quit(self) -> None:
+        """Quit the application."""
+        if self.upload_info_timer:
+            self.upload_info_timer.cancel()
+
+        await self.app.action_quit()
 
     async def refresh_upload_info(self) -> None:
         self.log.debug("Refreshing upload info")
