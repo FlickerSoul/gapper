@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import logging
 import urllib.parse
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, Optional, Self
 
 import requests
 import yaml
 from bs4 import BeautifulSoup, Tag
-from dataclasses_json import dataclass_json
+from dataclasses_json import config, dataclass_json
 
 from gapper.connect.api.course import GSCourse
 from gapper.connect.api.mixins import SessionHolder
@@ -20,15 +20,17 @@ from gapper.connect.api.utils import get_authenticity_token
 @dataclass
 class GSAccount(SessionHolder):
     email: str
-    password: str
     cookies: Optional[Dict[str, str]]
     courses: Dict[str, GSCourse]
+    password: str = field(
+        default="", metadata=config(exclude=lambda x: True), init=False
+    )
 
     def __init__(
         self,
         email: str,
-        password: str,
-        cookies: Dict[str, str] = None,
+        password: str = "",
+        cookies: Dict[str, str] | None = None,
         courses: Dict[str, GSCourse] | None = None,
         *,
         session: requests.Session | None = None,

@@ -2,23 +2,14 @@ import traceback
 from typing import cast
 
 import yaml
+from rich.text import Text
 from textual import on
 from textual.app import ComposeResult
 from textual.containers import Container, ScrollableContainer
-from textual.css.query import NoMatches
 from textual.message import Message
 from textual.reactive import var
 from textual.screen import Screen
-from textual.widgets import (
-    Button,
-    Checkbox,
-    Footer,
-    Header,
-    Input,
-    Label,
-    Pretty,
-    Static,
-)
+from textual.widgets import Button, Checkbox, Footer, Header, Input, Label, Static
 
 from gapper.connect.api.account import GSAccount
 from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH
@@ -26,6 +17,8 @@ from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH
 
 class LoginArea(Static):
     class LoggedIn(Message):
+        """Message sent when the user has logged in."""
+
         def __init__(self, account: GSAccount, save: bool) -> None:
             super().__init__()
             self.account = account
@@ -34,6 +27,7 @@ class LoginArea(Static):
     account = var(None)
 
     def compose(self) -> ComposeResult:
+        """Compose the login area."""
         yield Container(
             Static("Email", classes="label"),
             Input(placeholder="Gradescope Email", id="email_input"),
@@ -58,18 +52,19 @@ class LoginArea(Static):
         yield Container(
             Label("Please input your email and password to login."),
             Label("Alternatively, you can load your login info from a file."),
-            ScrollableContainer(id="login_help_info"),
+            ScrollableContainer(Label(id="login_help_info")),
         )
 
     @on(Button.Pressed, selector="#load_saved_and_login_btn")
     async def handle_load_saved_and_login(self) -> None:
+        """Handle the load saved and login button."""
         await self.handle_load_saved()
         await self.handle_login()
 
     @on(Button.Pressed, selector="#load_saved_btn")
     async def handle_load_saved(self) -> None:
-        info_section = self.get_widget_by_id("login_help_info")
-        await info_section.remove_children()
+        """Handle the load saved button."""
+        info_label = cast(Label, self.get_widget_by_id("login_help_info"))
 
         account_save_path = DEFAULT_LOGIN_SAVE_PATH
 
@@ -83,46 +78,53 @@ class LoginArea(Static):
         else:
             error = None
 
+        prompt_text = Text()
+
         match error:
             case None:
-                await info_section.mount(
-                    Label("Successfully loaded login info from file."),
+                prompt_text.append(
+                    "Successfully loaded login info from file.\n", style="bold green"
                 )
             case yaml.YAMLError():
-                await info_section.mount(
-                    Label("Cannot load login info because the file is invalid."),
-                    Label("You can try remove old login info my using"),
-                    Label(f"rm {DEFAULT_LOGIN_SAVE_PATH.absolute()}"),
+                prompt_text.append(
+                    "Cannot load login info because the file is invalid.\n",
+                    style="bold red",
+                )
+                prompt_text.append(
+                    "You can try remove old login info my using\n"
+                    f"rm {DEFAULT_LOGIN_SAVE_PATH.absolute()}\n",
+                    style="red",
                 )
             case FileNotFoundError():
-                await info_section.mount(
-                    Label("Cannot load login info because the save does not exist."),
-                    Label(
-                        f"Please check if the file {DEFAULT_LOGIN_SAVE_PATH.absolute()} exists."
-                    ),
+                prompt_text.append(
+                    "Cannot load login info because the save does not exist.\n",
+                    style="bold red",
+                )
+                prompt_text.append(
+                    f"Please check if the file {DEFAULT_LOGIN_SAVE_PATH.absolute()} exists.\n",
+                    style="red",
                 )
             case Exception():
-                await info_section.mount(
-                    Label("Cannot load login info because of an unknown error."),
-                    Label("You can try remove old login info my using"),
-                    Label(f"rm {DEFAULT_LOGIN_SAVE_PATH.absolute()}"),
+                prompt_text.append(
+                    "Cannot load login info because of an unknown error.\n",
+                    style="bold red",
+                )
+                prompt_text.append(
+                    "You can try remove old login info my using\n"
+                    f"rm {DEFAULT_LOGIN_SAVE_PATH.absolute()}\n",
+                    style="red",
                 )
 
         if error is not None:
-            await info_section.mount(
-                Pretty(error),
-                Pretty(traceback.format_tb(error.__traceback__)),
-            )
+            prompt_text.append(f"{error}\n")
+            prompt_text.append("\n".join(traceback.format_tb(error.__traceback__)))
+
+        info_label.update(prompt_text)
 
     @on(Button.Pressed, selector="#login_btn")
     async def handle_login(self) -> None:
-        info_section = self.get_widget_by_id("login_help_info")
-        await info_section.remove_children()
-
-        try:
-            await self.get_child_by_id("login_failed").remove()
-        except NoMatches:
-            pass
+        """Handle the login button."""
+        info_label = cast(Label, self.get_widget_by_id("login_help_info"))
 
         email = cast(Input, self.get_widget_by_id("email_input")).value
         password = cast(Input, self.get_widget_by_id("password_input")).value
@@ -131,6 +133,17 @@ class LoginArea(Static):
 
         if self.account is None:
             self.account = GSAccount(email, password).spawn_session()
+
+        if self.account.cookies:
+            info_label.update(Text("Trying to use cookies to login..."))
+        else:
+            if email.strip() == "":
+                info_label.update(Text("Email cannot be empty!", style="bold red"))
+                return
+
+            if password.strip() == "":
+                info_label.update(Text("Password is empty!", style="bold red"))
+                return
 
         if no_verify:
             self.account.no_verify()
@@ -141,7 +154,7 @@ class LoginArea(Static):
             await self.account.login(remember_me)
         except ValueError:
             self.account = None
-            await info_section.mount(Label("Login Failed"))
+            info_label.update(Text("Login Failed!", style="bold red"))
         else:
             if account_save_path:
                 self.account.to_yaml(account_save_path)

@@ -16,7 +16,7 @@ from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH
 class GradescopeConnect(App):
     BINDINGS = [
         ("ctrl+d", "toggle_dark", "Toggle dark mode"),
-        ("ctrl+q", "app.quit", "Quit"),
+        ("ctrl+q", "handle_quit", "Quit"),
     ]
     SCREENS = {
         "login_screen": LoginScreen(id="login_screen", name="login_screen"),
@@ -66,3 +66,6 @@ class GradescopeConnect(App):
                 assignment=event.assignment, autograder_path=self.autograder_path
             )
         )
+
+    async def action_handle_quit(self) -> None:
+        await self.action_quit()

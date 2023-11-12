@@ -8,7 +8,6 @@ CourseCardBackground {
 }
 
 #split_course_area {
-    height: auto;
     layout: grid;
     grid-size: 2 1;
     grid-columns: 30 5fr;
@@ -16,7 +15,6 @@ CourseCardBackground {
 }
 
 Screen {
-    height: 100%;
 }
 
 AssignmentArea {

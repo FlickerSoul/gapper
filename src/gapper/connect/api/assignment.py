@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, TypedDict
@@ -11,6 +13,13 @@ from requests_toolbelt import MultipartEncoder
 
 from gapper.connect.api.mixins import SessionHolder
 from gapper.connect.api.utils import OSChoices
+
+_assignment_logger = logging.getLogger("gapper.connect.api.assignment")
+
+NO_IMAGE_REGEX = re.compile(r"gon\.image *= *null *;?")
+IMAGE_REGEX = re.compile(
+    r"gon\.image *= *{.*\"name\" *: *\"gradescope/autograders:.*-(?P<docker_id>\d+)\""
+)
 
 
 class DockerStatusJson(TypedDict):
@@ -37,6 +46,7 @@ class GSAssignment(SessionHolder):
     release_date: str
     due_date: str
     hard_due_date: str | None
+    docker_id: str | None
 
     def __init__(
         self,
@@ -50,6 +60,7 @@ class GSAssignment(SessionHolder):
         release_date: str,
         due_date: str,
         hard_due_date: str | None,
+        docker_id: str | None = None,
         *,
         session: requests.Session | None = None,
     ) -> None:
@@ -64,6 +75,8 @@ class GSAssignment(SessionHolder):
         self.release_date = release_date
         self.due_date = due_date
         self.hard_due_date = hard_due_date
+        self.docker_id = docker_id
+        self._logger = _assignment_logger.getChild(f"GSAssignment_{self.aid}")
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, GSAssignment):
@@ -116,24 +129,39 @@ class GSAssignment(SessionHolder):
             raise ValueError(f"Upload failed with status code {response.status_code}")
 
     def get_active_docker_id(self) -> str | None:
-        autograder_config = self._session.get(
-            "https://www.gradescope.com/courses/"
-            + self.cid
-            + "/assignments/"
-            + self.aid
-            + "/configure_autograder"
-        )
+        if self.docker_id is None:
+            autograder_config = self._session.get(
+                "https://www.gradescope.com/courses/"
+                + self.cid
+                + "/assignments/"
+                + self.aid
+                + "/configure_autograder"
+            )
 
-        autograder_config_resp = BeautifulSoup(autograder_config.text, "html.parser")
+            if autograder_config.status_code != requests.codes.ok:
+                self._logger.debug(
+                    f"Failed to get autograder config. The status code is {autograder_config.status_code}"
+                )
+                return None
 
-        docker_image_tag = autograder_config_resp.find(
-            "input", id_="assignment_image_name"
-        )
-        image_name = docker_image_tag.get("value", None)
-        if image_name is None:
-            return None
+            self._logger.debug("Got autograder config")
+            self._logger.debug(autograder_config.text)
 
-        return image_name.rsplit("-")[-1]
+            if NO_IMAGE_REGEX.search(autograder_config.text) is not None:
+                self._logger.debug("No image found")
+                return None
+
+            id_match = IMAGE_REGEX.search(autograder_config.text)
+            if id_match is None:
+                self._logger.debug("No image found")
+                self._logger.error(
+                    "Cannot find docker image id. Please notify the developer of this error."
+                )
+                return None
+
+            self.docker_id = id_match.groupdict()["docker_id"]
+
+        return self.docker_id
 
     def get_docker_build_status(self) -> DockerStatusJson | None:
         docker_id = self.get_active_docker_id()

@@ -170,4 +170,9 @@ class AssignmentArea(Static):
 
     @on(Button.Pressed, selector="#upload_autograder_btn")
     async def handle_assignment_upload(self) -> None:
+        if self.selected_assignment is None:
+            await self.get_widget_by_id("info_container").mount(
+                Label("No assignment selected")
+            )
+            return
         self.post_message(type(self).AutograderUpload(self.selected_assignment))
