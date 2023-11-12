@@ -33,4 +33,5 @@ __problem_config__ = {
     "mock_input": False,
     "captured_context": ("GasStation",),
     "easy_context": False,
+    "gs_connect": None,
 }
