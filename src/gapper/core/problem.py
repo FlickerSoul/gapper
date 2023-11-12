@@ -17,6 +17,7 @@ from typing import (
     overload,
 )
 
+from gapper.connect.api.utils import extract_cid_aid_from_url
 from gapper.core.errors import MultipleProblemsDefinedError, NoProblemDefinedError
 from gapper.core.unittest_wrapper import TestCaseWrapper
 from gapper.core.utils import ModuleLoader
@@ -29,6 +30,12 @@ ProbInputType = ParamSpec("ProbInputType")
 ProbOutputType = TypeVar("ProbOutputType")
 
 _problem_logger = logging.getLogger("gapper.problem")
+
+
+@dataclass(frozen=True)
+class GSConnectConfig:
+    cid: str
+    aid: str
 
 
 @dataclass
@@ -47,6 +54,7 @@ class ProblemConfig:
     captured_context: Iterable[str] = ()
     easy_context: bool = False
     is_script: bool = False
+    gs_connect: Optional[GSConnectConfig] = None
 
 
 class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
@@ -230,5 +238,74 @@ def problem(
         fn: Callable[ProbInputType, ProbOutputType]
     ) -> Problem[ProbInputType, ProbOutputType]:
         return Problem(fn, config=config)
+
+    return _wrapper
+
+
+def build_connect_arguments(url_or_cid: str, aid: str | None = None) -> GSConnectConfig:
+    """Build the connect arguments.
+
+    :param url_or_cid: The url when aid is not specified, or the course id of the Gradescope assignment.
+        The format of the url should be
+        https://www.gradescope.com/courses/<cid>/assignments/<aid>[anything]
+
+                connect('12443', '112358')  # specify cid and aid
+                connect('https://www.gradescope.com/courses/12443/assignments/112358')  # specify url
+
+    :param aid: The assignment id of the Gradescope assignment. It should be specified when url_or_cid is a cid.
+    """
+    if aid is None:
+        url = url_or_cid
+        cid, aid = extract_cid_aid_from_url(url)
+        _problem_logger.debug(f"Extracted cid {cid} and aid {aid} from url {url}")
+    else:
+        cid = url_or_cid
+        _problem_logger.debug(f"Using cid {cid} and aid {aid} from user input.")
+
+    if not cid or not aid:
+        raise ValueError(
+            "Must specify both cid and aid at the same time. Or specify a url."
+        )
+
+    return GSConnectConfig(cid=cid, aid=aid)
+
+
+@overload
+def connect[T: Problem](cid: str, aid: str) -> Callable[[T], T]:
+    """Connect a problem to a Gradescope assignment.
+
+    :param cid: The course id of the Gradescope assignment.
+    :param aid: The assignment id of the Gradescope assignment.
+    """
+
+
+@overload
+def connect[T: Problem](url: str) -> Callable[[T], T]:
+    """Connect a problem to a Gradescope assignment.
+
+    :param url: The url of the Gradescope assignment.
+    """
+
+
+def connect[
+    T: Problem
+](url_or_cid: str, aid: str | None = None,) -> Callable[[T], T]:
+    """Connect a problem to a Gradescope assignment.
+
+    :param url_or_cid: The course id of the Gradescope assignment, or the url when aid is not specified.
+        The format of the url should be
+        https://www.gradescope.com/courses/<cid>/assignments/<aid>[anything]
+
+            connect('12443', '112358')  # specify cid and aid
+            connect('https://www.gradescope.com/courses/12443/assignments/112358')  # specify url
+
+    :param aid: The assignment id of the Gradescope assignment.
+
+    """
+    gs_connect_config = build_connect_arguments(url_or_cid, aid)
+
+    def _wrapper(prob: T) -> T:
+        prob.config.gs_connect = gs_connect_config
+        return prob
 
     return _wrapper

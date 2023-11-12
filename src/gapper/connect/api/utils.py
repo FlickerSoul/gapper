@@ -1,4 +1,5 @@
 import enum
+import re
 from typing import NamedTuple
 
 import requests
@@ -41,3 +42,22 @@ class OSChoices(enum.Enum):
                 return "Ubuntu 20.04"
             case OSChoices.UbuntuV2204:
                 return "Ubuntu 22.04"
+
+
+_CID_UID_REGEX = re.compile(
+    r"https://www.gradescope.com/courses/(?P<cid>\d+)/assignments/(?P<aid>\d+)(/?.*)"
+)
+
+
+class _AssignmentInfo(NamedTuple):
+    cid: str | None
+    aid: str | None
+
+
+def extract_cid_aid_from_url(url: str) -> _AssignmentInfo:
+    match = _CID_UID_REGEX.match(url)
+    if match is None:
+        return _AssignmentInfo(None, None)
+    match_group = match.groupdict()
+
+    return _AssignmentInfo(match_group["cid"], match_group["aid"])

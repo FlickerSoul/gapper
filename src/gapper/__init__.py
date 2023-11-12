@@ -1,6 +1,6 @@
 """The gapper (gap) package."""
 
-from .core.problem import problem
+from .core.problem import connect, problem
 from .core.test_parameter import (
     param,
     test_case,
@@ -15,6 +15,7 @@ from .core.test_parameter import (
 from .core.tester import post_test
 
 __all__ = [
+    "connect",
     "problem",
     "param",
     "test_case",
