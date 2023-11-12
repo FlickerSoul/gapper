@@ -22,8 +22,8 @@ from gapper.core.unittest_wrapper import TestCaseWrapper
 from gapper.core.utils import ModuleLoader
 
 if TYPE_CHECKING:
-    from gapper.core.result_synthesizer import PostTest
     from gapper.core.test_parameter import TestParam
+    from gapper.core.tester import PostTest
 
 ProbInputType = ParamSpec("ProbInputType")
 ProbOutputType = TypeVar("ProbOutputType")

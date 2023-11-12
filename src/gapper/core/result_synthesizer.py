@@ -7,52 +7,12 @@ from typing import TYPE_CHECKING, List
 
 from gapper.core.errors import InternalError
 from gapper.core.test_result import TestResult
-from gapper.core.utils import PostTestFn
 from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
 
 if TYPE_CHECKING:
-    from gapper.core.problem import Problem
     from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
-__all__ = ["ResultSynthesizer", "PostTest", "post_test"]
-
-
-class PostTest:
-    """A decorator for post tests. Will be used as @post_test() decorator."""
-
-    def __init__(self, post_test_fn: PostTestFn, as_test_case: bool = True) -> None:
-        """A decorator for specifying post tests. Will be used as @post_test().
-
-            from gapper import post_test, problem
-
-            @post_test()
-            @problem()
-            ...
-
-        :param post_test_fn: The function to be called after all tests are run.
-        :param as_test_case: Whether to treat the post test as a test case.
-            If this is set to True, the post test will incur a TestResult instance to be created
-            and be added to the pool of all test results after the post testing phrase is completed.
-            The test result will then be used to synthesize the score.
-
-            If this is set to False, the post test will not incur a TestResult instance.
-        """
-        self.post_test_fn = post_test_fn
-        self.as_test_case = as_test_case
-
-    def __call__(self, problem: Problem) -> Problem:
-        """Add the post test to the problem.
-
-        :param problem: The problem to add the post test to.
-        """
-        problem.add_post_test(self)
-        return problem
-
-    def __repr__(self) -> str:
-        return f"PostTest(post_test_fn={self.post_test_fn}, as_test_case={self.as_test_case})"
-
-
-post_test = PostTest
+__all__ = ["ResultSynthesizer"]
 
 
 class ResultSynthesizer:
