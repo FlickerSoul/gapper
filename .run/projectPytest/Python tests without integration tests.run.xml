@@ -9,7 +9,7 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-    <option name="_new_additionalArguments" value="&quot;--ignore\u003dintegration_test.py&quot;" />
+    <option name="_new_additionalArguments" value="&quot;--ignore-glob\u003d*integration_test.py&quot;" />
     <option name="_new_target" value="&quot;&quot;" />
     <option name="_new_targetType" value="&quot;CUSTOM&quot;" />
     <method v="2" />
