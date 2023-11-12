@@ -1,4 +1,6 @@
+import asyncio
 import logging
+import traceback
 from functools import wraps
 from pathlib import Path
 from time import time
@@ -8,9 +10,14 @@ import typer
 
 from gapper.cli.rich_test_check_output import rich_print_test_check
 from gapper.cli.rich_test_result_output import rich_print_test_results
+from gapper.connect.api.account import GSAccount
+from gapper.connect.api.assignment import GSAssignmentEssential
+from gapper.connect.gui.app_ui import GradescopeConnect
+from gapper.connect.gui.upload_app_ui import AutograderUploadApp
+from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH
 from gapper.core.file_handlers import AutograderZipper
 from gapper.core.injection import InjectionHandler
-from gapper.core.problem import Problem
+from gapper.core.problem import Problem, build_connect_arguments
 from gapper.core.result_synthesizer import ResultSynthesizer
 from gapper.core.tester import Tester
 from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
@@ -50,7 +57,6 @@ SavePathOpt = Annotated[
         "-s",
         help="The directory to save the generated tester file.",
         default_factory=lambda: Path.cwd(),
-        file_okay=False,
     ),
 ]
 VerboseOpt = Annotated[
@@ -87,6 +93,32 @@ InjectOpt = Annotated[
         "-i",
         help="The path to the tester file to inject.",
         default_factory=list,
+    ),
+]
+OverwriteConfirmOpt = Annotated[
+    bool, typer.Option("--confirm-overwrite", "-y", is_flag=True)
+]
+UploadOpt = Annotated[
+    bool,
+    typer.Option(
+        "--upload", "-u", is_flag=True, help="Whether to upload the autograder."
+    ),
+]
+UseGUIOpt = Annotated[
+    bool,
+    typer.Option(
+        "--gui",
+        "-g",
+        is_flag=True,
+        help="Whether to use the GUI to upload.",
+    ),
+]
+LoginSavePath = Annotated[
+    Path,
+    typer.Option(
+        "--login-save-path",
+        "-l",
+        help="The path to save the login info.",
     ),
 ]
 
@@ -137,17 +169,137 @@ def check(
         raise typer.Exit(code=1)
 
 
+def _load_from_path(login_save_path: Path) -> GSAccount:
+    try:
+        account = GSAccount.from_yaml(login_save_path).spawn_session()
+    except Exception as e:
+        typer.secho(
+            typer.style(
+                f"Cannot load login info due to error {e}.\n"
+                + "".join(traceback.format_tb(e.__traceback__)),
+                fg=typer.colors.RED,
+                bold=True,
+            )
+        )
+        typer.echo("Please check your login save path.")
+        typer.echo("If you haven't logged in, please use the login command.")
+        raise typer.Exit(code=1)
+
+    return account
+
+
+def _check_login_valid(account: GSAccount) -> None:
+    try:
+        asyncio.run(account.login(remember_me=True))
+    except Exception as e:
+        typer.secho(
+            typer.style(
+                f"Cannot login due to error {e}.\n"
+                + "".join(traceback.format_tb(e.__traceback__)),
+                fg=typer.colors.RED,
+                bold=True,
+            )
+        )
+        typer.echo("Please check your login info.")
+        raise typer.Exit(code=1)
+
+
+def _upload_with_gui(login_save_path: Path, autograder_path: Path) -> None:
+    gs_app = GradescopeConnect(
+        login_save_path=login_save_path, autograder_path=autograder_path
+    )
+    gs_app.run()
+
+
+def _upload_with_connect_details(
+    cid: str, aid: str, login_save_path: Path, autograder_path: Path
+) -> None:
+    account = _load_from_path(login_save_path)
+    _check_login_valid(account)
+
+    gs_assignment = GSAssignmentEssential(cid, aid, session=account.session)
+    gs_app = AutograderUploadApp(
+        assignment=gs_assignment, autograder_path=autograder_path
+    )
+    gs_app.run()
+
+
+@app.command()
+def upload(
+    autograder_path: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            help="The path to the autograder zip file.",
+        ),
+    ],
+    use_ui: UseGUIOpt = False,
+    login_save_path: LoginSavePath = DEFAULT_LOGIN_SAVE_PATH,
+    url: Annotated[
+        Optional[str], typer.Option("--url", "-u", help="The url to the autograder.")
+    ] = None,
+    cid: Annotated[
+        Optional[str], typer.Option("--cid", "-c", help="The course id.")
+    ] = None,
+    aid: Annotated[
+        Optional[str], typer.Option("--aid", "-a", help="The assignment id.")
+    ] = None,
+) -> None:
+    """Upload the autograder to Gradescope."""
+    if use_ui:
+        _upload_with_gui(login_save_path, autograder_path)
+    else:
+        if url:
+            connect_config = build_connect_arguments(url)
+        else:
+            connect_config = build_connect_arguments(cid, aid)
+
+        _upload_with_connect_details(
+            connect_config.cid, connect_config.aid, login_save_path, autograder_path
+        )
+
+
+@app.command()
+def login(
+    confirm_store: Annotated[
+        bool, typer.Option("--confirm-store", "-s", is_flag=True)
+    ] = False,
+    confirm_overwrite: OverwriteConfirmOpt = False,
+    login_save_path: LoginSavePath = DEFAULT_LOGIN_SAVE_PATH,
+) -> None:
+    """Login to Gradescope."""
+    email = typer.prompt("Enter your gradescope email")
+    password = typer.prompt("Enter your gradescope password", hide_input=True)
+    account = GSAccount(email, password).spawn_session()
+    _check_login_valid(account)
+
+    if confirm_store or typer.confirm(
+        "Confirm you want to store your session?", default=True
+    ):
+        if (
+            not login_save_path.exists()
+            or confirm_overwrite
+            or typer.confirm("File already exists. Overwrite?", default=False)
+        ):
+            account.to_yaml(login_save_path)
+            typer.echo(f"Login info saved to {login_save_path.absolute()}")
+            return
+
+    typer.secho(typer.style("Aborted.", fg=typer.colors.RED, bold=True))
+
+
 @app.command()
 @_timed
 def gen(
     path: ProblemPathArg,
-    save_path: SavePathOpt,
+    autograder_save_path: SavePathOpt,
     auto_inject: AutoInjectOpt,
     inject: InjectOpt,
-    confirm_overwrite: Annotated[
-        bool, typer.Option("--confirm-overwrite", "-y", is_flag=True)
-    ] = False,
+    confirm_overwrite: OverwriteConfirmOpt = False,
     verbose: VerboseOpt = False,
+    upload_flag: UploadOpt = False,
+    use_ui: UseGUIOpt = False,
+    login_save_path: LoginSavePath = DEFAULT_LOGIN_SAVE_PATH,
 ) -> None:
     """Generate the autograder for a problem."""
     setup_root_logger(verbose)
@@ -161,17 +313,40 @@ def gen(
     tester = Tester(problem)
     cli_logger.debug("Tester generated from problem")
 
-    if save_path.is_dir():
-        save_path = save_path / f"{problem.expected_submission_name}.zip"
+    if autograder_save_path.is_dir():
+        autograder_save_path = (
+            autograder_save_path / f"{problem.expected_submission_name}.zip"
+        )
 
     if confirm_overwrite or typer.confirm(
-        f"File {save_path.absolute()} already exists. Overwrite?", default=True
+        f"File {autograder_save_path.absolute()} already exists. Overwrite?",
+        default=True,
     ):
         typer.echo("Overwriting...")
-        AutograderZipper(tester).generate_zip(save_path)
-        typer.echo(f"Autograder zip generated successfully at {save_path.absolute()}")
+        AutograderZipper(tester).generate_zip(autograder_save_path)
+        typer.echo(
+            f"Autograder zip generated successfully at {autograder_save_path.absolute()}"
+        )
     else:
         typer.echo("Aborted.")
+        return
+
+    if upload_flag:
+        if use_ui:
+            _upload_with_gui(login_save_path, autograder_save_path)
+        else:
+            if problem.config.gs_connect is not None:
+                _upload_with_connect_details(
+                    problem.config.gs_connect.cid,
+                    problem.config.gs_connect.aid,
+                    login_save_path,
+                    autograder_save_path,
+                )
+            else:
+                typer.echo(
+                    "No Gradescope connection info found in problem config. "
+                    "Please use @gapper.connect() decorator, or use the --gui flag."
+                )
 
 
 @app.command()

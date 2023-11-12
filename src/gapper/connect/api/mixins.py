@@ -16,6 +16,10 @@ class SessionHolder:
     def __init__(self, session: requests.Session | None = None) -> None:
         self._session = session
 
+    @property
+    def session(self) -> requests.Session | None:
+        return self._session
+
     def load_session(self, session: requests.Session) -> Self:
         self._session = session
         return self
