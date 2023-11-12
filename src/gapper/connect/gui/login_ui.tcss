@@ -1,4 +1,4 @@
-#login_area {
+LoginScreen {
     height: 100%;
     grid-size: 1 4;
     grid-rows: 2fr 1fr 1fr;
@@ -6,7 +6,7 @@
     content-align: center middle;
 }
 
-#login_area .inputs {
+LoginScreen .inputs {
     height: auto;
     margin: 1 0;
     padding: 1 2;
@@ -17,7 +17,7 @@
     content-align: center middle;
 }
 
-#login_area .buttons,.options {
+LoginScreen .buttons,.options {
     height: auto;
     max-height: 3;
     margin: 3 0;
