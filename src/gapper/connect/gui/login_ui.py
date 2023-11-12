@@ -74,32 +74,44 @@ class LoginArea(Static):
         account_save_path = DEFAULT_LOGIN_SAVE_PATH
 
         try:
-            self.account = GSAccount.from_yaml(account_save_path)
-            self.account.spawn_session()
+            self.account = GSAccount.from_yaml(account_save_path).spawn_session()
             self.get_widget_by_id("email_input").value = self.account.email
             self.get_widget_by_id("password_input").value = self.account.password
             self.get_widget_by_id("remember_me").value = True
-        except FileNotFoundError as e:
-            await info_section.mount(
-                Label("Cannot load login info because the file does not exist."),
-                Pretty(e),
-                Pretty(traceback.format_tb(e.__traceback__)),
-            )
-        except yaml.YAMLError as e:
-            await info_section.mount(
-                Label("Cannot load login info because the file is invalid."),
-                Label("You can try remove old login info my using"),
-                Label(f"rm {DEFAULT_LOGIN_SAVE_PATH.absolute()}"),
-                Pretty(e),
-                Pretty(traceback.format_tb(e.__traceback__)),
-            )
         except Exception as e:
+            error = e
+        else:
+            error = None
+
+        match error:
+            case None:
+                await info_section.mount(
+                    Label("Successfully loaded login info from file."),
+                )
+            case yaml.YAMLError():
+                await info_section.mount(
+                    Label("Cannot load login info because the file is invalid."),
+                    Label("You can try remove old login info my using"),
+                    Label(f"rm {DEFAULT_LOGIN_SAVE_PATH.absolute()}"),
+                )
+            case FileNotFoundError():
+                await info_section.mount(
+                    Label("Cannot load login info because the save does not exist."),
+                    Label(
+                        f"Please check if the file {DEFAULT_LOGIN_SAVE_PATH.absolute()} exists."
+                    ),
+                )
+            case Exception():
+                await info_section.mount(
+                    Label("Cannot load login info because of an unknown error."),
+                    Label("You can try remove old login info my using"),
+                    Label(f"rm {DEFAULT_LOGIN_SAVE_PATH.absolute()}"),
+                )
+
+        if error is not None:
             await info_section.mount(
-                Label("Cannot load login info because of an unknown error."),
-                Label("You can try remove old login info my using"),
-                Label(f"rm {DEFAULT_LOGIN_SAVE_PATH.absolute()}"),
-                Pretty(e),
-                Pretty(traceback.format_tb(e.__traceback__)),
+                Pretty(error),
+                Pretty(traceback.format_tb(error.__traceback__)),
             )
 
     @on(Button.Pressed, selector="#login_btn")

@@ -31,3 +31,13 @@ class OSChoices(enum.Enum):
     UbuntuV1804 = ImageChoice("gradescope/autograder-base:ubuntu-18.04", 1)
     UbuntuV2004 = ImageChoice("gradescope/autograder-base:ubuntu-20.04", 2)
     UbuntuV2204 = ImageChoice("gradescope/autograder-base:ubuntu-22.04", 3)
+
+    @property
+    def name(self) -> str:
+        match self:
+            case OSChoices.UbuntuV1804:
+                return "Ubuntu 18.04"
+            case OSChoices.UbuntuV2004:
+                return "Ubuntu 20.04"
+            case OSChoices.UbuntuV2204:
+                return "Ubuntu 22.04"

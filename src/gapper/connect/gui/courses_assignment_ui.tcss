@@ -21,9 +21,13 @@ Screen {
 
 AssignmentArea {
     layout: grid;
-    grid-size: 1 3;
+    grid-size: 1 4;
     grid-columns: 1fr;
-    grid-rows: 5 5 1fr;
+    grid-rows: 3 1 5 1fr;
+}
+
+AssignmentArea Label {
+    margin-left: 1;
 }
 
 AssignmentArea #assignment_buttons {

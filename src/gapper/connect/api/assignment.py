@@ -73,7 +73,7 @@ class GSAssignment(SessionHolder):
     def __hash__(self) -> int:
         return hash(self.aid)
 
-    def upload_autograder(self, path: Path, os_choice: OSChoices) -> None:
+    async def upload_autograder(self, path: Path, os_choice: OSChoices) -> None:
         if not path.exists():
             raise FileNotFoundError(f"File {path} does not exist when uploading")
         if not path.is_file() or not path.suffix == ".zip":
