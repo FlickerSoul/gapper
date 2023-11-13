@@ -5,11 +5,11 @@ import pytest
 from gapper import problem
 from gapper.core.errors import MultipleProblemsDefinedError, NoProblemDefinedError
 from gapper.core.injection import InjectionHandler
+from gapper.core.problem import Problem
 from gapper.core.problem.extras.gradescope_connect import (
     GSConnectConfig,
     build_connect_config,
 )
-from gapper.core.problem.problem_def import Problem
 from tests.conftest import (
     INJECTION_PROBLEM_FOLDER,
     NO_PROBLEM_FILE_FOLDER,

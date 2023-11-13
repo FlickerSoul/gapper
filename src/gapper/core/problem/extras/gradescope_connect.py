@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Callable, overload
 from gapper.connect.api.utils import extract_cid_aid_from_url
 
 if TYPE_CHECKING:
-    from gapper.core.problem.problem_def import Problem
+    from gapper.core.problem import Problem
 
 _gs_connect_logger = logging.getLogger("gapper.core.problem.extras.gradescope_connect")
 

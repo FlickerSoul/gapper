@@ -11,5 +11,8 @@ from gapper.core.tester import PostTest
 assert post_test is PostTest
 ```
 
-## API
-::: gapper.core.tester
+## Tester API
+::: gapper.core.tester.tester_def
+
+## `PostTest` and `post_test` API
+::: gapper.core.tester.post_test_hook

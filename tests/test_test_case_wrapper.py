@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from gapper.core.problem.problem_def import Problem
+from gapper.core.problem import Problem
 from gapper.core.test_parameter import TestParam
 from gapper.core.test_result import TestResult
 from gapper.core.unittest_wrapper import TestCaseWrapper

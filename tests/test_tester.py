@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 
 from gapper.core.errors import InternalError, MultipleSubmissionError, NoSubmissionError
-from gapper.core.problem.problem_def import Problem
+from gapper.core.problem import Problem
 from gapper.core.tester import Tester
 from tests.conftest import (
     MULTIPLE_SUBMISSIONS_FOLDER,
