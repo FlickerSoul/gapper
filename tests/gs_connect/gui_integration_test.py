@@ -156,7 +156,7 @@ async def test_click_assignment(gs_account: AccountDetail, gs_cid: str, gs_aid: 
     await main_app_pilot.click("#login_btn")
     await main_app_pilot.pause()
 
-    await run_test_click_course(gs_account, gs_cid, main_app_pilot)
+    await run_test_click_course(gs_cid, main_app_pilot)
     await run_test_click_assignment(gs_cid, gs_aid, main_app_pilot)
 
 

@@ -102,6 +102,7 @@ LoginSavePath = Annotated[
     typer.Option(
         "--login-save-path",
         "-l",
+        dir_okay=False,
         help="The path to save the login info.",
     ),
 ]
