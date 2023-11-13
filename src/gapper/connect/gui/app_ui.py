@@ -11,7 +11,6 @@ from gapper.connect.gui.course_assignment_ui import CourseScreen
 from gapper.connect.gui.login_ui import LoginScreen
 from gapper.connect.gui.messages import AccountSave
 from gapper.connect.gui.mixin import LoadingHandler
-from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH
 
 
 class GradescopeConnect(LoadingHandler, App):
@@ -38,7 +37,13 @@ class GradescopeConnect(LoadingHandler, App):
         yield Footer()
 
     def on_mount(self) -> None:
-        self.push_screen(LoginScreen(id="login_screen", name="login_screen"))
+        self.push_screen(
+            LoginScreen(
+                login_save_path=self.login_save_path,
+                id="login_screen",
+                name="login_screen",
+            )
+        )
 
     @on(LoginScreen.LoggedIn)
     async def handle_login(self, message: LoginScreen.LoggedIn) -> None:
@@ -53,13 +58,15 @@ class GradescopeConnect(LoadingHandler, App):
 
     @on(AccountSave)
     async def handle_save(self, message: AccountSave) -> None:
+        self.log.debug("Got account save request.")
         if self.save or message.save:
+            self.log.debug("Saving account")
             try:
-                self.account.to_yaml(self.login_save_path or DEFAULT_LOGIN_SAVE_PATH)
+                self.account.to_yaml(self.login_save_path)
             except Exception as e:
                 self.log.debug(f"Failed to save account: {e}")
         else:
-            self.log.debug("Not saving account")
+            self.log.debug("Not saving account due to configs")
 
     @on(AssignmentArea.CreateNewAssignment)
     async def handle_create_new_assignment(self) -> None:
