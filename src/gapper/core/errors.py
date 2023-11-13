@@ -101,7 +101,8 @@ class NoSubmissionError(StudentError):
         return (
             f"No submission is found.\n"
             f"If you're submitting a script, please name your submission file as '{self.expected_name}'.\n"
-            f"If you're writing a function or a class, please name your submission fn/class as '{self.expected_name}'.\n"
+            f"If you're writing a function or a class, "
+            f"please name your submission fn/class as '{self.expected_name}'.\n"
             f"(without quotes)\n"
         )
 

@@ -6,7 +6,7 @@ This post discusses the effect of each `gap_` keyword and how they can be used.
 
 We list the possible `gap_` keywords below. 
 
-```python
+```text
 gap_expect: The expected output of the test case.
 gap_expect_stdout: The expected stdout of the test case.
 gap_hidden: Whether the test case is hidden.

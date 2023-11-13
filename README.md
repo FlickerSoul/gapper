@@ -6,8 +6,7 @@
 ![PyPI - License](https://img.shields.io/pypi/l/gapper)
 [<img src="https://img.shields.io/github/actions/workflow/status/flickersoul/gapper/python-package.yml">](https://github.com/FlickerSoul/gapper/actions/workflows/python-package.yml)
 [<img src="https://img.shields.io/codecov/c/github/FlickerSoul/gapper/main">](https://app.codecov.io/gh/FlickerSoul/gapper/)
-[<img src="https://img.shields.io/badge/Wiki-blue?link=https%3A%2F%2Fgithub.com%2FFlickerSoul%2Fgapper%2Fwiki">](https://github.com/FlickerSoul/gapper/wiki)
-[<img src="https://img.shields.io/badge/API_Reference-blue?link=https%3A%2F%2Fgapper.universe.observer">](https://gapper.universe.observer)
+[<img src="https://img.shields.io/badge/Wiki_and_API_Reference-blue?link=https%3A%2F%2Fgapper.universe.observer">](https://gapper.universe.observer)
 
 
 
@@ -17,11 +16,11 @@ GAP is a tool that allows you to create a Gradescope autograder from a decorator
 
 ## Showcase 
 
-[Vimeo](https://vimeo.com/884058503)
+[Generate and Upload Vimeo Video](https://vimeo.com/884058503)
 
-[Vimeo](https://vimeo.com/884058767)
+[Upload with GUI Vimeo Video](https://vimeo.com/884058767)
 
-[Vimeo](https://vimeo.com/884058863)
+[Upload with GUI 2 Vimeo Video](https://vimeo.com/884058863)
 
 
 ## Usage and Demonstration

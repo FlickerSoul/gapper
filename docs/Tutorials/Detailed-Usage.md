@@ -276,14 +276,14 @@ def ...
 The `problem` has two over loads: 
 
 ```python
-is_script: bool = False,
-context: Iterable[str] = (),
+is_script: bool = False
+context: Iterable[str] = ()
 ```
 and 
 ```python
-check_stdout: Optional[bool] = None,
-mock_input: Optional[bool] = None,
-context: Iterable[str] = (),
+check_stdout: Optional[bool] = None
+mock_input: Optional[bool] = None
+context: Iterable[str] = ()
 ```
 
 `is_script` is used to indicate if the assignment is a script, which is something like the following 
@@ -306,7 +306,7 @@ class GasStation:
 
 @problem(context=['GasStation'])
 class Car:
-    "The car uses GasStation."
+    """The car uses GasStation."""
 ```
 
 ### Examples
@@ -383,7 +383,7 @@ You can import `test_case` and `test_cases` to help the generation of tests. The
 from gapper import problem, test_case, test_cases, param
 
 @test_cases.param_iter((i, i + 1) for i in range(10))
-@test_cases.params([1, 2] param(1, b=1), param(1, b=3))
+@test_cases.params([1, 2], param(1, b=1), param(1, b=3))
 @test_case(1, b=4)
 @problem()
 def fn(a, b):
@@ -403,7 +403,9 @@ The following is the explanation of the effect of each option.
   
   ```python
   iter = ([i, i + 1] for i in range(1, 3))
-  @test_cases.param_iter(*iter)
+  @test_cases.param_iter(iter)
+  def fn(a, b):
+    ...
   ...
   ```
   is equivalent to 
