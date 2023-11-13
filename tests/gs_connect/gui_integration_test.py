@@ -11,7 +11,10 @@ import pytest_asyncio
 from gapper.connect.api.assignment import GSAssignmentEssential
 from gapper.connect.gui.app_ui import GradescopeConnect
 from gapper.connect.gui.autograder_upload_ui import AutograderUpload
-from gapper.connect.gui.course_assignment_ui import CourseScreen, make_course_car_name
+from gapper.connect.gui.course_assignment_ui import (
+    CourseScreen,
+    make_course_car_name,
+)
 from gapper.connect.gui.login_ui import LoginScreen
 from gapper.connect.gui.upload_app_ui import AutograderUploadApp
 from pytest_mock import MockerFixture
@@ -41,7 +44,9 @@ async def main_app_pilot() -> AsyncGenerator[Pilot, None]:
         yield pilot
 
 
-async def enter_account_detail(pilot: Pilot, account: AccountDetail, remember_me: bool = False) -> None:
+async def enter_account_detail(
+    pilot: Pilot, account: AccountDetail, remember_me: bool = False
+) -> None:
     with suppress():
         await pilot.click("#email_input")
         await pilot.press(*account.email)
@@ -97,7 +102,9 @@ async def test_login_save(gs_account: AccountDetail, tmp_path: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_login_failed_gui(gs_dummy_account: AccountDetail, main_app_pilot: Pilot) -> None:
+async def test_login_failed_gui(
+    gs_dummy_account: AccountDetail, main_app_pilot: Pilot
+) -> None:
     await enter_account_detail(main_app_pilot, gs_dummy_account)
 
     await main_app_pilot.click("#login_btn")
@@ -128,7 +135,9 @@ async def run_test_click_course(gs_cid: str, main_app_pilot: Pilot) -> None:
 
 
 @pytest.mark.asyncio
-async def test_click_course(gs_account: AccountDetail, gs_cid: str, main_app_pilot: Pilot) -> None:
+async def test_click_course(
+    gs_account: AccountDetail, gs_cid: str, main_app_pilot: Pilot
+) -> None:
     await enter_account_detail(main_app_pilot, gs_account)
     await main_app_pilot.click("#login_btn")
     await main_app_pilot.pause()
@@ -136,14 +145,18 @@ async def test_click_course(gs_account: AccountDetail, gs_cid: str, main_app_pil
     await run_test_click_course(gs_cid, main_app_pilot)
 
 
-async def run_test_click_assignment(gs_cid: str, gs_aid: str, main_app_pilot: Pilot) -> None:
+async def run_test_click_assignment(
+    gs_cid: str, gs_aid: str, main_app_pilot: Pilot
+) -> None:
     # assume the course is selected already
     await main_app_pilot.click("#refresh_assignments_btn")
     await main_app_pilot.pause()
 
     assert gs_aid in main_app_pilot.app.account.courses[gs_cid].assignments  # type: ignore
 
-    assignment_data = cast(DataTable, main_app_pilot.app.get_widget_by_id("assignment_table"))
+    assignment_data = cast(
+        DataTable, main_app_pilot.app.get_widget_by_id("assignment_table")
+    )
     assignment_data.focus()
     index = assignment_data.get_row_index(RowKey(gs_aid))
 
@@ -151,7 +164,9 @@ async def run_test_click_assignment(gs_cid: str, gs_aid: str, main_app_pilot: Pi
 
 
 @pytest.mark.asyncio
-async def test_click_assignment(gs_account: AccountDetail, gs_cid: str, gs_aid: str, main_app_pilot: Pilot) -> None:
+async def test_click_assignment(
+    gs_account: AccountDetail, gs_cid: str, gs_aid: str, main_app_pilot: Pilot
+) -> None:
     await enter_account_detail(main_app_pilot, gs_account)
     await main_app_pilot.click("#login_btn")
     await main_app_pilot.pause()
@@ -183,7 +198,9 @@ async def test_autograder_upload(
 
     assert autograder_upload.exists()
 
-    async with AutograderUploadApp(assignment=assignment, autograder_path=autograder_upload).run_test() as pilot:  # type: Pilot
+    async with AutograderUploadApp(
+        assignment=assignment, autograder_path=autograder_upload
+    ).run_test() as pilot:  # type: Pilot
         await pilot.pause()
 
         upload_screen = pilot.app.query_one("AutograderUpload")

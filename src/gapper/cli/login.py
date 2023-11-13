@@ -2,7 +2,12 @@ from typing import Annotated
 
 import typer
 
-from gapper.cli.cli_options import LoginSavePath, OverwriteConfirmOpt, VerboseOpt, timed
+from gapper.cli.cli_options import (
+    LoginSavePath,
+    OverwriteConfirmOpt,
+    VerboseOpt,
+    timed,
+)
 from gapper.cli.utils import check_login_valid
 from gapper.connect.api.account import GSAccount
 from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH

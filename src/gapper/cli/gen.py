@@ -13,7 +13,11 @@ from gapper.cli.cli_options import (
     VerboseOpt,
     timed,
 )
-from gapper.cli.utils import cli_logger, upload_with_connect_details, upload_with_gui
+from gapper.cli.utils import (
+    cli_logger,
+    upload_with_connect_details,
+    upload_with_gui,
+)
 from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH, add_debug_to_app
 from gapper.core.file_handlers import AutograderZipper
 from gapper.core.injection import InjectionHandler
@@ -49,7 +53,9 @@ def gen(
     cli_logger.debug("Tester generated from problem")
 
     if autograder_save_path.is_dir():
-        autograder_save_path = autograder_save_path / f"{problem.expected_submission_name}.zip"
+        autograder_save_path = (
+            autograder_save_path / f"{problem.expected_submission_name}.zip"
+        )
 
     if confirm_overwrite or typer.confirm(
         f"File {autograder_save_path.absolute()} already exists. Overwrite?",
@@ -58,7 +64,9 @@ def gen(
     ):
         typer.echo("Overwriting...")
         AutograderZipper(tester).generate_zip(autograder_save_path)
-        typer.echo(f"Autograder zip generated successfully at {autograder_save_path.absolute()}")
+        typer.echo(
+            f"Autograder zip generated successfully at {autograder_save_path.absolute()}"
+        )
 
     if upload_flag:
         if use_ui:

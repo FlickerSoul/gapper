@@ -79,7 +79,10 @@ InjectOpt = Annotated[
 OverwriteConfirmOpt = Annotated[
     bool,
     typer.Option(
-        "--confirm-overwrite", "-y", is_flag=True, help="Confirm overwrite files."
+        "--confirm-overwrite",
+        "-y",
+        is_flag=True,
+        help="Confirm overwrite files.",
     ),
 ]
 UploadOpt = Annotated[

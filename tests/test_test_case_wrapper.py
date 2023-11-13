@@ -35,7 +35,10 @@ from tests.conftest import make_problem_name
 def test_result_init(dummy_problem, test_param: TestParam) -> None:
     test_result = TestResult("test")
 
-    with patch("gapper.core.unittest_wrapper.TestCaseWrapper._run_test", new=lambda _, y: y):
+    with patch(
+        "gapper.core.unittest_wrapper.TestCaseWrapper._run_test",
+        new=lambda _, y: y,
+    ):
         wrapper = TestCaseWrapper(test_param, dummy_problem)
         wrapper.run_test(None, test_result)
 
@@ -46,7 +49,9 @@ def test_result_init(dummy_problem, test_param: TestParam) -> None:
         ("gap_extra_points", "extra_points"),
         ("gap_hidden", "hidden"),
     ]:
-        assert getattr(test_param.param_info, param_attr) == getattr(test_result, result_attr)
+        assert getattr(test_param.param_info, param_attr) == getattr(
+            test_result, result_attr
+        )
 
     des = getattr(test_param.param_info, "gap_description")
     if isinstance(des, str):
@@ -57,7 +62,9 @@ def test_result_init(dummy_problem, test_param: TestParam) -> None:
 
 
 def test_gap_check(request: pytest.FixtureRequest) -> None:
-    gap_check_tester: Problem = request.getfixturevalue(make_problem_name("sanity_check_with_gap_expect.py"))
+    gap_check_tester: Problem = request.getfixturevalue(
+        make_problem_name("sanity_check_with_gap_expect.py")
+    )
 
     for test in gap_check_tester.generate_tests():
         passed, result, out = test.check_test()

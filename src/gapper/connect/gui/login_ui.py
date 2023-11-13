@@ -9,7 +9,15 @@ from textual.app import ComposeResult
 from textual.containers import Container, ScrollableContainer
 from textual.message import Message
 from textual.screen import Screen
-from textual.widgets import Button, Checkbox, Footer, Header, Input, Label, Static
+from textual.widgets import (
+    Button,
+    Checkbox,
+    Footer,
+    Header,
+    Input,
+    Label,
+    Static,
+)
 
 from gapper.connect.api.account import GSAccount
 from gapper.connect.gui.messages import AccountSave
@@ -49,7 +57,9 @@ class LoginScreen(Screen):
             Input(placeholder="Gradescope Email", id="email_input"),
             Static("Password", classes="label"),
             Input(
-                placeholder="Gradescope Password", password=True, id="password_input"
+                placeholder="Gradescope Password",
+                password=True,
+                id="password_input",
             ),
             classes="inputs",
         )
@@ -102,7 +112,8 @@ class LoginScreen(Screen):
         match error:
             case None:
                 prompt_text.append(
-                    "Successfully loaded login info from file.\n", style="bold green"
+                    "Successfully loaded login info from file.\n",
+                    style="bold green",
                 )
             case yaml.YAMLError():
                 prompt_text.append(

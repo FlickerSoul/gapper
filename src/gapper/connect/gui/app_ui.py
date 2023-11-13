@@ -82,7 +82,8 @@ class GradescopeConnect(App):
     ) -> None:
         await self.push_screen(
             AutograderUpload(
-                assignment=event.assignment, autograder_path=self.autograder_path
+                assignment=event.assignment,
+                autograder_path=self.autograder_path,
             )
         )
 

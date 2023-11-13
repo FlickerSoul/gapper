@@ -89,7 +89,9 @@ class CourseDisplay(Static):
         await course_list_ui.mount(
             *(
                 CourseCard(
-                    course, classes="course_card", id=make_course_car_name(course.cid)
+                    course,
+                    classes="course_card",
+                    id=make_course_car_name(course.cid),
                 )
                 for course in sorted(
                     self.account.courses.values(),

@@ -23,7 +23,9 @@ from gapper.core.unittest_wrapper import ContextManager
 from gapper.core.utils import ModuleLoader
 
 if TYPE_CHECKING:
-    from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+    from gapper.gradescope.datatypes.gradescope_meta import (
+        GradescopeSubmissionMetadata,
+    )
 
 
 _tester_logger = logging.getLogger("gapper.tester")
@@ -52,7 +54,9 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         self._problem: Problem[ProbInputType, ProbOutputType] = problem
         self._submission: Any | None = None
         self._submission_context: ContextManager = ContextManager()
-        self._logger = _tester_logger.getChild(f"Tester_{problem and problem.expected_submission_name}")
+        self._logger = _tester_logger.getChild(
+            f"Tester_{problem and problem.expected_submission_name}"
+        )
 
     @property
     def problem(self) -> Problem[ProbInputType, ProbOutputType]:
@@ -74,7 +78,9 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         """The context of captured from the submission."""
         return self._submission_context
 
-    def _load_script_submission_from_path(self, path: Path) -> Generator[Callable[[], None], None, None]:
+    def _load_script_submission_from_path(
+        self, path: Path
+    ) -> Generator[Callable[[], None], None, None]:
         if path.is_dir():
             for sub_path in path.iterdir():
                 yield from self._load_script_submission_from_path(sub_path)
@@ -103,7 +109,9 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
             self.load_context_from_module(md)
 
             try:
-                yield self._load_symbol_from_module(md, self.problem.expected_submission_name)
+                yield self._load_symbol_from_module(
+                    md, self.problem.expected_submission_name
+                )
             except AttributeError:
                 return None
 
@@ -121,7 +129,9 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
             self._logger.debug("Loading object submission")
             submission_list = list(self._load_object_submission_from_path(path))
 
-        self._logger.debug(f"Found {len(submission_list)} submissions: {submission_list}")
+        self._logger.debug(
+            f"Found {len(submission_list)} submissions: {submission_list}"
+        )
 
         if len(submission_list) == 0:
             raise NoSubmissionError(self.problem.expected_submission_name)
@@ -149,7 +159,9 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
                 raise MultipleContextValueError(context_value_name)
 
             self.submission_context[context_value_name] = context_value
-            self._logger.debug(f"Loaded context value for {context_value_name} from {md}")
+            self._logger.debug(
+                f"Loaded context value for {context_value_name} from {md}"
+            )
 
         return self
 
@@ -161,7 +173,9 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
 
         self._logger.debug("Context completeness check passed")
 
-    def run(self, metadata: GradescopeSubmissionMetadata | None = None) -> List[TestResult]:
+    def run(
+        self, metadata: GradescopeSubmissionMetadata | None = None
+    ) -> List[TestResult]:
         """Run the tests.
 
         :param metadata: The metadata of the submission, which could be None.

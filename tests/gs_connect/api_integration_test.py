@@ -31,12 +31,16 @@ def test_account_login_with_cookie(gs_account: AccountDetail) -> None:
 def test_cli_login(gs_account: AccountDetail, tmp_path: Path) -> None:
     login_save = tmp_path / "login_save.json"
     args = ["login", "-l", str(login_save.absolute())]
-    result = CliRunner().invoke(cli_app, args, input="".join(map(lambda x: x + "\n", gs_account)))
+    result = CliRunner().invoke(
+        cli_app, args, input="".join(map(lambda x: x + "\n", gs_account))
+    )
     assert result.exit_code == 0
 
 
 def test_cli_login_failed(gs_dummy_account: AccountDetail, tmp_path: Path) -> None:
     login_save = tmp_path / "login_save.json"
     args = ["login", "-l", str(login_save.absolute())]
-    result = CliRunner().invoke(cli_app, args, input="".join(map(lambda x: x + "\n", gs_dummy_account)))
+    result = CliRunner().invoke(
+        cli_app, args, input="".join(map(lambda x: x + "\n", gs_dummy_account))
+    )
     assert result.exit_code == 1

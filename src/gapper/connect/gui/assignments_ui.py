@@ -49,7 +49,9 @@ class AssignmentArea(Static):
         yield DataTable(id="assignment_table")
 
     async def on_mount(self) -> None:
-        assignment_table: DataTable = cast(DataTable, self.get_widget_by_id("assignment_table"))
+        assignment_table: DataTable = cast(
+            DataTable, self.get_widget_by_id("assignment_table")
+        )
 
         await self.change_course_name()
 
@@ -72,7 +74,9 @@ class AssignmentArea(Static):
         await self.load_assignments()
 
     async def clear_info_section(self) -> ScrollableContainer:
-        info_container: ScrollableContainer = cast(ScrollableContainer, self.get_widget_by_id("info_container"))
+        info_container: ScrollableContainer = cast(
+            ScrollableContainer, self.get_widget_by_id("info_container")
+        )
         await info_container.remove_children()
 
         return info_container
@@ -83,10 +87,14 @@ class AssignmentArea(Static):
         if self.course:
             await container.mount(Label(f"Loaded Course: {self.course.name}"))
         else:
-            await container.mount(Label("No course loaded. Please select from the left."))
+            await container.mount(
+                Label("No course loaded. Please select from the left.")
+            )
 
     async def load_assignments(self) -> None:
-        assignment_table: DataTable = cast(DataTable, self.get_widget_by_id("assignment_table"))
+        assignment_table: DataTable = cast(
+            DataTable, self.get_widget_by_id("assignment_table")
+        )
 
         assignment_table.clear()
         self.log.debug("Cleared assignment table")
@@ -118,12 +126,16 @@ class AssignmentArea(Static):
         await self.load_assignments()
 
     @on(DataTable.CellSelected, selector="#assignment_table")
-    async def handle_assignment_cell_selected(self, message: DataTable.CellSelected) -> None:
+    async def handle_assignment_cell_selected(
+        self, message: DataTable.CellSelected
+    ) -> None:
         self.log.debug(f"Selected assignment {message.cell_key.row_key.value}")
         await self._load_selected(message.cell_key.row_key.value)
 
     @on(DataTable.RowSelected, selector="#assignment_table")
-    async def handle_assignment_row_selected(self, message: DataTable.RowSelected) -> None:
+    async def handle_assignment_row_selected(
+        self, message: DataTable.RowSelected
+    ) -> None:
         self.log.debug(f"Selected assignment {message.row_key.value}")
         await self._load_selected(message.row_key.value)
 
@@ -131,7 +143,9 @@ class AssignmentArea(Static):
         self.selected_assignment = self.course.assignments.get(key, None)
         info_container: ScrollableContainer = await self.clear_info_section()
         await info_container.mount(
-            Label(f"Selected assignment {self.selected_assignment and self.selected_assignment.name}")
+            Label(
+                f"Selected assignment {self.selected_assignment and self.selected_assignment.name}"
+            )
         )
 
     async def refresh_assignment(self) -> None:
@@ -140,7 +154,9 @@ class AssignmentArea(Static):
 
         if self.course is None:
             self.log.debug("No course loaded, cannot refresh assignments")
-            await info_container.mount(Label("No course loaded, cannot refresh assignments"))
+            await info_container.mount(
+                Label("No course loaded, cannot refresh assignments")
+            )
             return
 
         self.log.debug("Refreshing assignments")
@@ -152,7 +168,9 @@ class AssignmentArea(Static):
     @on(Button.Pressed, selector="#add_assignment_btn")
     async def handle_assignment_create(self) -> None:
         if self.course is None:
-            await self.get_widget_by_id("info_container").mount(Label("No course selected"))
+            await self.get_widget_by_id("info_container").mount(
+                Label("No course selected")
+            )
             return
 
         self.post_message(type(self).CreateNewAssignment(self.course))
@@ -160,6 +178,8 @@ class AssignmentArea(Static):
     @on(Button.Pressed, selector="#upload_autograder_btn")
     async def handle_assignment_upload(self) -> None:
         if self.selected_assignment is None:
-            await self.get_widget_by_id("info_container").mount(Label("No assignment selected"))
+            await self.get_widget_by_id("info_container").mount(
+                Label("No assignment selected")
+            )
             return
         self.post_message(type(self).AutograderUpload(self.selected_assignment))

@@ -15,18 +15,18 @@ def custom_test(param: TestCaseWrapper, result_proxy, solution, submission) -> N
     standard_sln = solution(standard_middleware)
     standard_sub = submission(standard_middleware)
     for test_response in param.test_param.args:
-        assert standard_sln.generate_middleware_response(test_response) == standard_sub.generate_middleware_response(
+        assert standard_sln.generate_middleware_response(
             test_response
-        )
+        ) == standard_sub.generate_middleware_response(test_response)
 
     private_middleware = PrivateTestingMiddleware("the secret")
     private_sln = solution(private_middleware)
     private_sub = submission(private_middleware)
 
     for test_response in param.test_param.args:
-        assert private_sln.generate_middleware_response(test_response) == private_sub.generate_middleware_response(
+        assert private_sln.generate_middleware_response(
             test_response
-        )
+        ) == private_sub.generate_middleware_response(test_response)
 
 
 @test_cases.params(

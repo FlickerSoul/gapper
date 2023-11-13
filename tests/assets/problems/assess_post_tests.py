@@ -2,7 +2,9 @@ from typing import List
 
 from gapper import post_test, problem, test_cases
 from gapper.core.test_result import TestResult
-from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+from gapper.gradescope.datatypes.gradescope_meta import (
+    GradescopeSubmissionMetadata,
+)
 
 
 def check_at_least_half_is_correct(

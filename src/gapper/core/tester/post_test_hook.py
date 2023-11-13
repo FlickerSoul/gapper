@@ -2,11 +2,17 @@ from __future__ import annotations
 
 from typing import List
 
-from gapper.core.errors import InternalError, SubmissionSyntaxError, TestFailedError
+from gapper.core.errors import (
+    InternalError,
+    SubmissionSyntaxError,
+    TestFailedError,
+)
 from gapper.core.problem import Problem
 from gapper.core.test_result import TestResult
 from gapper.core.utils import PostTestFn
-from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+from gapper.gradescope.datatypes.gradescope_meta import (
+    GradescopeSubmissionMetadata,
+)
 
 
 class PostTest:
@@ -59,13 +65,18 @@ class PostTest:
         try:
             self._run(test_results, result_proxy, metadata)
         except AssertionError as e:
-            result_proxy and result_proxy.add_error(TestFailedError(e), set_failed=result_proxy.is_pass_status_unset)
+            result_proxy and result_proxy.add_error(
+                TestFailedError(e), set_failed=result_proxy.is_pass_status_unset
+            )
         except SyntaxError as e:
             result_proxy and result_proxy.add_error(
-                SubmissionSyntaxError(e), set_failed=result_proxy.is_pass_status_unset
+                SubmissionSyntaxError(e),
+                set_failed=result_proxy.is_pass_status_unset,
             )
         except Exception as e:
-            result_proxy.add_error(InternalError(e), set_failed=result_proxy.is_pass_status_unset)
+            result_proxy.add_error(
+                InternalError(e), set_failed=result_proxy.is_pass_status_unset
+            )
         else:
             if result_proxy and result_proxy.is_pass_status_unset:
                 result_proxy.set_pass_status("passed")

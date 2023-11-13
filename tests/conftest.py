@@ -94,7 +94,10 @@ def tester_fixture(request: pytest.FixtureRequest) -> Problem[Any, Any]:
 
 @pytest.fixture()
 def all_preset_problems(request) -> List[Problem[Any, Any]]:
-    return [request.getfixturevalue(make_problem_name(prob_name.name)) for prob_name in preset_problem_paths()]
+    return [
+        request.getfixturevalue(make_problem_name(prob_name.name))
+        for prob_name in preset_problem_paths()
+    ]
 
 
 @pytest.fixture()

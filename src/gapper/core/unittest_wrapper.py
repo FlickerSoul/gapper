@@ -3,20 +3,40 @@ from __future__ import annotations
 
 import logging
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, Callable, NamedTuple, Protocol, Self, Sequence, Tuple
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    NamedTuple,
+    Protocol,
+    Self,
+    Sequence,
+    Tuple,
+)
 from unittest import TestCase
 from unittest.mock import patch
 
-from gapper.core.errors import InternalError, SubmissionSyntaxError, TestFailedError
+from gapper.core.errors import (
+    InternalError,
+    SubmissionSyntaxError,
+    TestFailedError,
+)
 from gapper.core.pipeline_support import PipelineBase
 from gapper.core.test_result import TestResult
-from gapper.core.utils import CaptureStdout, CustomTestFn, apply_context_on_fn, generate_custom_input
+from gapper.core.utils import (
+    CaptureStdout,
+    CustomTestFn,
+    apply_context_on_fn,
+    generate_custom_input,
+)
 
 if TYPE_CHECKING:
     from gapper.core.problem import Problem
     from gapper.core.test_parameter import TestParam
     from gapper.core.utils import CustomEqualityCheckFn
-    from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+    from gapper.gradescope.datatypes.gradescope_meta import (
+        GradescopeSubmissionMetadata,
+    )
 
 _test_wrapper_logger = logging.getLogger("gapper.test_wrapper")
 
@@ -39,7 +59,9 @@ class EvalFn[Input, Output](Protocol):
         ...
 
 
-def _stdout_cm_adder[Output](fn: Callable[..., Output]) -> Callable[..., EvalOutput[Output]]:
+def _stdout_cm_adder[Output](
+    fn: Callable[..., Output]
+) -> Callable[..., EvalOutput[Output]]:
     def _wrapper(self, *args, **kwargs) -> Any:
         with CaptureStdout(capture=self.problem.config.check_stdout) as cm:
             res = fn(self, *args, **kwargs)
@@ -140,7 +162,9 @@ class TestCaseWrapper(TestCase):
         except AssertionError as e:
             result.add_error(TestFailedError(e), set_failed=result.is_pass_status_unset)
         except SyntaxError as e:
-            result.add_error(SubmissionSyntaxError(e), set_failed=result.is_pass_status_unset)
+            result.add_error(
+                SubmissionSyntaxError(e), set_failed=result.is_pass_status_unset
+            )
         except Exception as e:
             result.add_error(InternalError(e), set_failed=result.is_pass_status_unset)
         else:
@@ -156,7 +180,10 @@ class TestCaseWrapper(TestCase):
         """
 
         self._logger.debug("Checking test")
-        if self.test_param.param_info.gap_expect is None and self.test_param.param_info.gap_expect_stdout is None:
+        if (
+            self.test_param.param_info.gap_expect is None
+            and self.test_param.param_info.gap_expect_stdout is None
+        ):
             self._logger.debug("Test skipped")
             return None
 
@@ -164,7 +191,9 @@ class TestCaseWrapper(TestCase):
             raise Warning("gap_override_test is not None, check_test is ignored.")
         else:
             if self.test_param.param_info.gap_override_check:
-                check_fn: CustomEqualityCheckFn = self.test_param.param_info.gap_override_check
+                check_fn: CustomEqualityCheckFn = (
+                    self.test_param.param_info.gap_override_check
+                )
             else:
                 check_fn = self.assertEqual  # type: ignore
 
@@ -182,14 +211,18 @@ class TestCaseWrapper(TestCase):
                 try:
                     check_fn(actual_result, self.test_param.param_info.gap_expect)
                 except AssertionError:
-                    self._logger.debug("Check failed because it does not meet gap_expect")
+                    self._logger.debug(
+                        "Check failed because it does not meet gap_expect"
+                    )
                     flag = False
 
             if self.test_param.param_info.gap_expect_stdout is not None:
                 try:
                     assert actual_out == self.test_param.param_info.gap_expect_stdout
                 except AssertionError:
-                    self._logger.debug("Check failed because it does not meet gap_expect_stdout")
+                    self._logger.debug(
+                        "Check failed because it does not meet gap_expect_stdout"
+                    )
                     flag = False
 
             return flag, actual_result, actual_out
@@ -198,7 +231,10 @@ class TestCaseWrapper(TestCase):
         """Set the test result object to default values specified in the info."""
         result.set_name(self.test_param.param_info.gap_name)
         result.set_extra_points(self.test_param.param_info.gap_extra_points)
-        if self.test_param.param_info.gap_max_score is None and self.test_param.param_info.gap_weight is None:
+        if (
+            self.test_param.param_info.gap_max_score is None
+            and self.test_param.param_info.gap_weight is None
+        ):
             result.set_default_weight()
         else:
             result.set_max_score(self.test_param.param_info.gap_max_score)
@@ -225,14 +261,23 @@ class TestCaseWrapper(TestCase):
 
         if self.test_param.param_info.gap_override_test is not None:
             self._logger.debug("Handing testing to gap_override_test")
-            if self.problem.config.easy_context or self.test_param.param_info.gap_easy_context:
+            if (
+                self.problem.config.easy_context
+                or self.test_param.param_info.gap_easy_context
+            ):
                 self._logger.debug("Using easy context")
-                self.gap_override_test_with_context(self, result, self.problem.solution, submission)
+                self.gap_override_test_with_context(
+                    self, result, self.problem.solution, submission
+                )
             else:
-                self.test_param.param_info.gap_override_test(self, result, self.problem.solution, submission)
+                self.test_param.param_info.gap_override_test(
+                    self, result, self.problem.solution, submission
+                )
         else:
             if self.test_param.param_info.gap_override_check:
-                check_fn: CustomEqualityCheckFn = self.test_param.param_info.gap_override_check
+                check_fn: CustomEqualityCheckFn = (
+                    self.test_param.param_info.gap_override_check
+                )
             else:
                 check_fn = self.assertEqual  # type: ignore
 
@@ -242,7 +287,9 @@ class TestCaseWrapper(TestCase):
 
             self._logger.debug(f"Selected evaluation fn {eval_fn.__name__}")
 
-            expected_result, expected_out = eval_fn(self.problem.solution, self.test_param)
+            expected_result, expected_out = eval_fn(
+                self.problem.solution, self.test_param
+            )
             actual_result, actual_out = eval_fn(submission, self.test_param)
 
             check_fn(expected_result, actual_result)
@@ -273,7 +320,9 @@ class TestCaseWrapper(TestCase):
 
     @property
     def gap_override_test_with_context(self) -> CustomTestFn:
-        return apply_context_on_fn(self.test_param.param_info.gap_override_test, self.context)
+        return apply_context_on_fn(
+            self.test_param.param_info.gap_override_test, self.context
+        )
 
     def load_context(self, context: ContextManager) -> Self:
         """Load the submission context into the test case.

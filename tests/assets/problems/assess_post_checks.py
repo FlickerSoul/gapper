@@ -28,7 +28,9 @@ def recursive_check(
     if not check_recursive_ast(submission):
         result_proxy.set_score(result_proxy.max_score // 2)
         result_proxy.set_pass_status("failed")
-        result_proxy.add_description("Failed because recursive call not found in submission.")
+        result_proxy.add_description(
+            "Failed because recursive call not found in submission."
+        )
 
 
 # @test_cases.params(

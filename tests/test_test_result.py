@@ -64,7 +64,9 @@ def test_test_result_rich_output() -> None:
     assert result.rich_test_output == "Passed"
 
     result.add_description("test description")
-    assert result.rich_test_output == ("Passed\n" + "Description(s): \n" + "  test description")
+    assert result.rich_test_output == (
+        "Passed\n" + "Description(s): \n" + "  test description"
+    )
 
     result.add_error(InternalError("test error"), set_failed=False)
     assert (

@@ -10,7 +10,9 @@ from gapper.core.test_result import TestResult
 from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
 
 if TYPE_CHECKING:
-    from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+    from gapper.gradescope.datatypes.gradescope_meta import (
+        GradescopeSubmissionMetadata,
+    )
 
 __all__ = ["ResultSynthesizer"]
 

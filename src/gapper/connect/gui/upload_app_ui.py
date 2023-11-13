@@ -35,7 +35,9 @@ class AutograderUploadApp(App):
 
     def compose(self) -> ComposeResult:
         yield Header()
-        yield Static("You can quit this uploader now (ctrl+q) :)", classes="quit_prompt")
+        yield Static(
+            "You can quit this uploader now (ctrl+q) :)", classes="quit_prompt"
+        )
         yield Footer()
 
     async def on_mount(self) -> None:

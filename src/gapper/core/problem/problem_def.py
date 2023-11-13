@@ -16,7 +16,10 @@ from typing import (
     overload,
 )
 
-from gapper.core.errors import MultipleProblemsDefinedError, NoProblemDefinedError
+from gapper.core.errors import (
+    MultipleProblemsDefinedError,
+    NoProblemDefinedError,
+)
 from gapper.core.problem.problem_config import ProblemConfig
 from gapper.core.unittest_wrapper import TestCaseWrapper
 from gapper.core.utils import ModuleLoader
@@ -149,9 +152,13 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
 
 @overload
 def problem(
-    *, is_script: bool = False, context: Iterable[str] = (), easy_context: bool = False
+    *,
+    is_script: bool = False,
+    context: Iterable[str] = (),
+    easy_context: bool = False,
 ) -> Callable[
-    [Callable[ProbInputType, ProbOutputType]], Problem[ProbInputType, ProbOutputType]
+    [Callable[ProbInputType, ProbOutputType]],
+    Problem[ProbInputType, ProbOutputType],
 ]:
     """Assert that this problem is a script."""
     ...
@@ -165,7 +172,8 @@ def problem(
     context: Iterable[str] = (),
     easy_context: bool = False,
 ) -> Callable[
-    [Callable[ProbInputType, ProbOutputType]], Problem[ProbInputType, ProbOutputType]
+    [Callable[ProbInputType, ProbOutputType]],
+    Problem[ProbInputType, ProbOutputType],
 ]:
     """Assert that this problem will be tested with custom input & captured stdout."""
     ...
@@ -179,7 +187,8 @@ def problem(
     context: Iterable[str] = (),
     easy_context: bool = False,
 ) -> Callable[
-    [Callable[ProbInputType, ProbOutputType]], Problem[ProbInputType, ProbOutputType]
+    [Callable[ProbInputType, ProbOutputType]],
+    Problem[ProbInputType, ProbOutputType],
 ]:
     """Create a problem object.
 

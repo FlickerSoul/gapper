@@ -9,7 +9,9 @@ __all__ = ["run_autograder"]
 from gapper.core.errors import InternalError, StudentError
 from gapper.core.result_synthesizer import ResultSynthesizer
 from gapper.core.tester import Tester
-from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+from gapper.gradescope.datatypes.gradescope_meta import (
+    GradescopeSubmissionMetadata,
+)
 from gapper.gradescope.datatypes.gradescope_output import GradescopeJson
 from gapper.gradescope.vars import (
     AUTOGRADER_METADATA,
