@@ -5,12 +5,23 @@ from textual.widgets import Footer, Header, Static
 
 from gapper.connect.api.assignment import GSAssignment, GSAssignmentEssential
 from gapper.connect.gui.autograder_upload_ui import AutograderUpload
+from gapper.connect.gui.mixin import LoadingHandler
 
 
-class AutograderUploadApp(App):
+class AutograderUploadApp(LoadingHandler, App):
     BINDINGS = [
         ("ctrl+q", "app.quit", "Quit"),
     ]
+
+    CSS = """
+        Screen {
+            align: center middle;
+        }
+        
+        .quit_prompt {
+            width: auto;
+        }
+    """
 
     def __init__(
         self,
@@ -25,7 +36,9 @@ class AutograderUploadApp(App):
 
     def compose(self) -> ComposeResult:
         yield Header()
-        yield Static("You can quit this uploader now (ctrl+q). :)")
+        yield Static(
+            "You can quit this uploader now (ctrl+q) :)", classes="quit_prompt"
+        )
         yield Footer()
 
     async def on_mount(self) -> None:
