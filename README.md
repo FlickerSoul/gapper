@@ -13,6 +13,15 @@
 
 GAP is a tool that allows you to create a Gradescope autograder from a decorator so that you can ditch the cumbersome `gradescope-utils`. It's inspired by [aga](https://github.com/rileyshahar/aga) and reconstructed from the ground up to be easier to use and maintain. 
 
+## Showcase 
+
+[Vimeo](https://vimeo.com/884058503)
+
+[Vimeo](https://vimeo.com/884058767)
+
+[Vimeo](https://vimeo.com/884058863)
+
+
 ## Usage and Demonstration
 
 ### Installation
@@ -30,4 +39,4 @@ pip install -e gapper
 
 ### Usage 
 
-Please refer to the [Wiki page](https://github.com/FlickerSoul/gapper/wiki) of this repository for detailed usage. For API reference, please visit [here](https://gapper.universe.observer).
+Please refer to the [GH Pages](https://gapper.universe.observer) of this repository for detailed usage and API reference.
