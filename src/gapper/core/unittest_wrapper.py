@@ -27,7 +27,7 @@ from gapper.core.utils import (
 )
 
 if TYPE_CHECKING:
-    from gapper.core.problem import Problem
+    from gapper.core.problem.problem_def import Problem
     from gapper.core.test_parameter import TestParam
     from gapper.core.utils import CustomEqualityCheckFn
     from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata

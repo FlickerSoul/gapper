@@ -17,7 +17,7 @@ from gapper.cli.utils import cli_logger, upload_with_connect_details, upload_wit
 from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH, add_debug_to_app
 from gapper.core.file_handlers import AutograderZipper
 from gapper.core.injection import InjectionHandler
-from gapper.core.problem import Problem
+from gapper.core.problem.problem_def import Problem
 from gapper.core.tester import Tester
 from gapper.logger_utils import setup_root_logger
 

@@ -1,5 +1,5 @@
 from gapper import gs_connect, problem, test_case
-from gapper.core.problem import GSConnectConfig
+from gapper.core.problem.extras.gradescope_connect import GSConnectConfig
 
 
 @test_case("1", "2")

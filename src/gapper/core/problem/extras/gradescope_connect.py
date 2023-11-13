@@ -1,9 +1,21 @@
 from __future__ import annotations
 
-from typing import Callable, overload
+import logging
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Callable, overload
 
 from gapper.connect.api.utils import extract_cid_aid_from_url
-from gapper.core.problem import GSConnectConfig, Problem, _problem_logger
+
+if TYPE_CHECKING:
+    from gapper.core.problem.problem_def import Problem
+
+_gs_connect_logger = logging.getLogger("gapper.core.problem.extras.gradescope_connect")
+
+
+@dataclass(frozen=True)
+class GSConnectConfig:
+    cid: str
+    aid: str
 
 
 def build_connect_config(url_or_cid: str, aid: str | None = None) -> GSConnectConfig:
@@ -21,10 +33,10 @@ def build_connect_config(url_or_cid: str, aid: str | None = None) -> GSConnectCo
     if aid is None:
         url = url_or_cid
         cid, aid = extract_cid_aid_from_url(url)
-        _problem_logger.debug(f"Extracted cid {cid} and aid {aid} from url {url}")
+        _gs_connect_logger.debug(f"Extracted cid {cid} and aid {aid} from url {url}")
     else:
         cid = url_or_cid
-        _problem_logger.debug(f"Using cid {cid} and aid {aid} from user input.")
+        _gs_connect_logger.debug(f"Using cid {cid} and aid {aid} from user input.")
 
     if not cid or not aid:
         raise ValueError(

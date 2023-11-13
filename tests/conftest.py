@@ -5,7 +5,8 @@ from typing import Any, Generator, List
 
 import pytest
 
-from gapper.core.problem import Problem, ProblemConfig
+from gapper.core.problem.problem_config import ProblemConfig
+from gapper.core.problem.problem_def import Problem
 from gapper.core.tester import Tester
 
 TEST_ASSET_FOLDER = Path(__file__).parent / "assets"

@@ -1,7 +1,6 @@
 """The gapper (gap) package."""
 
-from .core.problem import problem
-from .core.problem_extras import gs_connect
+from .core.problem import gs_connect, problem
 from .core.test_parameter import (
     param,
     test_case,

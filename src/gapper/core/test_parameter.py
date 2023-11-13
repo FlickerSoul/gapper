@@ -34,7 +34,7 @@ __all__ = [
 from gapper.core.errors import InternalError
 
 if TYPE_CHECKING:
-    from gapper.core.problem import ProbInputType, Problem, ProbOutputType
+    from gapper.core.problem.problem_def import ProbInputType, Problem, ProbOutputType
     from gapper.core.utils import CustomEqualityCheckFn, CustomTestFn, PostChecksFn
 
 

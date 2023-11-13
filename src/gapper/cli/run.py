@@ -10,7 +10,7 @@ from gapper.cli.cli_options import (
 from gapper.cli.rich_test_result_output import rich_print_test_results
 from gapper.cli.utils import cli_logger
 from gapper.core.injection import InjectionHandler
-from gapper.core.problem import Problem
+from gapper.core.problem.problem_def import Problem
 from gapper.core.result_synthesizer import ResultSynthesizer
 from gapper.core.tester import Tester
 from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata

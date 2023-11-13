@@ -2,8 +2,6 @@
 from __future__ import annotations
 
 import logging
-from collections import defaultdict
-from dataclasses import dataclass, field
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -14,12 +12,12 @@ from typing import (
     List,
     Optional,
     ParamSpec,
-    TypedDict,
     TypeVar,
     overload,
 )
 
 from gapper.core.errors import MultipleProblemsDefinedError, NoProblemDefinedError
+from gapper.core.problem.problem_config import ProblemConfig
 from gapper.core.unittest_wrapper import TestCaseWrapper
 from gapper.core.utils import ModuleLoader
 
@@ -31,35 +29,6 @@ ProbInputType = ParamSpec("ProbInputType")
 ProbOutputType = TypeVar("ProbOutputType")
 
 _problem_logger = logging.getLogger("gapper.problem")
-
-
-@dataclass(frozen=True)
-class GSConnectConfig:
-    cid: str
-    aid: str
-
-
-class ProblemConfigExtra(TypedDict):
-    gs_connect: Optional[GSConnectConfig]
-
-
-@dataclass
-class ProblemConfig:
-    """Problem configuration.
-
-    :param check_stdout: Whether to check the stdout of the solution.
-    :param mock_input: Whether to mock the input of the solution.
-    :param captured_context: The context to capture from the submission.
-    :param is_script: Whether this problem is a script.
-    :param easy_context: Whether to use context directly in gap override tests.
-    """
-
-    check_stdout: bool = False
-    mock_input: bool = False
-    captured_context: Iterable[str] = ()
-    easy_context: bool = False
-    is_script: bool = False
-    extras: ProblemConfigExtra = field(default_factory=lambda: defaultdict(None))
 
 
 class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):

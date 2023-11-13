@@ -16,7 +16,7 @@ from gapper.core.errors import (
     MultipleSubmissionError,
     NoSubmissionError,
 )
-from gapper.core.problem import ProbInputType, Problem, ProbOutputType
+from gapper.core.problem.problem_def import ProbInputType, Problem, ProbOutputType
 from gapper.core.test_result import TestResult
 from gapper.core.unittest_wrapper import ContextManager
 from gapper.core.utils import ModuleLoader, PostTestFn
