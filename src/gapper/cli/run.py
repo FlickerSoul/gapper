@@ -30,14 +30,8 @@ def run(
     """Run the autograder on an example submission."""
     setup_root_logger(verbose)
 
-    cli_logger.debug(
-        f"Try loading metadata from {metadata_path and metadata_path.absolute()}"
-    )
-    metadata = (
-        None
-        if metadata_path is None
-        else GradescopeSubmissionMetadata.from_file(metadata_path)
-    )
+    cli_logger.debug(f"Try loading metadata from {metadata_path and metadata_path.absolute()}")
+    metadata = None if metadata_path is None else GradescopeSubmissionMetadata.from_file(metadata_path)
     cli_logger.debug(f"Metadata loaded: {metadata}")
 
     total_score = metadata.assignment.total_points if metadata else total_score
@@ -55,9 +49,7 @@ def run(
     test_results = tester.load_submission_from_path(submission).run(metadata)
     cli_logger.debug("Test results generated from tester")
 
-    score_obtained = ResultSynthesizer(
-        results=test_results, total_score=total_score
-    ).synthesize_score()
+    score_obtained = ResultSynthesizer(results=test_results, total_score=total_score).synthesize_score()
     cli_logger.debug(f"Score obtained from synthesizer {score_obtained}")
 
     rich_print_test_results(test_results, score_obtained, total_score)
