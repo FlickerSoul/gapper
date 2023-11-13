@@ -146,6 +146,22 @@ def test_load_auto_inject() -> None:
             GSConnectConfig("112358", "2468"),
         ],
         [
+            ("https://www.gradescope.com/courses/112358/assignments/2468/", None),
+            GSConnectConfig("112358", "2468"),
+        ],
+        [
+            ("https://www.gradescope.com/courses/112358/assignments/2468", None),
+            GSConnectConfig("112358", "2468"),
+        ],
+        [
+            ("www.gradescope.com/courses/112358/assignments/2468/review_grades", None),
+            GSConnectConfig("112358", "2468"),
+        ],
+        [
+            ("gradescope.com/courses/112358/assignments/2468/review_grades", None),
+            GSConnectConfig("112358", "2468"),
+        ],
+        [
             (
                 "https://www.gradescope.com/courses/112358/assignments/2468/review_grades",
                 "112358",

@@ -45,7 +45,7 @@ class OSChoices(enum.Enum):
 
 
 _CID_UID_REGEX = re.compile(
-    r"https://www.gradescope.com/courses/(?P<cid>\d+)/assignments/(?P<aid>\d+)(/?.*)"
+    r"(https://)?(www.)?gradescope.com/courses/(?P<cid>\d+)/assignments/(?P<aid>\d+)(/?.*)"
 )
 
 
