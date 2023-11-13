@@ -39,11 +39,11 @@ def url(
             help="The path to the autograder zip file.",
         ),
     ],
+    assignment_url: Annotated[
+        Optional[str], typer.Argument(help="The url to the autograder.")
+    ],
     login_save_path: LoginSavePath = DEFAULT_LOGIN_SAVE_PATH,
     ui_debug: UIDebugOpt = False,
-    assignment_url: Annotated[
-        Optional[str], typer.Option("--url", "-u", help="The url to the autograder.")
-    ] = None,
 ) -> None:
     """Upload an autograder to Gradescope using the assignment url."""
     add_debug_to_app(ui_debug)
@@ -67,12 +67,8 @@ def ids(
     ],
     login_save_path: LoginSavePath = DEFAULT_LOGIN_SAVE_PATH,
     ui_debug: UIDebugOpt = False,
-    cid: Annotated[
-        Optional[str], typer.Option("--cid", "-c", help="The course id.")
-    ] = None,
-    aid: Annotated[
-        Optional[str], typer.Option("--aid", "-a", help="The assignment id.")
-    ] = None,
+    cid: Annotated[Optional[str], typer.Argument(help="The course id.")] = None,
+    aid: Annotated[Optional[str], typer.Argument(help="The assignment id.")] = None,
 ) -> None:
     """Upload an autograder to Gradescope using the cid and aid."""
     add_debug_to_app(ui_debug)
