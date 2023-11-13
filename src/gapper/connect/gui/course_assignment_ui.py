@@ -65,6 +65,10 @@ class CourseCard(Static):
             select_indicator.add_class("hidden")
 
 
+def make_course_car_name(cid: str) -> str:
+    return f"course_car_{cid}"
+
+
 class CourseDisplay(Static):
     class CourseRefresh(Message):
         pass
@@ -84,7 +88,9 @@ class CourseDisplay(Static):
 
         await course_list_ui.mount(
             *(
-                CourseCard(course, classes="course_card")
+                CourseCard(
+                    course, classes="course_card", id=make_course_car_name(course.cid)
+                )
                 for course in sorted(
                     self.account.courses.values(),
                     key=lambda c: (int(c.inactive), c.year, c.term),

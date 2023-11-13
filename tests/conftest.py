@@ -20,6 +20,8 @@ NO_SUBMISSION_FOLDER = TEST_ASSET_FOLDER / "no_submission_defined"
 SINGLE_SUBMISSION_FOLDER = TEST_ASSET_FOLDER / "single_submission_defined"
 MULTIPLE_SUBMISSIONS_FOLDER = TEST_ASSET_FOLDER / "multiple_submissions_defined"
 
+PACKED_AUTOGRADER_FOLDER = TEST_ASSET_FOLDER / "packed_autograders"
+
 PROBLEM_CONFIG_VAR_NAME = "__problem_config__"
 
 

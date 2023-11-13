@@ -1,7 +1,7 @@
 import traceback
 from pathlib import Path
 from threading import Timer
-from typing import cast
+from typing import Callable, cast
 
 from rich.text import Text
 from textual import on
@@ -18,8 +18,22 @@ from gapper.connect.api.assignment import (
 from gapper.connect.api.utils import OSChoices
 
 
-class Repeat(Timer):
+class Repeat[**P, T](Timer):
+    def __init__(
+        self,
+        interval: float | int,
+        function: Callable[P, T],
+        args=None,
+        kwargs=None,
+        call_immediately: bool = False,
+    ) -> None:
+        super().__init__(interval, function, args, kwargs)
+        self.call_immediately = call_immediately
+
     def run(self):
+        if self.call_immediately:
+            self.function(*self.args, **self.kwargs)
+
         while not self.finished.wait(self.interval):
             self.function(*self.args, **self.kwargs)
 
@@ -101,7 +115,9 @@ class AutograderUpload(Screen):
             )
         else:
             self.upload_info_timer = Repeat(
-                1, lambda: self.run_worker(self.refresh_upload_info())
+                1,
+                lambda: self.run_worker(self.refresh_upload_info()),
+                call_immediately=True,
             )
             self.upload_info_timer.start()
 
