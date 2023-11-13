@@ -7,6 +7,11 @@ copyright: Copyright &copy; 2023 Larry Zeng and Contributors
 
 nav:
   - Home: index.md
+  - Tutorials:
+      - Tutorials/Getting-Started.md
+      - Tutorials/Detailed-Usage.md
+      - Tutorials/gap_-Keywords.md
+      - Tutorials/Test-Result-(Proxy).md
   - API:
     - API/problem.md
     - API/test_cases.md
@@ -32,6 +37,9 @@ theme:
     - content.code.annotate
     - content.code.copy
     - navigation.top
+    - navigation.tabs
+    - navigation.indexes
+    - navigation.tabs.sticky
     - navigation.footer
     - search.highlight
     - search.suggest
