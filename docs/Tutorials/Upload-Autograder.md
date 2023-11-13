@@ -59,7 +59,7 @@ def add(a: int, b: int) -> int:
     ...
 ```
 
-The `<cid>` and `<aid>` must be strings of digits. You can reference [the API](API/problem_extras.md) for more information. 
+The `<cid>` and `<aid>` must be strings of digits. You can reference [the API](../API/problem_extras.md) for more information. 
 
 #### `--upload --gui` flag with GUI
 
