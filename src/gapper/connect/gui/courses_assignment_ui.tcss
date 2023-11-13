@@ -12,7 +12,7 @@ CourseCardBackground {
     width: 41;
 }
 
-Screen {
+CourseScreen {
     height: 100%;
     layout: horizontal;
 }
