@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import typer
 from textual import on
 from textual.app import App, ComposeResult
 from textual.widgets import Footer, Header
@@ -69,8 +70,12 @@ class GradescopeConnect(LoadingHandler, App):
             self.log.debug("Not saving account due to configs")
 
     @on(AssignmentArea.CreateNewAssignment)
-    async def handle_create_new_assignment(self) -> None:
-        pass
+    def handle_create_new_assignment(
+        self, event: AssignmentArea.CreateNewAssignment
+    ) -> None:
+        typer.launch(
+            f"https://www.gradescope.com/courses/{event.course.cid}/assignments/new"
+        )
 
     @on(AssignmentArea.AutograderUpload)
     async def handle_upload_autograder(
