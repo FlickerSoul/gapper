@@ -32,5 +32,5 @@ __problem_config__ = {
     "mock_input": False,
     "captured_context": ["adder"],
     "easy_context": True,
-    "gs_connect": None,
+    "extras": {},
 }

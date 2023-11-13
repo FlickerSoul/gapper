@@ -6,7 +6,7 @@ import typer
 from gapper.cli.cli_options import LoginSavePath, UIDebugOpt, timed
 from gapper.cli.utils import upload_with_connect_details, upload_with_gui
 from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH, add_debug_to_app
-from gapper.core.problem import build_connect_config
+from gapper.core.problem_extras.gradescope_connect import build_connect_config
 
 upload = typer.Typer(name="upload")
 

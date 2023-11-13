@@ -68,10 +68,11 @@ def gen(
         if use_ui:
             upload_with_gui(login_save_path, autograder_save_path)
         else:
-            if problem.config.gs_connect is not None:
+            if problem.config.extras["gs_connect"] is not None:
+                gs_connect = problem.config.extras["gs_connect"]
                 upload_with_connect_details(
-                    problem.config.gs_connect.cid,
-                    problem.config.gs_connect.aid,
+                    gs_connect.cid,
+                    gs_connect.aid,
                     login_save_path,
                     autograder_save_path,
                 )

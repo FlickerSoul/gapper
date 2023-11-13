@@ -1,10 +1,10 @@
-from gapper import connect, problem, test_case
+from gapper import gs_connect, problem, test_case
 from gapper.core.problem import GSConnectConfig
 
 
 @test_case("1", "2")
 @test_case("1", "2")
-@connect("112358", "2468")
+@gs_connect("112358", "2468")
 @problem()
 def string_connection(a: str, b: str) -> str:
     return a + b
@@ -16,5 +16,7 @@ __problem_config__ = {
     "mock_input": False,
     "captured_context": (),
     "easy_context": False,
-    "gs_connect": GSConnectConfig("112358", "2468"),
+    "extras": {
+        "gs_connect": GSConnectConfig("112358", "2468"),
+    },
 }

@@ -16,5 +16,5 @@ __problem_config__ = {
     "mock_input": True,
     "captured_context": (),
     "easy_context": False,
-    "gs_connect": None,
+    "extras": {},
 }
