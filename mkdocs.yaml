@@ -27,6 +27,8 @@ nav:
     - API/tester.md
     - API/gradescope_data_types.md
     - API/errors.md
+  - Contribute:
+    - Contributing/how_to_contribute.md
 
 extra:
   social:
