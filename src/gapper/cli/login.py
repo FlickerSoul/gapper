@@ -12,7 +12,13 @@ from gapper.logger_utils import setup_root_logger
 @timed
 def login(
     confirm_store: Annotated[
-        bool, typer.Option("--confirm-store", "-s", is_flag=True)
+        bool,
+        typer.Option(
+            "--confirm-store",
+            "-s",
+            is_flag=True,
+            help="Confirm storing your login info.",
+        ),
     ] = False,
     confirm_overwrite: OverwriteConfirmOpt = False,
     login_save_path: LoginSavePath = DEFAULT_LOGIN_SAVE_PATH,
