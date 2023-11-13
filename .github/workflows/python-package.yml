@@ -39,6 +39,9 @@ jobs:
         python -V
         poetry run python -V
     - name: Test with pytest
+      env:
+        GS_TEST_CONNECT_PASSWORD: ${{ secrets.GS_TEST_CONNECT_PASSWORD }}
+        GS_TEST_CONNECT_EMAIL: ${{ secrets.GS_TEST_CONNECT_EMAIL }}
       run: |
         poetry run pytest --cov --cov-report=json
     - name: Upload coverage reports to Codecov
