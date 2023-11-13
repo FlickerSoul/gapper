@@ -1,5 +1,6 @@
 # Useful Utils
 
+## API
 ::: gapper.core.utils
     options:
         members:
