@@ -25,7 +25,7 @@ class AutograderZipper:
             "requirements.txt",
         }
         self.ignore_folder = {"__pycache__"}
-        self.ignore_files = {".pyc"}
+        self.ignore_files = {".pyc", ".DS_Store"}
 
     def generate_zip(self, zip_file_path: Path) -> None:
         """Generate the autograder zip file given a save path.
