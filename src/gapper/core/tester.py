@@ -15,6 +15,8 @@ from gapper.core.errors import (
     MultipleContextValueError,
     MultipleSubmissionError,
     NoSubmissionError,
+    SubmissionSyntaxError,
+    TestFailedError,
 )
 from gapper.core.problem.problem_def import ProbInputType, Problem, ProbOutputType
 from gapper.core.test_result import TestResult
@@ -221,9 +223,7 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
             else:
                 result_proxy = None
 
-            self._logger.debug(f"Running post test {post_test_case}")
-            post_test_case.post_test_fn(results, result_proxy, metadata)
-            self._logger.debug(f"Post test {post_test_case} completed")
+            post_test_case.run(results, result_proxy, metadata)
 
             if result_proxy is not None:
                 addition_test_results.append(result_proxy)
@@ -290,6 +290,47 @@ class PostTest:
 
     def __repr__(self) -> str:
         return f"PostTest(post_test_fn={self.post_test_fn}, as_test_case={self.as_test_case})"
+
+    def run(
+        self,
+        test_results: List[TestResult],
+        result_proxy: TestResult | None,
+        metadata: GradescopeSubmissionMetadata | None,
+    ) -> TestResult | None:
+        """Run the post test.
+
+        :param test_results: The results of the tests.
+        :param result_proxy: The proxy of the post test result.
+        :param metadata: The metadata of the submission, which could be None.
+        """
+
+        try:
+            self._run(test_results, result_proxy, metadata)
+        except AssertionError as e:
+            result_proxy and result_proxy.add_error(
+                TestFailedError(e), set_failed=result_proxy.is_pass_status_unset
+            )
+        except SyntaxError as e:
+            result_proxy and result_proxy.add_error(
+                SubmissionSyntaxError(e), set_failed=result_proxy.is_pass_status_unset
+            )
+        except Exception as e:
+            result_proxy.add_error(
+                InternalError(e), set_failed=result_proxy.is_pass_status_unset
+            )
+        else:
+            if result_proxy and result_proxy.is_pass_status_unset:
+                result_proxy.set_pass_status("passed")
+
+        return result_proxy
+
+    def _run(
+        self,
+        test_results: List[TestResult],
+        result_proxy: TestResult,
+        metadata: GradescopeSubmissionMetadata | None,
+    ) -> None:
+        self.post_test_fn(test_results, result_proxy, metadata)
 
 
 post_test = PostTest

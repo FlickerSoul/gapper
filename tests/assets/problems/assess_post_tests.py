@@ -6,15 +6,16 @@ from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMeta
 
 
 def check_at_least_half_is_correct(
-    results: List[TestResult],
-    current_result_proxy: TestResult,
+    test_results: List[TestResult],
+    test_proxy: TestResult,
     metadata: GradescopeSubmissionMetadata | None,
 ) -> None:
-    if sum(result.is_passed for result in results) > len(results) // 2:
-        current_result_proxy.set_max_score(0)
-        current_result_proxy.set_pass_status("passed")
+    test_proxy.set_max_score(0)
+    # if the number of passed tests is greater than half of the total number of tests
+    if sum(result.is_passed for result in test_results) > len(test_results) // 2:
+        test_proxy.set_pass_status("passed")
 
-        current_result_proxy.set_extra_points(5)
+        test_proxy.set_extra_points(5)
 
 
 @test_cases.singular_param_iter([i for i in range(10)], gap_max_score=1)

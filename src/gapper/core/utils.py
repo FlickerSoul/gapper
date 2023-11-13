@@ -108,18 +108,18 @@ class PostChecksFn(Protocol):
 class PostTestFn(Protocol):
     def __call__(
         self,
-        results: List[TestResult],
-        current_result_proxy: TestResult | None,
+        test_results: List[TestResult],
+        test_proxy: TestResult | None,
         metadata: GradescopeSubmissionMetadata | None,
     ) -> None:
         """The function type to be called after all tests are run.
 
-        :param results: A list of test results from tested test cases.
+        :param test_results: A list of test results from tested test cases.
             Note that, the number of results will remain the same through
             the post testing phrase, even though you have post tests with as_test_case
             set to True. The results from post tests will not be added until the
             post testing phrase is completed.
-        :param current_result_proxy: The TestResult instance of this post test to be used as a proxy.
+        :param test_proxy: The TestResult instance of this post test to be used as a proxy.
             If the post_test's as_test_case is set to False, this will be None.
         :param metadata: The metadata of the submission.
         """
