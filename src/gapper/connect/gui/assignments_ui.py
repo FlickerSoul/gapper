@@ -68,6 +68,7 @@ class AssignmentArea(Static):
         await self.change_course_name()
 
         if not self.course.assignments:
+            self.log.debug("No assignments, refreshing")
             await self.refresh_assignment()
 
         await self.load_assignments()
@@ -162,7 +163,7 @@ class AssignmentArea(Static):
         await self.course.get_assignments()
         self.log.debug(f"Got {len(self.course.assignments)} assignments")
 
-        self.post_message(AccountSave())
+        self.app.post_message(AccountSave())
 
     @on(Button.Pressed, selector="#add_assignment_btn")
     async def handle_assignment_create(self) -> None:

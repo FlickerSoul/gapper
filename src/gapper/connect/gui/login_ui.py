@@ -12,6 +12,7 @@ from textual.screen import Screen
 from textual.widgets import Button, Checkbox, Footer, Header, Input, Label, Static
 
 from gapper.connect.api.account import GSAccount
+from gapper.connect.gui.messages import AccountSave
 from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH
 
 
@@ -178,9 +179,7 @@ class LoginScreen(Screen):
                 prompt.append("Please check your email and password. ", style="red")
             info_label.update(prompt)
         else:
-            if remember_me:
-                self.account.to_yaml(self.login_save_path)
-
             self.post_message(
                 self.LoggedIn(self.account, remember_me, self.login_save_path)
             )
+            self.app.post_message(AccountSave())

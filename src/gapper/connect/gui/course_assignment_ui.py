@@ -9,7 +9,6 @@ from rich.text import Text
 from textual import on
 from textual.app import ComposeResult
 from textual.containers import ScrollableContainer
-from textual.css.query import NoMatches
 from textual.events import Click
 from textual.message import Message
 from textual.screen import Screen
@@ -89,12 +88,6 @@ class CourseDisplay(Static):
         ):
             await course_list_ui.mount(CourseCard(course, classes="course_card"))
 
-        try:
-            if self.get_widget_by_id("course_loading").has_class("hidden"):
-                self.get_widget_by_id("course_loading").add_class("hidden")
-        except NoMatches:
-            self.log.debug("No loading indicator found, prob when mounting")
-
         self.log.debug(f"Finished loading {len(self.account.courses)} courses")
 
     async def on_mount(self) -> None:
@@ -106,7 +99,7 @@ class CourseDisplay(Static):
     async def refresh_course(self) -> None:
         await self.get_child_by_id("course_list").remove_children()
         await self.account.get_admin_courses()
-        self.post_message(AccountSave())
+        self.app.post_message(AccountSave())
 
         await self._load_courses()
 
