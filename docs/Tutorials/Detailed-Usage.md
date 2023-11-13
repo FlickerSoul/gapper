@@ -29,119 +29,229 @@ Once `gapper` is installed, you can invoke it through either `gap`, `gapper`, or
 
 <details>
   <summary>❯ gapper --help</summary>    
-    ```text
-    ❯ gapper --help
+```text
+❯ gapper --help
 
-     Usage: gapper [OPTIONS] COMMAND [ARGS]...
+Usage: gapper [OPTIONS] COMMAND [ARGS]...
 
-    ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-    │ --install-completion        [bash|zsh|fish|powershell|pwsh]  Install completion for the specified shell.             │
-    │                                                              [default: None]                                         │
-    │ --show-completion           [bash|zsh|fish|powershell|pwsh]  Show completion for the specified shell, to copy it or  │
-    │                                                              customize the installation.                             │
-    │                                                              [default: None]                                         │
-    │ --help                                                       Show this message and exit.                             │
-    ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-    ╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-    │ check             Check if the problem is defined correctly again the gap_check fields.                              │
-    │ gen               Generate the autograder for a problem.                                                             │
-    │ run               Run the autograder on an example submission.                                                       │
-    │ run-in-prod       Run the autograder in production mode.                                                             │
-    ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-    ```
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --install-completion        [bash|zsh|fish|powershell|pwsh]  Install completion for the specified shell.                │
+│                                                              [default: None]                                            │
+│ --show-completion           [bash|zsh|fish|powershell|pwsh]  Show completion for the specified shell, to copy it or     │
+│                                                              customize the installation.                                │
+│                                                              [default: None]                                            │
+│ --help                                                       Show this message and exit.                                │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ check              Check if the problem is defined correctly again the gap_check fields.                                │
+│ gen                Generate the autograder for a problem.                                                               │
+│ login              Login to Gradescope.                                                                                 │
+│ run                Run the autograder on an example submission.                                                         │
+│ run-in-prod        Run the autograder in production mode.                                                               │
+│ upload                                                                                                                  │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
 </details>
 
 <details>
   <summary>❯ gapper check --help</summary>    
-    ```text
-    ❯ gapper check --help
+```text
+❯ gapper check --help
 
-     Usage: gapper check [OPTIONS] PATH
+ Usage: gapper check [OPTIONS] PATH
 
-     Check if the problem is defined correctly again the gap_check fields.
+ Check if the problem is defined correctly again the gap_check fields.
 
-    ╭─ Arguments ──────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-    │ *    path      PATH  The path to the problem python file. [default: None] [required]                                 │
-    ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-    ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-    │ --auto-inject  -a            Whether to auto inject the tester file. [default: (dynamic)]                            │
-    │ --inject       -i      PATH  The path to the tester file to inject. [default: (dynamic)]                             │
-    │ --verbose      -v            Whether to run in verbose mode.                                                         │
-    │ --help                       Show this message and exit.                                                             │
-    ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-    ```
+╭─ Arguments ─────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *    path      PATH  The path to the problem python file. [default: None] [required]                                    │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --auto-inject  -a            Whether to auto inject the tester file. [default: (dynamic)]                               │
+│ --inject       -i      PATH  The path to the tester file to inject. [default: (dynamic)]                                │
+│ --verbose      -v            Whether to run in verbose mode.                                                            │
+│ --help                       Show this message and exit.                                                                │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
 </details>
 
 <details>
   <summary>❯ gapper gen --help</summary>    
-    ```text
-    ❯ gapper gen --help
+```text
+❯ gapper gen --help
 
-     Usage: gapper gen [OPTIONS] PATH
+ Usage: gapper gen [OPTIONS] PATH
 
-     Generate the autograder for a problem.
+ Generate the autograder for a problem.
 
-    ╭─ Arguments ──────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-    │ *    path      PATH  The path to the problem python file. [default: None] [required]                                 │
-    ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-    ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-    │ --save-path          -s      DIRECTORY  The directory to save the generated tester file. [default: (dynamic)]        │
-    │ --auto-inject        -a                 Whether to auto inject the tester file. [default: (dynamic)]                 │
-    │ --inject             -i      PATH       The path to the tester file to inject. [default: (dynamic)]                  │
-    │ --confirm-overwrite  -y                                                                                              │
-    │ --verbose            -v                 Whether to run in verbose mode.                                              │
-    │ --help                                  Show this message and exit.                                                  │
-    ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-    ```
+╭─ Arguments ─────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *    path      PATH  The path to the problem python file. [default: None] [required]                                    │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --save-path          -s      PATH  The directory to save the generated tester file. [default: (dynamic)]                │
+│ --auto-inject        -a            Whether to auto inject the tester file. [default: (dynamic)]                         │
+│ --inject             -i      PATH  The path to the tester file to inject. [default: (dynamic)]                          │
+│ --confirm-overwrite  -y            Confirm overwrite files.                                                             │
+│ --verbose            -v            Whether to run in verbose mode.                                                      │
+│ --upload             -u            Whether to upload the autograder.                                                    │
+│ --gui                -g            Whether to use the GUI to upload.                                                    │
+│ --login-save-path    -l      PATH  The path to save the login info.                                                     │
+│                                    [default: /Users/flicker_soul/.config/gapper/gs_account.yaml]                        │
+│ --ui-debug           -d            Whether to run in verbose mode.                                                      │
+│ --help                             Show this message and exit.                                                          │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+</details>
+
+<details>
+   <summary>❯ gapper login --help</summary>    
+```text
+❯ gapper login --help
+
+ Usage: gapper login [OPTIONS]
+
+ Login to Gradescope.
+
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --confirm-store      -s            Confirm storing your login info.                                                     │
+│ --confirm-overwrite  -y            Confirm overwrite files.                                                             │
+│ --login-save-path    -l      PATH  The path to save the login info.                                                     │
+│                                    [default: /Users/flicker_soul/.config/gapper/gs_account.yaml]                        │
+│ --verbose            -v            Whether to run in verbose mode.                                                      │
+│ --help                             Show this message and exit.                                                          │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
 </details>
 
 <details>
   <summary>❯ gapper run --help</summary>
-    ```text
-    ❯ gapper run --help
+```text
+❯ gapper run --help
 
-     Usage: gapper run [OPTIONS] PATH SUBMISSION
+ Usage: gapper run [OPTIONS] PATH SUBMISSION
 
-     Run the autograder on an example submission.
+ Run the autograder on an example submission.
 
-    ╭─ Arguments ──────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-    │ *    path            PATH  The path to the problem python file. [default: None] [required]                           │
-    │ *    submission      PATH  The path to the submission file. [default: None] [required]                               │
-    ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-    ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-    │ --metadata     -m      FILE   The path to the submission metadata file. [default: (dynamic)]                         │
-    │ --auto-inject  -a             Whether to auto inject the tester file. [default: (dynamic)]                           │
-    │ --inject       -i      PATH   The path to the tester file to inject. [default: (dynamic)]                            │
-    │ --verbose      -v             Whether to run in verbose mode.                                                        │
-    │ --total-score          FLOAT  [default: 20]                                                                          │
-    │ --help                        Show this message and exit.                                                            │
-    ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-    ```
+╭─ Arguments ─────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *    path            PATH  The path to the problem python file. [default: None] [required]                              │
+│ *    submission      PATH  The path to the submission file. [default: None] [required]                                  │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --metadata     -m      FILE   The path to the submission metadata file. [default: (dynamic)]                            │
+│ --auto-inject  -a             Whether to auto inject the tester file. [default: (dynamic)]                              │
+│ --inject       -i      PATH   The path to the tester file to inject. [default: (dynamic)]                               │
+│ --verbose      -v             Whether to run in verbose mode.                                                           │
+│ --total-score          FLOAT  [default: 20]                                                                             │
+│ --help                        Show this message and exit.                                                               │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
 </details>
 
 <details>
   <summary>❯ gapper run-in-prod --help</summary>   
-    ```text
-    ❯ gapper run-in-prod --help
+```text
+❯ gapper run-in-prod --help
 
-     Usage: gapper run-in-prod [OPTIONS] [TESTER_PATH] [SUBMISSION_DIR]
-                               [METADATA_FILE] [OUTPUT_FILE]
+ Usage: gapper run-in-prod [OPTIONS] [TESTER_PATH] [SUBMISSION_DIR]
+                           [METADATA_FILE] [OUTPUT_FILE]
 
-     Run the autograder in production mode.
+ Run the autograder in production mode.
 
-    ╭─ Arguments ──────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-    │   tester_path         [TESTER_PATH]     The path to the tester pickle file.                                          │
-    │                                         [default: /autograder/source/tester.pckl]                                    │
-    │   submission_dir      [SUBMISSION_DIR]  The path to the submission directory. [default: /autograder/submission]      │
-    │   metadata_file       [METADATA_FILE]   The path to the submission metadata file.                                    │
-    │                                         [default: /autograder/submission_metadata.json]                              │
-    │   output_file         [OUTPUT_FILE]     The path to the output file. [default: /autograder/results/results.json]     │
-    ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-    ╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-    │ --verbose  -v        Whether to run in verbose mode. [default: True]                                                 │
-    │ --help               Show this message and exit.                                                                     │
-    ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-    ```
+╭─ Arguments ─────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│   tester_path         [TESTER_PATH]     The path to the tester pickle file. [default: /autograder/source/tester.pckl]   │
+│   submission_dir      [SUBMISSION_DIR]  The path to the submission directory. [default: /autograder/submission]         │
+│   metadata_file       [METADATA_FILE]   The path to the submission metadata file.                                       │
+│                                         [default: /autograder/submission_metadata.json]                                 │
+│   output_file         [OUTPUT_FILE]     The path to the output file. [default: /autograder/results/results.json]        │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --verbose  -v        Whether to run in verbose mode. [default: True]                                                    │
+│ --help               Show this message and exit.                                                                        │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+</details>
+
+<details>
+  <summary>❯ gapper upload --help</summary>
+```text
+❯ gapper upload --help
+
+ Usage: gapper upload [OPTIONS] COMMAND [ARGS]...
+
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --help          Show this message and exit.                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ gui      Upload an autograder to Gradescope with GUI.                                                                   │
+│ ids      Upload an autograder to Gradescope using the cid and aid.                                                      │
+│ url      Upload an autograder to Gradescope using the assignment url.                                                   │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+</details>
+
+<details>
+  <summary>❯ gapper upload gui --help</summary>
+```text
+❯ gapper upload gui --help
+
+ Usage: gapper upload gui [OPTIONS] AUTOGRADER_PATH
+
+ Upload an autograder to Gradescope with GUI.
+
+╭─ Arguments ─────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *    autograder_path      PATH  The path to the autograder zip file. [default: None] [required]                         │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --login-save-path  -l      PATH  The path to save the login info.                                                       │
+│                                  [default: /Users/flicker_soul/.config/gapper/gs_account.yaml]                          │
+│ --ui-debug         -d            Whether to run in verbose mode.                                                        │
+│ --help                           Show this message and exit.                                                            │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+</details>
+
+<details>
+  <summary>❯ gapper upload ids --help</summary>
+```text
+❯ gapper upload ids --help
+
+ Usage: gapper upload ids [OPTIONS] AUTOGRADER_PATH [CID] [AID]
+
+ Upload an autograder to Gradescope using the cid and aid.
+
+╭─ Arguments ─────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *    autograder_path      PATH   The path to the autograder zip file. [default: None] [required]                        │
+│      cid                  [CID]  The course id. [default: None]                                                         │
+│      aid                  [AID]  The assignment id. [default: None]                                                     │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --login-save-path  -l      PATH  The path to save the login info.                                                       │
+│                                  [default: /Users/flicker_soul/.config/gapper/gs_account.yaml]                          │
+│ --ui-debug         -d            Whether to run in verbose mode.                                                        │
+│ --help                           Show this message and exit.                                                            │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+</details>
+
+<details>
+  <summary>❯ gapper upload url --help</summary>
+```text
+❯ gapper upload url --help
+
+ Usage: gapper upload url [OPTIONS] AUTOGRADER_PATH ASSIGNMENT_URL
+
+ Upload an autograder to Gradescope using the assignment url.
+
+╭─ Arguments ─────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *    autograder_path      PATH  The path to the autograder zip file. [default: None] [required]                         │
+│ *    assignment_url       TEXT  The url to the autograder. [default: None] [required]                                   │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --login-save-path  -l      PATH  The path to save the login info.                                                       │
+│                                  [default: /Users/flicker_soul/.config/gapper/gs_account.yaml]                          │
+│ --ui-debug         -d            Whether to run in verbose mode.                                                        │
+│ --help                           Show this message and exit.                                                            │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
 </details>
 
 ## Glossary 
