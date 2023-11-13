@@ -5,10 +5,9 @@ from textual.widgets import Footer, Header, Static
 
 from gapper.connect.api.assignment import GSAssignment, GSAssignmentEssential
 from gapper.connect.gui.autograder_upload_ui import AutograderUpload
-from gapper.connect.gui.mixin import LoadingHandler
 
 
-class AutograderUploadApp(LoadingHandler, App):
+class AutograderUploadApp(App):
     BINDINGS = [
         ("ctrl+q", "app.quit", "Quit"),
     ]

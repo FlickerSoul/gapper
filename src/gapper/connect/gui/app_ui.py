@@ -11,10 +11,9 @@ from gapper.connect.gui.autograder_upload_ui import AutograderUpload
 from gapper.connect.gui.course_assignment_ui import CourseScreen
 from gapper.connect.gui.login_ui import LoginScreen
 from gapper.connect.gui.messages import AccountSave
-from gapper.connect.gui.mixin import LoadingHandler
 
 
-class GradescopeConnect(LoadingHandler, App):
+class GradescopeConnect(App):
     BINDINGS = [
         ("ctrl+d", "toggle_dark", "Toggle dark mode"),
         ("ctrl+q", "handle_quit", "Quit"),
