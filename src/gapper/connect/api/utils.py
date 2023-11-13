@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 
 def get_authenticity_token(session: requests.Session) -> str:
-    init_resp = session.get("https://www.gradescope.com/", verify=False)
+    init_resp = session.get("https://www.gradescope.com/")
     parsed_init_resp = BeautifulSoup(init_resp.text, "html.parser")
     for form in parsed_init_resp.find_all("form"):
         if form.get("action") == "/login":
