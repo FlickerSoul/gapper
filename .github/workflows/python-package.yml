@@ -6,8 +6,18 @@ name: Python package
 on:
   push:
     branches: [ "main" ]
+    paths: 
+      - src/**
+      - tests/**
+      - poetry.lock
+      - pyproject.toml
   pull_request:
     branches: [ "main" ]
+    paths: 
+      - src/**
+      - tests/**
+      - poetry.lock
+      - pyproject.toml
 
 jobs:
   build:
