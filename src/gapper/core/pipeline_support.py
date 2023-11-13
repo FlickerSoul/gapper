@@ -15,9 +15,7 @@ __all__ = [
 class PipelineBase:
     """A pipeline action base class. All pipeline actions should inherit from this class."""
 
-    def __init__(
-        self, name: str, *args, _pipeline_replace: bool = False, **kwargs
-    ) -> None:
+    def __init__(self, name: str, *args, _pipeline_replace: bool = False, **kwargs) -> None:
         """A pipeline base class.
 
         :param name: The name of the attribute to be extracted from the piped object.
@@ -65,10 +63,8 @@ class PipelineFactory:
         self._replace = _pipeline_replace
         self._name = name
 
-    def __call__(self, *args: Any, **kwargs: Any) -> ValueType:
-        return type(self).ValueType(
-            self._name, *args, _pipeline_replace=self._replace, **kwargs
-        )
+    def __call__(self, *args: Any, **kwargs: Any) -> ValueType:  # noqa: F821
+        return type(self).ValueType(self._name, *args, _pipeline_replace=self._replace, **kwargs)
 
 
 class Constructor(PipelineFactory):

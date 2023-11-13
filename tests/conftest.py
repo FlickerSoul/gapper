@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Any, Generator, List
 
 import pytest
-
 from gapper.core.problem import Problem
 from gapper.core.problem.problem_config import ProblemConfig
 from gapper.core.tester import Tester
@@ -95,10 +94,7 @@ def tester_fixture(request: pytest.FixtureRequest) -> Problem[Any, Any]:
 
 @pytest.fixture()
 def all_preset_problems(request) -> List[Problem[Any, Any]]:
-    return [
-        request.getfixturevalue(make_problem_name(prob_name.name))
-        for prob_name in preset_problem_paths()
-    ]
+    return [request.getfixturevalue(make_problem_name(prob_name.name)) for prob_name in preset_problem_paths()]
 
 
 @pytest.fixture()

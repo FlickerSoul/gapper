@@ -9,9 +9,7 @@ class GasStation:
     pass
 
 
-def test_override(
-    tc: TestCaseWrapper, result: TestResult, solution: Type, submission: Type
-) -> None:
+def test_override(tc: TestCaseWrapper, result: TestResult, solution: Type, submission: Type) -> None:
     gas_station = tc.context.GasStation()
     sol_obj = solution(gas_station)
     sub_obj = submission(gas_station)

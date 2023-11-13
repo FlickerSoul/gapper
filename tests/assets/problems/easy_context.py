@@ -13,9 +13,7 @@ adder: Callable[[int, int], int]
 
 
 def custom_test(param: TestCaseWrapper, result_proxy: TestResult, solution, submission):
-    assert solution(*param.test_param.args, my_adder) == submission(
-        *param.test_param.args, adder
-    )
+    assert solution(*param.test_param.args, my_adder) == submission(*param.test_param.args, adder)
     assert my_adder(*param.test_param.args) == adder(*param.test_param.args)
 
 

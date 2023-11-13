@@ -2,7 +2,6 @@ from itertools import chain, product
 from typing import Any
 
 import pytest
-
 from gapper.core.errors import InternalError
 from gapper.core.test_result import TestResult
 
@@ -65,9 +64,7 @@ def test_test_result_rich_output() -> None:
     assert result.rich_test_output == "Passed"
 
     result.add_description("test description")
-    assert result.rich_test_output == (
-        "Passed\n" + "Description(s): \n" + "  test description"
-    )
+    assert result.rich_test_output == ("Passed\n" + "Description(s): \n" + "  test description")
 
     result.add_error(InternalError("test error"), set_failed=False)
     assert (

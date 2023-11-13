@@ -6,16 +6,7 @@ from dataclasses import asdict, dataclass
 from enum import Enum
 from functools import partial
 from itertools import product
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    ClassVar,
-    Dict,
-    Iterable,
-    List,
-    Sequence,
-    overload,
-)
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Iterable, List, Sequence, overload
 
 __all__ = [
     "TestParam",
@@ -93,14 +84,8 @@ class ParamExtractor:
         return self._param_info
 
     @classmethod
-    def extra_gap_info(
-        cls, kwargs: Dict[str, Any], check_residue: bool = True
-    ) -> Dict[str, Any]:
-        gap_kwargs = {
-            k.value: kwargs.pop(k.value)
-            for k in GapReservedKeywords
-            if k.value in kwargs
-        }
+    def extra_gap_info(cls, kwargs: Dict[str, Any], check_residue: bool = True) -> Dict[str, Any]:
+        gap_kwargs = {k.value: kwargs.pop(k.value) for k in GapReservedKeywords if k.value in kwargs}
 
         if check_residue:
             if caught_residue := cls.check_gap_kwargs_residue(kwargs):
@@ -241,9 +226,7 @@ class TestParam(ParamExtractor):
         """Make itself to be a decorator."""
         return self.register_test_param(prob)
 
-    def register_test_param[
-        T: Problem[ProbInputType, ProbOutputType]
-    ](self, prob: T) -> T:
+    def register_test_param[T: Problem[ProbInputType, ProbOutputType]](self, prob: T) -> T:
         """Register the test parameter to the problem."""
         prob.add_test_parameter(self)
         return prob
@@ -289,11 +272,7 @@ class TestParam(ParamExtractor):
 
     def __eq__(self, other: TestParam) -> bool:
         if isinstance(other, TestParam):
-            return (
-                self.args == other.args
-                and self.kwargs == other.kwargs
-                and super().__eq__(other)
-            )
+            return self.args == other.args and self.kwargs == other.kwargs and super().__eq__(other)
 
         return False
 
@@ -325,9 +304,7 @@ class TestParamBundle:
     singular_param_iter: ClassVar[partial[TestParamBundle]]
 
     @overload
-    def __init__[
-        T: Problem[ProbInputType, ProbOutputType]
-    ](
+    def __init__[T: Problem[ProbInputType, ProbOutputType]](
         self,
         *args: Any,
         gap_expect: Any | Sequence[Any] | None = None,
@@ -335,15 +312,10 @@ class TestParamBundle:
         gap_hidden: bool | Sequence[bool] = False,
         gap_name: str | Sequence[str] | None = None,
         gap_extra_points: float | Sequence[float] | None = None,
-        gap_override_check: CustomEqualityCheckFn
-        | Sequence[CustomEqualityCheckFn]
-        | None = None,
+        gap_override_check: CustomEqualityCheckFn | Sequence[CustomEqualityCheckFn] | None = None,
         gap_easy_context: bool | Sequence[bool] = False,
         gap_override_test: CustomTestFn | Sequence[CustomTestFn] | None = None,
-        gap_post_checks: List[List[PostChecksFn]]
-        | List[PostChecksFn]
-        | PostChecksFn
-        | None = None,
+        gap_post_checks: List[List[PostChecksFn]] | List[PostChecksFn] | PostChecksFn | None = None,
         gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
         gap_is_pipeline: bool | Sequence[bool] = False,
         gap_max_score: float | Sequence[float] | None = None,
@@ -356,9 +328,7 @@ class TestParamBundle:
         ...
 
     @overload
-    def __init__[
-        T: Problem[ProbInputType, ProbOutputType]
-    ](
+    def __init__[T: Problem[ProbInputType, ProbOutputType]](
         self,
         *args: Any,
         gap_expect: Any | Sequence[Any] | None = None,
@@ -366,15 +336,10 @@ class TestParamBundle:
         gap_hidden: bool | Sequence[bool] = False,
         gap_name: str | Sequence[str] | None = None,
         gap_extra_points: float | Sequence[float] | None = None,
-        gap_override_check: CustomEqualityCheckFn
-        | Sequence[CustomEqualityCheckFn]
-        | None = None,
+        gap_override_check: CustomEqualityCheckFn | Sequence[CustomEqualityCheckFn] | None = None,
         gap_easy_context: bool | Sequence[bool] = False,
         gap_override_test: CustomTestFn | Sequence[CustomTestFn] | None = None,
-        gap_post_checks: List[List[PostChecksFn]]
-        | List[PostChecksFn]
-        | PostChecksFn
-        | None = None,
+        gap_post_checks: List[List[PostChecksFn]] | List[PostChecksFn] | PostChecksFn | None = None,
         gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
         gap_is_pipeline: bool | Sequence[bool] = False,
         gap_weight: float | Sequence[float] | None = None,
@@ -416,14 +381,7 @@ class TestParamBundle:
                seealso::
                 :class:`gapper.core.test_parameter.ParamExtractor`
         """
-        if (
-            gap_params
-            + gap_param_iter
-            + gap_zip
-            + gap_product
-            + gap_singular_params
-            + gap_singular_param_iter
-        ) != 1:
+        if (gap_params + gap_param_iter + gap_zip + gap_product + gap_singular_params + gap_singular_param_iter) != 1:
             raise ValueError(
                 "Exactly many of gap_product, gap_zip, or gap_params are True. "
                 "Only 1 of the flags is allowed. \n"
@@ -441,9 +399,7 @@ class TestParamBundle:
         gap_kwargs_dict = ParamExtractor.extra_gap_info(kwargs)
 
         if gap_params:
-            self.final_params: List[TestParam] = type(self).parse_params(
-                *args, **kwargs
-            )
+            self.final_params: List[TestParam] = type(self).parse_params(*args, **kwargs)
         elif gap_param_iter:
             self.final_params = type(self).parse_param_iter(*args, **kwargs)
         elif gap_singular_params:
@@ -472,17 +428,14 @@ class TestParamBundle:
 
         arg_iter = args[0]
 
-        return list(
-            arg if isinstance(arg, TestParam) else param(*arg) for arg in arg_iter
-        )
+        return list(arg if isinstance(arg, TestParam) else param(*arg) for arg in arg_iter)
 
     @staticmethod
     def parse_params(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
         """Parse the parameters for param sequence."""
         if kwargs:
             raise ValueError(
-                "gap_params=True ignores non-gap kwargs. "
-                "Please use `param()` directive to assist specifying kwargs."
+                "gap_params=True ignores non-gap kwargs. " "Please use `param()` directive to assist specifying kwargs."
             )
 
         return list(arg if isinstance(arg, TestParam) else param(*arg) for arg in args)
@@ -499,9 +452,7 @@ class TestParamBundle:
         return list(arg if isinstance(arg, TestParam) else param(arg) for arg in args)
 
     @staticmethod
-    def parse_singular_param_iter(
-        *args: Iterable[Any], **kwargs: Any
-    ) -> List[TestParam]:
+    def parse_singular_param_iter(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
         if kwargs:
             raise ValueError(
                 "gap_singular_param_iter=True ignores non-gap kwargs. "
@@ -509,15 +460,11 @@ class TestParamBundle:
             )
 
         if len(args) != 1:
-            raise ValueError(
-                "gap_singular_param_iter=True only accepts 1 iterable argument."
-            )
+            raise ValueError("gap_singular_param_iter=True only accepts 1 iterable argument.")
 
         arg_iter = args[0]
 
-        return list(
-            arg if isinstance(arg, TestParam) else param(arg) for arg in arg_iter
-        )
+        return list(arg if isinstance(arg, TestParam) else param(arg) for arg in arg_iter)
 
     @staticmethod
     def parse_zip_or_product(
@@ -546,9 +493,7 @@ class TestParamBundle:
             # create empty args for zip if there are no args
             if combined_args and combined_kwargs:
                 if len(combined_args) != len(combined_kwargs):
-                    raise ValueError(
-                        'length of "args" and "kwargs" must match in zip mode'
-                    )
+                    raise ValueError('length of "args" and "kwargs" must match in zip mode')
             elif combined_args:
                 combined_kwargs = [()] * len(combined_args)
             elif combined_kwargs:
@@ -563,35 +508,26 @@ class TestParamBundle:
         )
 
     @staticmethod
-    def add_gap_kwargs(
-        gap_kwargs: Dict[str, Any], final_params: List[TestParam]
-    ) -> None:
+    def add_gap_kwargs(gap_kwargs: Dict[str, Any], final_params: List[TestParam]) -> None:
         """Add gap_kwargs to the finalized parameters."""
         # process gap input type
         for gap_kwarg_key, gap_kwarg_value in gap_kwargs.items():
-            if isinstance(gap_kwarg_value, Iterable) and not isinstance(
-                gap_kwarg_value, str
-            ):
+            if isinstance(gap_kwarg_value, Iterable) and not isinstance(gap_kwarg_value, str):
                 gap_kwargs[gap_kwarg_key] = list(gap_kwarg_value)
             else:
                 gap_kwargs[gap_kwarg_key] = [gap_kwarg_value] * len(final_params)
 
         # validate gap input type
-        if not all(
-            len(gap_kwarg_value) == len(final_params)
-            for gap_kwarg_value in gap_kwargs.values()
-        ):
+        if not all(len(gap_kwarg_value) == len(final_params) for gap_kwarg_value in gap_kwargs.values()):
             # the length of the kwargs should be equal to the number of test cases
             # i.e. the length of the combined args
             raise ValueError(
-                f"all gap_ keyword args must have the same length as the test cases, "
-                f"which is {len(final_params)}"
+                f"all gap_ keyword args must have the same length as the test cases, " f"which is {len(final_params)}"
             )
 
         # the gap kwargs list we want
         gap_kwargs_list: List[Dict[str, Any]] = [
-            dict(zip(gap_kwargs.keys(), gap_kwarg_value))
-            for gap_kwarg_value in zip(*gap_kwargs.values())
+            dict(zip(gap_kwargs.keys(), gap_kwarg_value)) for gap_kwarg_value in zip(*gap_kwargs.values())
         ]
 
         if not gap_kwargs_list:
@@ -601,9 +537,7 @@ class TestParamBundle:
         for final_param, kwargs in zip(final_params, gap_kwargs_list):
             final_param.update_gap_kwargs(**kwargs)
 
-    def __call__(
-        self, prob: Problem[ProbInputType, ProbOutputType]
-    ) -> Problem[ProbInputType, ProbOutputType]:
+    def __call__(self, prob: Problem[ProbInputType, ProbOutputType]) -> Problem[ProbInputType, ProbOutputType]:
         """Generate the test cases as a decorator."""
         for final_param in self.final_params:
             prob = final_param.register_test_param(prob)

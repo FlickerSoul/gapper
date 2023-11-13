@@ -2,10 +2,10 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
 from gapper.core.errors import InternalError, MultipleSubmissionError, NoSubmissionError
 from gapper.core.problem import Problem
 from gapper.core.tester import Tester
+
 from tests.conftest import (
     MULTIPLE_SUBMISSIONS_FOLDER,
     NO_SUBMISSION_FOLDER,
@@ -79,18 +79,11 @@ def test_dump_and_load(tmp_path: Path, tester_fixture: Tester, name: str) -> Non
     dump_file = tmp_path / f"{name}_tester.dump"
     tester_fixture.dump_to(dump_file)
     restored_tester = Tester.from_file(dump_file)
-    assert (
-        restored_tester.submission_context.keys()
-        == tester_fixture.submission_context.keys()
-    )
+    assert restored_tester.submission_context.keys() == tester_fixture.submission_context.keys()
 
 
 def test_post_test(request: pytest.FixtureRequest) -> None:
     prob_name = "assess_post_tests.py"
     tester: Tester = request.getfixturevalue(make_tester_name(prob_name))
-    results = tester.load_submission_from_path(
-        TEST_SUBMISSIONS_FOLDER / prob_name
-    ).run()
-    assert len(tester.problem.test_cases) + len(tester.problem.post_tests) == len(
-        results
-    )
+    results = tester.load_submission_from_path(TEST_SUBMISSIONS_FOLDER / prob_name).run()
+    assert len(tester.problem.test_cases) + len(tester.problem.post_tests) == len(results)

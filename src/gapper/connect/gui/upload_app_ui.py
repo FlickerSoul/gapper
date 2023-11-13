@@ -27,7 +27,7 @@ class AutograderUploadApp(App):
         *args,
         assignment: GSAssignment | GSAssignmentEssential,
         autograder_path: Path,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.assignment = assignment
@@ -35,9 +35,7 @@ class AutograderUploadApp(App):
 
     def compose(self) -> ComposeResult:
         yield Header()
-        yield Static(
-            "You can quit this uploader now (ctrl+q) :)", classes="quit_prompt"
-        )
+        yield Static("You can quit this uploader now (ctrl+q) :)", classes="quit_prompt")
         yield Footer()
 
     async def on_mount(self) -> None:

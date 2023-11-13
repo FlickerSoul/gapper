@@ -39,12 +39,8 @@ def build_connect_config(url_or_cid: str, aid: str | None = None) -> GSConnectCo
         _gs_connect_logger.debug(f"Using cid {cid} and aid {aid} from user input.")
 
     if not cid or not aid:
-        raise ValueError(
-            "Must specify both cid and aid at the same time. Or specify a url."
-        )
-    if (
-        not cid.isdigit() or not aid.isdigit()
-    ):  # not perfect for 0-9 checking but it's fine
+        raise ValueError("Must specify both cid and aid at the same time. Or specify a url.")
+    if not cid.isdigit() or not aid.isdigit():  # not perfect for 0-9 checking but it's fine
         raise ValueError("cid and aid must be digits.")
 
     return GSConnectConfig(cid=cid, aid=aid)
@@ -67,9 +63,10 @@ def gs_connect[T: Problem](url: str) -> Callable[[T], T]:
     """
 
 
-def gs_connect[
-    T: Problem
-](url_or_cid: str, aid: str | None = None,) -> Callable[[T], T]:
+def gs_connect[T: Problem](
+    url_or_cid: str,
+    aid: str | None = None,
+) -> Callable[[T], T]:
     """Connect a problem to a Gradescope assignment.
 
     :param url_or_cid: The course id of the Gradescope assignment, or the url when aid is not specified.
