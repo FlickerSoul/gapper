@@ -68,6 +68,7 @@ extra_css:
 plugins:
   - search
   - mkdocstrings:
+      default_handler: python
       handlers:
         python:
           options:
