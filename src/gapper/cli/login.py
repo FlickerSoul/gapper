@@ -27,15 +27,15 @@ def login(
     check_login_valid(account)
 
     if confirm_store or typer.confirm(
-        "Confirm you want to store your session?", default=True
+        "Confirm you want to store your session?", default=True, abort=True
     ):
         if (
             not login_save_path.exists()
             or confirm_overwrite
-            or typer.confirm("File already exists. Overwrite?", default=False)
+            or typer.confirm(
+                "File already exists. Overwrite?", default=False, abort=True
+            )
         ):
             account.to_yaml(login_save_path)
             typer.echo(f"Login info saved to {login_save_path.absolute()}")
             return
-
-    typer.secho(typer.style("Aborted.", fg=typer.colors.RED, bold=True))

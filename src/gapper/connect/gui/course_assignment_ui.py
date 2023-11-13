@@ -19,7 +19,7 @@ from gapper.connect.api.course import GSCourse
 from gapper.connect.gui.assignments_ui import AssignmentArea
 from gapper.connect.gui.messages import AccountSave
 
-_COURSE_SIDE_BAR_SIZE = 40
+_COURSE_SIDE_BAR_SIZE = 38
 
 
 class CourseCard(Static):
@@ -82,11 +82,15 @@ class CourseDisplay(Static):
             ScrollableContainer, self.get_child_by_id("course_list")
         )
 
-        for course in sorted(
-            self.account.courses.values(),
-            key=lambda c: (int(c.inactive), c.year, c.term),
-        ):
-            await course_list_ui.mount(CourseCard(course, classes="course_card"))
+        await course_list_ui.mount(
+            *(
+                CourseCard(course, classes="course_card")
+                for course in sorted(
+                    self.account.courses.values(),
+                    key=lambda c: (int(c.inactive), c.year, c.term),
+                )
+            )
+        )
 
         self.log.debug(f"Finished loading {len(self.account.courses)} courses")
 

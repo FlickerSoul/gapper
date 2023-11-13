@@ -56,15 +56,13 @@ def gen(
     if confirm_overwrite or typer.confirm(
         f"File {autograder_save_path.absolute()} already exists. Overwrite?",
         default=True,
+        abort=True,
     ):
         typer.echo("Overwriting...")
         AutograderZipper(tester).generate_zip(autograder_save_path)
         typer.echo(
             f"Autograder zip generated successfully at {autograder_save_path.absolute()}"
         )
-    else:
-        typer.echo("Aborted.")
-        return
 
     if upload_flag:
         if use_ui:
