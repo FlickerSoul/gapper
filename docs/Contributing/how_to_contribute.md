@@ -8,11 +8,10 @@ code to the project. This document contains the guidelines for contributing to t
 
 We assume you have `Python>=3.12` and [`poetry`](https://python-poetry.org/) is installed on your computer. 
 
-<details>
-<summary>Python Version Management</summary>
+/// details | Python Version Management
 We recommend using [`pyenv`](https://github.com/pyenv/pyenv) to manage your python version. 
 You can find its installation instructions [here](https://github.com/pyenv/pyenv?tab=readme-ov-file#installation)
-</details>
+///
 
 ## Setup
 

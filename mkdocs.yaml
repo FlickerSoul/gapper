@@ -89,4 +89,5 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
       use_pygments: true
-  - pymdownx.superfences
+  - pymdownx.blocks.details:
+  - pymdownx.superfences:

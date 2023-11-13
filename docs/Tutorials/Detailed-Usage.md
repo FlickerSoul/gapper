@@ -27,8 +27,7 @@ If you want a brief of the whole process, please refer to the workflow brief in 
 
 Once `gapper` is installed, you can invoke it through either `gap`, `gapper`, or `gradescope-autograder-packer`. 
 
-<details>
-  <summary>❯ gapper --help</summary>    
+/// details | ❯ gapper --help
 ```text
 ❯ gapper --help
 
@@ -51,10 +50,9 @@ Usage: gapper [OPTIONS] COMMAND [ARGS]...
 │ upload                                                                                                                  │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
-</details>
+///
 
-<details>
-  <summary>❯ gapper check --help</summary>    
+/// details | ❯ gapper check --help
 ```text
 ❯ gapper check --help
 
@@ -72,10 +70,9 @@ Usage: gapper [OPTIONS] COMMAND [ARGS]...
 │ --help                       Show this message and exit.                                                                │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
-</details>
+///
 
-<details>
-  <summary>❯ gapper gen --help</summary>    
+/// details | ❯ gapper gen --help
 ```text
 ❯ gapper gen --help
 
@@ -100,10 +97,9 @@ Usage: gapper [OPTIONS] COMMAND [ARGS]...
 │ --help                             Show this message and exit.                                                          │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
-</details>
+///
 
-<details>
-   <summary>❯ gapper login --help</summary>    
+/// details | ❯ gapper login --help
 ```text
 ❯ gapper login --help
 
@@ -120,10 +116,9 @@ Usage: gapper [OPTIONS] COMMAND [ARGS]...
 │ --help                             Show this message and exit.                                                          │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
-</details>
+///
 
-<details>
-  <summary>❯ gapper run --help</summary>
+/// details | ❯ gapper run --help
 ```text
 ❯ gapper run --help
 
@@ -144,10 +139,9 @@ Usage: gapper [OPTIONS] COMMAND [ARGS]...
 │ --help                        Show this message and exit.                                                               │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
-</details>
+///
 
-<details>
-  <summary>❯ gapper run-in-prod --help</summary>   
+/// details | ❯ gapper run-in-prod --help
 ```text
 ❯ gapper run-in-prod --help
 
@@ -168,10 +162,9 @@ Usage: gapper [OPTIONS] COMMAND [ARGS]...
 │ --help               Show this message and exit.                                                                        │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
-</details>
+///
 
-<details>
-  <summary>❯ gapper upload --help</summary>
+/// details | ❯ gapper upload --help
 ```text
 ❯ gapper upload --help
 
@@ -186,10 +179,9 @@ Usage: gapper [OPTIONS] COMMAND [ARGS]...
 │ url      Upload an autograder to Gradescope using the assignment url.                                                   │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
-</details>
+///
 
-<details>
-  <summary>❯ gapper upload gui --help</summary>
+/// details | ❯ gapper upload gui --help
 ```text
 ❯ gapper upload gui --help
 
@@ -207,10 +199,9 @@ Usage: gapper [OPTIONS] COMMAND [ARGS]...
 │ --help                           Show this message and exit.                                                            │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
-</details>
+///
 
-<details>
-  <summary>❯ gapper upload ids --help</summary>
+/// details | ❯ gapper upload ids --help
 ```text
 ❯ gapper upload ids --help
 
@@ -230,10 +221,9 @@ Usage: gapper [OPTIONS] COMMAND [ARGS]...
 │ --help                           Show this message and exit.                                                            │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
-</details>
+///
 
-<details>
-  <summary>❯ gapper upload url --help</summary>
+/// details | ❯ gapper upload url --help
 ```text
 ❯ gapper upload url --help
 
@@ -252,7 +242,7 @@ Usage: gapper [OPTIONS] COMMAND [ARGS]...
 │ --help                           Show this message and exit.                                                            │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
-</details>
+///
 
 ## Glossary 
 

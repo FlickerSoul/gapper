@@ -5,15 +5,13 @@ There are two ways to upload your autograder directly to gradescope: through GUI
 ## Prerequisite
 You need to understand what a course is and what an assignment is in gradescope, and the difference between the two.
 
-<details>
-<summary>What is a course?</summary>
+/// details | What is a course?
 A course is what you would see when you first log into gradescope. A course is usually listed as cards, and is under a specific year and term, e.g. Fall 2023. 
-</details>
+///
 
-<details>
-<summary>What is an assignment?</summary>
+/// details | What is an assignment?
 An assignment is what you would see when you click on a course. An assignment is listed as a list.
-</details>
+///
 
 Before uploading, you are assumed to have your gradescope email and password, and have created the assignment you're uploading the autograder to. 
 
