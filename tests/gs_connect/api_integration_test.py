@@ -2,8 +2,8 @@ import asyncio
 import re
 
 import pytest
-
 from gapper.connect.api.account import GSAccount
+
 from tests.gs_connect.conftest import AccountDetail
 
 

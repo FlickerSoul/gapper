@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import Tuple
 
 import pytest
+from gapper.cli import app as cli_app
 from typer.testing import CliRunner
 
-from gapper.cli import app as cli_app
 from tests.conftest import preset_problem_paths, preset_submission_paths
 
 
