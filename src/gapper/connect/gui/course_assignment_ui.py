@@ -2,9 +2,13 @@ from __future__ import annotations
 
 from typing import cast
 
+from rich.console import Group
+from rich.panel import Panel
+from rich.style import Style
+from rich.text import Text
 from textual import on
 from textual.app import ComposeResult
-from textual.containers import Container, ScrollableContainer
+from textual.containers import ScrollableContainer
 from textual.css.query import NoMatches
 from textual.events import Click
 from textual.message import Message
@@ -16,9 +20,7 @@ from gapper.connect.api.course import GSCourse
 from gapper.connect.gui.assignments_ui import AssignmentArea
 from gapper.connect.gui.messages import AccountSave
 
-
-class CourseCardBackground(Static):
-    pass
+_COURSE_SIDE_BAR_SIZE = 40
 
 
 class CourseCard(Static):
@@ -32,27 +34,26 @@ class CourseCard(Static):
         self.course = course
 
     def compose(self) -> ComposeResult:
-        max_len = max(
-            len(self.course.shortname),
-            len(self.course.name),
-            len(self.course.cid),
-            len(self.course.assignment_count),
-            len(self.course.term),
-        )
-
         yield Label(
-            "<" + ("=" * (max_len - 2)) + ">",
+            "<" + ("=" * (_COURSE_SIDE_BAR_SIZE - 2)) + ">",
             id=f"selected_{self.course.cid}",
             classes="hidden",
         )
-        yield Label("-" * max_len)
-        yield Label(self.course.shortname, id="course_shortname")
-        yield Label(self.course.name, id="course_name")
-        yield Label(self.course.cid, id="course_cid")
-        yield Label(self.course.assignment_count, id="course_assignment_count")
-        yield Label(self.course.term, id="course_term")
-        yield Label("-" * max_len)
-        yield CourseCardBackground()
+
+        inner = Group(
+            Text(f"{self.course.name}", style=Style(bold=True, italic=True)),
+            Text("\n"),
+            Text(f"{self.course.assignment_count}"),
+        )
+
+        yield Label(
+            Panel(
+                inner,
+                title=self.course.shortname,
+                subtitle=f"{self.course.year} {self.course.term} ({self.course.cid})",
+                width=_COURSE_SIDE_BAR_SIZE,
+            )
+        )
 
     def on_click(self, _: Click) -> None:
         self.post_message(CourseCard.CourseCardSelected(self))
@@ -83,7 +84,8 @@ class CourseDisplay(Static):
         )
 
         for course in sorted(
-            self.account.courses.values(), key=lambda c: (c.year, c.term)
+            self.account.courses.values(),
+            key=lambda c: (int(c.inactive), c.year, c.term),
         ):
             await course_list_ui.mount(CourseCard(course, classes="course_card"))
 
@@ -125,11 +127,8 @@ class CourseScreen(Screen):
 
     def compose(self) -> ComposeResult:
         yield Header()
-        yield Container(
-            CourseDisplay(self.account, id="course_display"),
-            AssignmentArea(id="assignment_area"),
-            id="split_course_area",
-        )
+        yield CourseDisplay(self.account, id="course_display")
+        yield AssignmentArea(id="assignment_area")
         yield Footer()
 
     @on(CourseDisplay.CourseRefresh)
