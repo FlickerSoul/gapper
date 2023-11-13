@@ -13,6 +13,7 @@ nav:
       - Tutorials/gap_-Keywords.md
       - Tutorials/Test-Result-(Proxy).md
       - Tutorials/Upload-Autograder.md
+      - Tutorials/Various-Function-Protocols.md
   - API:
     - API/problem.md
     - API/problem_extras.md
