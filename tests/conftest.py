@@ -108,3 +108,14 @@ def all_preset_problem_tester_with_default_config(
 @pytest.fixture()
 def dummy_problem() -> Problem[Any, Any]:
     return Problem(lambda: None, config=ProblemConfig())
+
+
+@pytest.fixture(autouse=True)
+def injection_clean_up() -> None:
+    try:
+        import gapper.injection  # type: ignore
+    except ImportError:
+        pass
+    else:
+        del sys.modules["gapper.injection"]
+        del gapper.injection  # type: ignore

@@ -1,4 +1,3 @@
-import sys
 from itertools import product
 from pathlib import Path
 from typing import Tuple
@@ -8,17 +7,6 @@ from typer.testing import CliRunner
 
 from gapper.cli import app as cli_app
 from tests.conftest import preset_problem_paths, preset_submission_paths
-
-
-@pytest.fixture(autouse=True)
-def injection_clean_up() -> None:
-    try:
-        import gapper.injection  # type: ignore
-    except ImportError:
-        pass
-    else:
-        del sys.modules["gapper.injection"]
-        del gapper.injection  # type: ignore
 
 
 @pytest.mark.parametrize(
