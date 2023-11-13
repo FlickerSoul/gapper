@@ -11,7 +11,10 @@ command_impls = [check, run, run_in_prod, upload, login, gen]
 
 app = typer.Typer()
 for command_impl in command_impls:
-    app.command()(command_impl)
+    if isinstance(command_impl, typer.Typer):
+        app.add_typer(command_impl, name=command_impl.info.name)
+    else:
+        app.command()(command_impl)
 
 
 __all__ = ["app"]
