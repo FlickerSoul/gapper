@@ -40,3 +40,7 @@ pip install -e gapper
 ### Usage 
 
 Please refer to the [GH Pages](https://gapper.universe.observer) of this repository for detailed usage and API reference.
+
+## Questions? Tips?
+
+Please use the [Discussions](https://github.com/FlickerSoul/gapper/discussions) to post any questions or tips you found along the way! 
