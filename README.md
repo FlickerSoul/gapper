@@ -31,15 +31,13 @@ Install from PyPI
 pip install gapper
 ```
 
-Install from source
-```bash
-git clone https://github.com/FlickerSoul/gapper.git
-pip install -e gapper
-```
+For detailed instruction, please read [the documentation page](https://gapper.universe.observer/Tutorials/Getting-Started/#workflow-brief)
 
 ### Usage 
 
-Please refer to the [GH Pages](https://gapper.universe.observer) of this repository for detailed usage and API reference.
+Please refer to the [get started tutorial](https://gapper.universe.observer/Tutorials/Getting-Started/) and [detailed usage](https://gapper.universe.observer/Tutorials/Detailed-Usage/) for detailed usage.
+
+The API reference can be found [here](https://gapper.universe.observer/API/problem/).
 
 ## Questions? Tips?
 
