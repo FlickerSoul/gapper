@@ -31,9 +31,14 @@ nav:
     - Contributing/how_to_contribute.md
 
 extra:
+  analytics:
+    provider: google
+    property: G-JEY0JHXDF4
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/FlickerSoul/gapper
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/gapper/
     - icon: fontawesome/brands/telegram
       link: https://t.me/the_universe_observer
 
