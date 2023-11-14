@@ -1,6 +1,5 @@
 # Gradescope Autograder Packer (gapper)
 
-![Code Style Badge](https://img.shields.io/badge/Code_Style-Black-blue)
 [<img src="https://img.shields.io/pypi/v/gapper">](https://pypi.org/project/gapper/)
 [<img src="https://img.shields.io/pypi/pyversions/gapper">](https://pypi.org/project/gapper/)
 ![PyPI - License](https://img.shields.io/pypi/l/gapper)
