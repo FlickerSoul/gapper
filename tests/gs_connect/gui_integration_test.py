@@ -215,3 +215,6 @@ async def test_autograder_upload(
         await pilot.pause()  # wait for refresh
 
         success_callback_spy.assert_called_once()
+
+        # cancel timer to avoid error in teardown
+        upload_screen.upload_info_timer.cancel()
