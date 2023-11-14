@@ -14,7 +14,7 @@ class AccountDetail(NamedTuple):
 @pytest.fixture(scope="module", autouse=True)
 def ensure_gs_environment(gs_email, gs_password, gs_aid, gs_cid) -> None:
     test_connect_flag = os.environ.get("GS_TEST_CONNECT", _not_set)
-    if test_connect_flag is _not_set or int(test_connect_flag) != 1:
+    if test_connect_flag is _not_set or test_connect_flag != "ensure":
         return
 
     if any(value is _not_set for value in [gs_email, gs_password, gs_aid, gs_cid]):
