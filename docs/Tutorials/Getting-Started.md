@@ -41,6 +41,82 @@ If you're interested, please check out the following workflow brief.
 
 ## Workflow Brief
 
+### Python Requirement
+
+You're assumed to have installed Python 3.12.0 or above. If not, please checkout the following dropdown box for more information. 
+
+/// details | Python Version Management
+The minimal Python version required by `gapper` is 3.12.0. We recommend `pyenv` for Python version management for several reasons: 
+
+1. easy install and remove 
+2. uses `shim` to switch versions painlessly
+
+If you're using `conda`, please reference its manual for python version and dependency management.
+
+* go to [pyenv installation page](https://github.com/pyenv/pyenv?tab=readme-ov-file#installation) and follow the install instructions. Note that you might need to manually add `pyenv` into your system PATH.
+
+Quick pyenv recipes:
+
+* `pyenv versions` to check out the installed Python versions and the currently using version.
+* `pyenv install --list` lists all available Python versions to be installed.
+* `pyenv install <python-version>` to install a specific Python version. For example, `pyenv install 3.12.0`.
+* `pyenv global <python-version>` to set the global Python version. For example, `pyenv global 3.12.0`. After calling `pyenv global <version>`, the `python` and `python3` commands will now be the version you specified. 
+* After using the python for this project, you can switch back to your original Python version by calling `pyenv global <original-version>`.
+///
+
+### Gapper Installation
+
+We recommend creating a virtual environment for your packages. If you're not familiar with virtual environment, please check out the following dropdown box for more information.
+
+/// details | Virtual Environment
+Virtual environment is a tool that helps you manage your Python packages. `pip install <package>` installs the package globally, meaning if you have two projects requiring the same package but different version, `pip install` will get you in trouble. 
+
+If you're using `conda`, you can create a virtual environment by calling `conda create -n <env-name> python=<python-version>`. For example, `conda create -n gapper python=3.12.0`. You can activate the virtual environment by calling `conda activate <env-name>`. For example, `conda activate gapper`. You can deactivate the virtual environment by calling `conda deactivate`. And you can reuse the virtual environment by calling `conda activate <env-name>` again.
+
+The easiest way to create a virtual environment is to use `venv` module. 
+
+
+```bash
+python3 -m venv <path-to-venv>
+```
+
+Usually, we use it as the following. 
+
+```python
+# install virtual environment in the under the venv folder in the current working directory
+python3 -m venv ./venv
+# this ignores the venv folder in git. feel free to ignore it if you're not familiar with git.
+echo "venv/" >> .gitignore  
+```
+
+After creating the virtual environment, you can activate it by calling 
+```bash
+source <path-to-venv>/bin/activate
+```
+
+For example, accompanying the previous example, 
+
+```bash
+source ./venv/bin/activate
+```
+
+After activating the virtual environment, you can install packages using `pip install <package>` as usual. 
+`pip` will install the packages under the `venv` folder and will not affect any other projects. 
+Once you're done with the project, you can deactivate the virtual environment by calling `deactivate`. 
+
+```bash
+deactivate
+```
+
+If you want to use gapper and thus the virtual environment again, simply call `source <path-to-venv>/bin/activate` again.
+///
+
+```bash
+pip install gapper
+```
+
+### Create Autograder
+
 Suppose you are creating a autograder for the following Python solution:
 
 ```python
