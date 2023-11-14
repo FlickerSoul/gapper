@@ -54,6 +54,7 @@ jobs:
         GS_TEST_CONNECT_EMAIL: ${{ secrets.GS_TEST_CONNECT_EMAIL }}
         GS_TEST_CONNECT_CID: ${{ secrets.GS_TEST_CONNECT_CID }}
         GS_TEST_CONNECT_AID: ${{ secrets.GS_TEST_CONNECT_AID }}
+        GS_TEST_CONNECT: ${{ secrets.GS_TEST_CONNECT }}
       run: |
         poetry run pytest --cov --cov-report=json -rsE
     - name: Upload coverage reports to Codecov

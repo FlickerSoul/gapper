@@ -11,6 +11,16 @@ class AccountDetail(NamedTuple):
     password: str
 
 
+@pytest.fixture(scope="module", autouse=True)
+def ensure_gs_environment(gs_email, gs_password, gs_aid, gs_cid) -> None:
+    test_connect_flag = os.environ.get("GS_TEST_CONNECT", _not_set)
+    if test_connect_flag is _not_set or int(test_connect_flag) != 1:
+        return
+
+    if any(value is _not_set for value in [gs_email, gs_password, gs_aid, gs_cid]):
+        pytest.fail("GS Connect API test ENV variables are not set.")
+
+
 @pytest.fixture(scope="module")
 def gs_email() -> str | object:
     return os.environ.get("GS_TEST_CONNECT_EMAIL", _not_set)
@@ -44,7 +54,7 @@ def gs_account(gs_email, gs_password) -> AccountDetail:
     return AccountDetail(gs_email, gs_password)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def gs_cid(gs_test_cid) -> str:
     if gs_test_cid is _not_set:
         pytest.skip("GS Connect API Course ID test ENV variables are not set.")
@@ -52,7 +62,7 @@ def gs_cid(gs_test_cid) -> str:
     return gs_test_cid
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def gs_aid(gs_test_aid) -> str:
     if gs_test_aid is _not_set:
         pytest.skip("GS Connect API Assignment ID test ENV variables are not set.")
