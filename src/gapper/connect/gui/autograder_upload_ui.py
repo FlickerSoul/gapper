@@ -3,6 +3,7 @@ from pathlib import Path
 from threading import Timer
 from typing import Callable, cast
 
+import typer
 from rich.text import Text
 from textual import on
 from textual.app import ComposeResult
@@ -84,11 +85,25 @@ class AutograderUpload(Screen):
                 id="os_select",
             ),
         )
-        yield Button("Upload", id="upload_btn")
+        yield Container(
+            Button("Upload", id="upload_btn"),
+            Button("Open In Browser", id="open_assignment_btn"),
+            id="btn_controls",
+        )
         yield Container(Label("Info"), ScrollableContainer(Label(id="info_label")))
         yield Container(Label("Error"), ScrollableContainer(Label(id="error_label")))
 
         yield Footer()
+
+    @on(Button.Pressed, "#open_assignment_btn")
+    async def open_assignment(self) -> None:
+        """Open the assignment in the browser."""
+        typer.launch(
+            "https://www.gradescope.com/"
+            f"courses/{self.assignment.cid}/"
+            f"assignments/{self.assignment.aid}/"
+            f"configure_autograder"
+        )
 
     @on(Button.Pressed, "#upload_btn")
     async def uploads(self) -> None:
