@@ -10,7 +10,7 @@ import pytest
 import pytest_asyncio
 from gapper.connect.api.assignment import GSAssignmentEssential
 from gapper.connect.gui.app_ui import GradescopeConnect
-from gapper.connect.gui.autograder_upload_ui import AutograderUpload
+from gapper.connect.gui.autograder_upload_ui import AutograderUploadScreen
 from gapper.connect.gui.course_assignment_ui import (
     CourseScreen,
     make_course_car_name,
@@ -204,7 +204,7 @@ async def test_autograder_upload(
         await pilot.pause()
 
         upload_screen = pilot.app.query_one("AutograderUpload")
-        assert isinstance(upload_screen, AutograderUpload)
+        assert isinstance(upload_screen, AutograderUploadScreen)
 
         success_callback_spy: MagicMock = mocker.spy(
             upload_screen,

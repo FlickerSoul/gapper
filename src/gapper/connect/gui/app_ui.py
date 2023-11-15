@@ -7,7 +7,7 @@ from textual.widgets import Footer, Header
 
 from gapper.connect.api.account import GSAccount
 from gapper.connect.gui.assignments_ui import AssignmentArea
-from gapper.connect.gui.autograder_upload_ui import AutograderUpload
+from gapper.connect.gui.autograder_upload_ui import AutograderUploadScreen
 from gapper.connect.gui.course_assignment_ui import CourseScreen
 from gapper.connect.gui.login_ui import LoginScreen
 from gapper.connect.gui.messages import AccountSave
@@ -81,7 +81,7 @@ class GradescopeConnect(App):
         self, event: AssignmentArea.AutograderUpload
     ) -> None:
         await self.push_screen(
-            AutograderUpload(
+            AutograderUploadScreen(
                 assignment=event.assignment,
                 autograder_path=self.autograder_path,
             )

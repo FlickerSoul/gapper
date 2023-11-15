@@ -39,7 +39,7 @@ class Repeat[**P, T](Timer):
             self.function(*self.args, **self.kwargs)
 
 
-class AutograderUpload(Screen):
+class AutograderUploadScreen(Screen):
     BINDINGS = [("ctrl+b", "go_back", "Go Back"), ("ctrl+q", "quit", "Quit")]
 
     CSS_PATH = "autograder_upload_ui.tcss"

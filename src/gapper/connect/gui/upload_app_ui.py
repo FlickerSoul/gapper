@@ -4,7 +4,7 @@ from textual.app import App, ComposeResult
 from textual.widgets import Footer, Header, Static
 
 from gapper.connect.api.assignment import GSAssignment, GSAssignmentEssential
-from gapper.connect.gui.autograder_upload_ui import AutograderUpload
+from gapper.connect.gui.autograder_upload_ui import AutograderUploadScreen
 
 
 class AutograderUploadApp(App):
@@ -42,7 +42,7 @@ class AutograderUploadApp(App):
 
     async def on_mount(self) -> None:
         await self.push_screen(
-            AutograderUpload(
+            AutograderUploadScreen(
                 assignment=self.assignment,
                 autograder_path=self.autograder_path,
                 id="autograder_uploader",
