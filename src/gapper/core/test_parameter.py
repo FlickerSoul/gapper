@@ -18,6 +18,8 @@ from typing import (
 )
 
 __all__ = [
+    "tc",
+    "tcs",
     "TestParam",
     "TestParamBundle",
     "test_case",
@@ -305,6 +307,7 @@ class TestParam(ParamExtractor):
         return f"param{self.format(with_gap_kwargs=True)}"
 
 
+tc = TestParam
 test_case = TestParam
 param = TestParam
 test_case.pipeline = partial(TestParam, gap_is_pipeline=True)
@@ -630,6 +633,7 @@ class TestParamBundle:
         return partial_cls
 
 
+tcs = TestParamBundle
 test_cases = TestParamBundle
 test_cases_params = partial(test_cases, gap_params=True)
 test_cases_param_iter = partial(test_cases, gap_param_iter=True)

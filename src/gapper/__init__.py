@@ -3,6 +3,8 @@
 from .core.problem import gs_connect, problem
 from .core.test_parameter import (
     param,
+    tc,
+    tcs,
     test_case,
     test_cases,
     test_cases_param_iter,
@@ -18,6 +20,8 @@ __all__ = [
     "gs_connect",
     "problem",
     "param",
+    "tc",
+    "tcs",
     "test_case",
     "test_cases",
     "test_cases_param_iter",
