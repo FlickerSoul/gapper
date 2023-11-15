@@ -3,6 +3,7 @@ from typing import Any, Dict, Sequence
 
 import pytest
 from gapper import param, test_case, test_cases
+from gapper.core.test_parameter import GapReservedKeywords
 
 
 def test_weight_and_max_score_cannot_be_specified_both() -> None:
@@ -258,3 +259,25 @@ def test_test_singular_param_iter(args, kwargs, results) -> None:
     assert len(bundle.final_params) == len(results)
     for i, j in zip(bundle.final_params, results):
         assert i == j
+
+
+@pytest.mark.parametrize("gap_kwargs", [item.value for item in GapReservedKeywords])
+def test_tc_bind(gap_kwargs) -> None:
+    is_set = object()
+    bound = test_case.bind(**{gap_kwargs: is_set})
+    case = bound()
+    assert getattr(case.param_info, gap_kwargs) == is_set
+
+
+@pytest.mark.parametrize("gap_kwargs", [item.value for item in GapReservedKeywords])
+def test_tcs_bind(gap_kwargs) -> None:
+    is_set = object()
+    bound = test_cases.bind(**{gap_kwargs: is_set})
+    for helper in ["params", "param_iter", "singular_params", "singular_param_iter"]:
+        assert helper in bound.__dict__
+
+        test_args = [[1], [2], [3]]
+        bundle = getattr(bound, helper)(test_args)
+
+        for case in bundle.final_params:
+            assert getattr(case.param_info, gap_kwargs) == is_set
