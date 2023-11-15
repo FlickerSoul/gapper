@@ -203,7 +203,7 @@ async def test_autograder_upload(
     ).run_test() as pilot:  # type: Pilot
         await pilot.pause()
 
-        upload_screen = pilot.app.query_one("AutograderUpload")
+        upload_screen = pilot.app.query_one("AutograderUploadScreen")
         assert isinstance(upload_screen, AutograderUploadScreen)
 
         success_callback_spy: MagicMock = mocker.spy(
