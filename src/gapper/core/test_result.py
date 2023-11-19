@@ -1,4 +1,4 @@
-"""This module contains the test result class."""
+"""The module for the test result."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -12,6 +12,20 @@ if TYPE_CHECKING:
 
 @dataclass
 class TestResult:
+    """Test result for a single test case.
+
+    :param default_name: The default name of the test.
+    :param name: The name of the test.
+    :param score: The score obtained by the test.
+    :param max_score: The max score can obtained for the test.
+    :param weight: The weight of the test.
+    :param extra_points: The extra points of the test, applied when the test is passed.
+    :param errors: The errors of the test.
+    :param pass_status: The pass status of the test.
+    :param hidden: Whether the test is hidden.
+    :param descriptions: The descriptions of the test.
+    """
+
     default_name: str
     name: str | None = None
     score: float | None = field(default=None)

@@ -1,3 +1,4 @@
+"""CLI options for gapper."""
 from functools import wraps
 from pathlib import Path
 from time import time
@@ -112,6 +113,8 @@ LoginSavePath = Annotated[
 
 
 def timed[T](fn: T) -> T:
+    """Time a function execution."""
+
     @wraps(fn)
     def wrapper(*args, **kwargs):
         start = time()

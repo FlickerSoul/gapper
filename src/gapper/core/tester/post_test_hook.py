@@ -1,3 +1,4 @@
+"""The post test hook."""
 from __future__ import annotations
 
 from typing import List
@@ -19,7 +20,7 @@ class PostTest:
     """A decorator for post tests. Will be used as @post_test() decorator."""
 
     def __init__(self, post_test_fn: PostTestFn, as_test_case: bool = True) -> None:
-        """A decorator for specifying post tests. Will be used as @post_test().
+        """Init the post test.
 
             from gapper import post_test, problem
 
@@ -47,6 +48,7 @@ class PostTest:
         return problem
 
     def __repr__(self) -> str:
+        """Return the representation of the post test."""
         return f"PostTest(post_test_fn={self.post_test_fn}, as_test_case={self.as_test_case})"
 
     def run(
@@ -61,7 +63,6 @@ class PostTest:
         :param result_proxy: The proxy of the post test result.
         :param metadata: The metadata of the submission, which could be None.
         """
-
         try:
             self._run(test_results, result_proxy, metadata)
         except AssertionError as e:

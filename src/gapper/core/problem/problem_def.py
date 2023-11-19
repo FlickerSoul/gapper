@@ -1,4 +1,4 @@
-"""This module defines the Problem class, which is the abstract representation of a assignment problem."""
+"""The module defines the Problem class, which is the abstract representation of a assignment problem."""
 from __future__ import annotations
 
 import logging
@@ -35,7 +35,7 @@ _problem_logger = logging.getLogger("gapper.problem")
 
 
 class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
-    """A abstract representation of a assignment problem."""
+    """An abstract representation of a assignment problem."""
 
     def __init__(
         self,
@@ -100,6 +100,7 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
     def __call__(
         self, *args: ProbInputType.args, **kwargs: ProbInputType.kwargs
     ) -> ProbOutputType:
+        """Run the solution in the problem."""
         return self._solution(*args, **kwargs)
 
     def generate_tests(self) -> Generator[TestCaseWrapper, None, None]:
@@ -198,7 +199,6 @@ def problem(
     :param context: The context to capture from the submission.
     :param easy_context: Whether to use context directly in gap override tests.
     """
-
     if is_script:
         if check_stdout is not None or mock_input is not None:
             raise ValueError("Cannot specify check_stdout or mock_input for a script.")

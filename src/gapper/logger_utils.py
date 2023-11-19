@@ -1,3 +1,4 @@
+"""Utilities for setting up the root logger."""
 import logging
 
 _package_logger = logging.getLogger("gapper")

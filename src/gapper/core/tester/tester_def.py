@@ -1,4 +1,4 @@
-"""This module contains the definition of the tester class."""
+"""Tester class and helper definitions."""
 from __future__ import annotations
 
 import logging
@@ -32,7 +32,10 @@ _tester_logger = logging.getLogger("gapper.tester")
 
 
 class ProblemUnpickler(Unpickler):
+    """The unpickler for the problem class."""
+
     def find_class(self, module: str, name: str) -> Any:
+        """Find the class from the module and name."""
         match name:
             case "Problem":
                 return Problem
@@ -43,6 +46,8 @@ class ProblemUnpickler(Unpickler):
 
 
 class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
+    """The tester class, handling test cases' testing."""
+
     def __init__(
         self,
         problem: Problem[ProbInputType, ProbOutputType],

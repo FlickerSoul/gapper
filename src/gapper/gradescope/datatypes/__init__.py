@@ -1,0 +1,1 @@
+"""Gradescope Data Types module."""

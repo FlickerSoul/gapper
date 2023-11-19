@@ -1,3 +1,4 @@
+"""This module contains the classes for Gradescope assignments."""
 from __future__ import annotations
 
 import logging
@@ -23,6 +24,8 @@ IMAGE_REGEX = re.compile(
 
 
 class DockerStatusJson(TypedDict):
+    """The json response of the docker status of upload."""
+
     id: int
     assignment_id: int
     name: str
@@ -36,6 +39,8 @@ class DockerStatusJson(TypedDict):
 @dataclass_json
 @dataclass
 class GSAssignmentEssential(SessionHolder):
+    """The essential information of a Gradescope assignment."""
+
     cid: str
     aid: str
     docker_id: str | None
@@ -48,6 +53,13 @@ class GSAssignmentEssential(SessionHolder):
         *,
         session: requests.Session | None = None,
     ) -> None:
+        """Create a Gradescope assignment essential object.
+
+        :param cid: The course id of the Gradescope assignment.
+        :param aid: The assignment id of the Gradescope assignment.
+        :param docker_id: The docker id of the assignment.
+        :param session: The session to use.
+        """
         super().__init__(session)
         self.cid = cid
         self.aid = aid
@@ -55,6 +67,11 @@ class GSAssignmentEssential(SessionHolder):
         self._logger = _assignment_logger.getChild(f"GSAssignmentEssential_{self.aid}")
 
     async def upload_autograder(self, path: Path, os_choice: OSChoices) -> None:
+        """Upload the autograder to the assignment.
+
+        :param path: The path to the autograder zip file.
+        :param os_choice: The choice of the operating system.
+        """
         if not path.exists():
             raise FileNotFoundError(f"File {path} does not exist when uploading")
         if not path.is_file() or not path.suffix == ".zip":
@@ -97,6 +114,7 @@ class GSAssignmentEssential(SessionHolder):
             raise ValueError(f"Upload failed with status code {response.status_code}")
 
     def get_active_docker_id(self) -> str | None:
+        """Get the active docker id of the assignment."""
         if self.docker_id is None:
             autograder_config = self._session.get(
                 "https://www.gradescope.com/courses/"
@@ -132,6 +150,7 @@ class GSAssignmentEssential(SessionHolder):
         return self.docker_id
 
     def get_docker_build_status(self) -> DockerStatusJson | None:
+        """Get the docker build status of the assignment."""
         docker_id = self.get_active_docker_id()
         if docker_id is None:
             return None
@@ -140,10 +159,21 @@ class GSAssignmentEssential(SessionHolder):
             f"https://www.gradescope.com/courses/{self.cid}/assignments/{self.aid}/docker_images/{docker_id}.json"
         ).json()
 
+    def __eq__(self, other: Any) -> bool:
+        """Check if two GSAssignments are equal."""
+        if isinstance(other, GSAssignmentEssential):
+            return self.cid == other.cid and self.aid == other.aid
+        return False
+
+    def __hash__(self) -> int:
+        return hash(f"{self.cid}{self.aid}")
+
 
 @dataclass_json
 @dataclass
 class GSAssignment(GSAssignmentEssential):
+    """The Gradescope assignment with detailed information."""
+
     name: str
     points: str
     submissions: str
@@ -169,6 +199,21 @@ class GSAssignment(GSAssignmentEssential):
         *,
         session: requests.Session | None = None,
     ) -> None:
+        """Create a Gradescope assignment object.
+
+        :param cid: The course id of the Gradescope assignment.
+        :param name: The name of the Gradescope assignment.
+        :param aid: The assignment id of the Gradescope assignment.
+        :param points: The points of the Gradescope assignment.
+        :param submissions: The submissions of the Gradescope assignment.
+        :param percent_graded: The percent graded of the Gradescope assignment.
+        :param published: Whether the Gradescope assignment is published.
+        :param release_date: The release date of the Gradescope assignment.
+        :param due_date: The due date of the Gradescope assignment.
+        :param hard_due_date: The late due date of the Gradescope assignment.
+        :param docker_id: The docker id of the Gradescope assignment.
+        :param session: The session to use.
+        """
         super().__init__(cid, aid, docker_id, session=session)
         self.name = name
         self.points = points
@@ -179,11 +224,3 @@ class GSAssignment(GSAssignmentEssential):
         self.due_date = due_date
         self.hard_due_date = hard_due_date
         self._logger = _assignment_logger.getChild(f"GSAssignment_{self.aid}")
-
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, GSAssignment):
-            return self.aid == other.aid
-        return False
-
-    def __hash__(self) -> int:
-        return hash(self.aid)

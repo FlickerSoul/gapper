@@ -44,6 +44,11 @@ class GradescopeTestJson:
 
     @classmethod
     def from_test_result(cls, result: TestResult) -> GradescopeTestJson:
+        """Convert a test result to Gradescope JSON.
+
+        :param result: The test result to convert.
+        :return: The Gradescope Test JSON.
+        """
         if result.pass_status is None:
             # even though gradescope says status is optional, setting it to None
             # will cause an error.
@@ -97,6 +102,7 @@ class GradescopeJson:
         :param score: The score obtained from the submission.
         :param save_path: The path to save the Gradescope JSON to.
         :param kwargs: The keyword arguments to pass to the constructor.
+        :return: The Gradescope JSON.
         """
         gs_json = cls(
             score=score,
@@ -114,6 +120,12 @@ class GradescopeJson:
     def from_error(
         cls, error: InternalError | StudentError, save_path: Path | None = None
     ) -> GradescopeJson:
+        """Convert an error to Gradescope JSON.
+
+        :param error: The error to convert.
+        :param save_path: The path to save the Gradescope JSON to.
+        :return: The Gradescope JSON.
+        """
         gs_json = cls(
             score=0,
             tests=[],

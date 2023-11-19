@@ -1,3 +1,4 @@
+"""Command line interface for checking the problem against the gap_check fields."""
 import typer
 
 from gapper.cli.cli_options import (

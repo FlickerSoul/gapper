@@ -1,3 +1,4 @@
+"""The Gradescope connect decorator and helpers."""
 from __future__ import annotations
 
 import logging
@@ -14,6 +15,8 @@ _gs_connect_logger = logging.getLogger("gapper.core.problem.extras.gradescope_co
 
 @dataclass(frozen=True)
 class GSConnectConfig:
+    """The configuration for Gradescope connect."""
+
     cid: str
     aid: str
 

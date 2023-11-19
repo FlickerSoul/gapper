@@ -1,3 +1,4 @@
+"""Account manager for Gradescope."""
 from __future__ import annotations
 
 import logging
@@ -19,6 +20,14 @@ from gapper.connect.api.utils import get_authenticity_token
 @dataclass_json
 @dataclass
 class GSAccount(SessionHolder):
+    """Account for Gradescope.
+
+    :param email: The email of the account.
+    :param password: The password of the account.
+    :param cookies: The cookies of the account.
+    :param courses: The courses of the account.
+    """
+
     email: str
     cookies: Optional[Dict[str, str]]
     courses: Dict[str, GSCourse]
@@ -35,6 +44,14 @@ class GSAccount(SessionHolder):
         *,
         session: requests.Session | None = None,
     ) -> None:
+        """Initialize the account.
+
+        :param email: The email of the account.
+        :param password: The password of the account.
+        :param cookies: The cookies of the account.
+        :param courses: The courses of the account.
+        :param session: The session to use.
+        """
         super().__init__(session)
         self.email = email
         self.password = password
@@ -91,6 +108,7 @@ class GSAccount(SessionHolder):
         raise ValueError("Login failed")
 
     def confirm_login(self) -> bool:
+        """Confirm login by accessing the account page."""
         confirm_resp = self._session.get(
             "https://www.gradescope.com/account", allow_redirects=False
         )
@@ -154,6 +172,16 @@ class GSAccount(SessionHolder):
         assignment_count: str,
         inactive: bool,
     ) -> None:
+        """Collect a course.
+
+        :param cid: The course id.
+        :param name: The course name.
+        :param shortname: The course shortname.
+        :param term: The course term.
+        :param year: The course year.
+        :param assignment_count: The number of assignments in the course.
+        :param inactive: Whether the course is inactive.
+        """
         self.courses[cid] = GSCourse(
             cid,
             name,
@@ -167,7 +195,7 @@ class GSAccount(SessionHolder):
 
     @staticmethod
     def serialize_login_params(session, email, password, remember_me: bool) -> str:
-        """
+        """Make login params.
 
         :param session:
         :param email:
@@ -201,6 +229,10 @@ class GSAccount(SessionHolder):
         return str(urllib.parse.urlencode(login_params))
 
     def load_session(self, session: requests.Session) -> Self:
+        """Load the session and recursively load it for courses.
+
+        :param session: The session to load.
+        """
         super().load_session(session)
         for course in self.courses.values():
             course.load_session(session)
@@ -208,6 +240,7 @@ class GSAccount(SessionHolder):
         return self
 
     def spawn_session(self) -> Self:
+        """Spawn a session and recursively load it for courses."""
         super().spawn_session()
         self.load_session(self._session)
 
@@ -215,13 +248,20 @@ class GSAccount(SessionHolder):
 
     @classmethod
     def from_yaml(cls, path: Path) -> GSAccount:
-        """Load the account manager from a yaml file."""
+        """Load the account manager from a yaml file.
+
+        :param path: The path to the yaml file.
+        """
         with open(path, "r") as f:
             data = yaml.safe_load(f)
 
         return cls.from_dict(data, infer_missing=True)
 
     def to_yaml(self, path: Path | None = None) -> str:
+        """Dump the account manager to a yaml file.
+
+        :param path: The path to the yaml file. None to just return the yaml data.
+        """
         yaml_data = yaml.dump(self.to_dict())
         path.parent.mkdir(exist_ok=True, parents=True)
 

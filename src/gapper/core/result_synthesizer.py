@@ -1,4 +1,4 @@
-"""This module contains a class to synthesize the results from a tester."""
+"""The module contains a class to synthesize the results from a tester."""
 from __future__ import annotations
 
 import logging
@@ -18,6 +18,8 @@ __all__ = ["ResultSynthesizer"]
 
 
 class ResultSynthesizer:
+    """A class to synthesize the results from a tester."""
+
     def __init__(
         self,
         *,
@@ -25,7 +27,7 @@ class ResultSynthesizer:
         metadata: GradescopeSubmissionMetadata | None = None,
         total_score: float | None = None,
     ) -> None:
-        """A class to synthesize the results from a tester.
+        """Init the result synthesizer.
 
         :param results: The results of the tester.
         :param metadata: The metadata of the submission.

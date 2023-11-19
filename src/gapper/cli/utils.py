@@ -1,3 +1,4 @@
+"""Utility functions for CLI commands."""
 import asyncio
 import logging
 import traceback
@@ -12,6 +13,10 @@ from gapper.connect.gui.upload_app_ui import AutograderUploadApp
 
 
 def load_account_from_path(login_save_path: Path) -> GSAccount:
+    """Load the account cookie login info from the given path.
+
+    :param login_save_path: The path to the login save file.
+    """
     try:
         account = GSAccount.from_yaml(login_save_path).spawn_session()
     except Exception as e:
@@ -31,6 +36,10 @@ def load_account_from_path(login_save_path: Path) -> GSAccount:
 
 
 def check_login_valid(account: GSAccount) -> None:
+    """Check if the login is valid.
+
+    :param account: The account to check.
+    """
     try:
         asyncio.run(account.login(remember_me=True))
     except Exception as e:
@@ -47,6 +56,11 @@ def check_login_valid(account: GSAccount) -> None:
 
 
 def upload_with_gui(login_save_path: Path, autograder_path: Path) -> None:
+    """Upload the autograder with GUI.
+
+    :param login_save_path: The path to the login save file.
+    :param autograder_path: The path to the autograder zip file.
+    """
     gs_app = GradescopeConnect(
         login_save_path=login_save_path, autograder_path=autograder_path
     )
@@ -56,6 +70,13 @@ def upload_with_gui(login_save_path: Path, autograder_path: Path) -> None:
 def upload_with_connect_details(
     cid: str, aid: str, login_save_path: Path, autograder_path: Path
 ) -> None:
+    """Upload the autograder with connect details.
+
+    :param cid: The course id.
+    :param aid: The assignment id.
+    :param login_save_path: The path to the login save file.
+    :param autograder_path: The path to the autograder zip file.
+    """
     account = load_account_from_path(login_save_path)
     check_login_valid(account)
 

@@ -1,3 +1,4 @@
+"""Rich print the test check result."""
 from textwrap import indent
 from typing import Any, Tuple
 

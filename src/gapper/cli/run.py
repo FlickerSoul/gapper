@@ -1,3 +1,4 @@
+"""CLI command running the problem on some example submissions."""
 from gapper.cli.cli_options import (
     AutoInjectOpt,
     InjectOpt,

@@ -1,3 +1,4 @@
+"""CLI App for Gapper."""
 import typer
 
 from .check import check

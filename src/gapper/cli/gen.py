@@ -1,3 +1,4 @@
+"""CLI command for generating autograder zip with additional upload ability."""
 import typer
 
 from gapper.cli.cli_options import (

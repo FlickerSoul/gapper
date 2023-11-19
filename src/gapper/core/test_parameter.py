@@ -1,4 +1,4 @@
-"""This module contains the test case (parameter) support classes and functions."""
+"""The module contains the test case (parameter) support classes and functions."""
 from __future__ import annotations
 
 import warnings
@@ -147,6 +147,7 @@ class ParamExtractor:
         self._param_info.update(kwargs)
 
     def __eq__(self, other: ParamExtractor) -> bool:
+        """Check if the test parameter is equal to another test parameter."""
         if isinstance(other, ParamExtractor):
             return self.param_info == other.param_info
         return False
@@ -238,7 +239,6 @@ class TestParam(ParamExtractor):
         :param args: The arguments for the test parameter.
         :param kwargs: The keyword arguments for the test parameter, including kwargs.
         """
-
         super().__init__(kwargs)
         self._args = args
         self._kwargs = kwargs
@@ -294,6 +294,12 @@ class TestParam(ParamExtractor):
         return partial(cls, **gap_kwargs)
 
     def __eq__(self, other: TestParam) -> bool:
+        """Check if the test parameter is equal to another test parameter.
+
+        Two test parameters are equal if their args, kwargs, and params_info are equal.
+
+        :param other: The other test parameter to compare with.
+        """
         if isinstance(other, TestParam):
             return (
                 self.args == other.args
@@ -304,6 +310,7 @@ class TestParam(ParamExtractor):
         return False
 
     def __repr__(self) -> str:
+        """Return the representation of the test parameter."""
         return f"param{self.format(with_gap_kwargs=True)}"
 
 
@@ -464,6 +471,7 @@ class TestParamBundle:
 
     @staticmethod
     def parse_param_iter(*args: Iterable[Any], **kwargs: Any) -> List[TestParam]:
+        """Parse the param_iter args to param sequence."""
         if kwargs:
             raise ValueError(
                 "gap_param_iter=True ignores non-gap kwargs. "
@@ -505,6 +513,7 @@ class TestParamBundle:
     def parse_singular_param_iter(
         *args: Iterable[Any], **kwargs: Any
     ) -> List[TestParam]:
+        """Parse the singular_param_iter args to param sequence."""
         if kwargs:
             raise ValueError(
                 "gap_singular_param_iter=True ignores non-gap kwargs. "

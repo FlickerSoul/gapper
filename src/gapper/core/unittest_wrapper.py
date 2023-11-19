@@ -1,4 +1,4 @@
-"""This module contains the TestCaseWrapper class, and related help definitions."""
+"""TestCaseWrapper and related helper definitions."""
 from __future__ import annotations
 
 import logging
@@ -42,7 +42,10 @@ _test_wrapper_logger = logging.getLogger("gapper.test_wrapper")
 
 
 class ContextManager(dict):
+    """A context manager that is also a dict."""
+
     def __getattr__(self, item: str) -> Any:
+        """Get the item from the dict."""
         try:
             return self[item]
         except KeyError as e:
@@ -50,12 +53,17 @@ class ContextManager(dict):
 
 
 class EvalOutput[Output](NamedTuple):
+    """The output of the evaluation function."""
+
     output: Output
     stdout: str | None
 
 
 class EvalFn[Input, Output](Protocol):
+    """The evaluation function type."""
+
     def __call__(self, to_be_eval: Input, param: TestParam) -> EvalOutput:
+        """Evaluate the to_be_eval with test param."""
         ...
 
 
@@ -178,7 +186,6 @@ class TestCaseWrapper(TestCase):
 
         :return: True if the test passes, False if the test fails, None if the test is skipped.
         """
-
         self._logger.debug("Checking test")
         if (
             self.test_param.param_info.gap_expect is None
@@ -320,6 +327,10 @@ class TestCaseWrapper(TestCase):
 
     @property
     def gap_override_test_with_context(self) -> CustomTestFn:
+        """The gap_override_test function with context loaded.
+
+        :return: The gap_override_test function with context loaded.
+        """
         return apply_context_on_fn(
             self.test_param.param_info.gap_override_test, self.context
         )

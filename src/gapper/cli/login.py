@@ -1,3 +1,4 @@
+"""CLI command to login to Gradescope."""
 from typing import Annotated
 
 import typer

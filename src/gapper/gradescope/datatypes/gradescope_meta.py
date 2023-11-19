@@ -129,7 +129,6 @@ class GradescopeSubmissionMetadata:
 
         :param path: The path to load the submission metadata from.
         """
-
         obj = cls.from_json(path.read_text())  # type: ignore
         _gradescope_meta_logger.debug(
             f"Submission metadata loaded from {path.absolute()}"

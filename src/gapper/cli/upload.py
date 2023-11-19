@@ -1,3 +1,4 @@
+"""Upload an autograder to Gradescope."""
 from pathlib import Path
 from typing import Annotated, Optional
 

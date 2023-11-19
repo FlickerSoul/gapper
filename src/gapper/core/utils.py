@@ -34,7 +34,7 @@ _util_logger = logging.getLogger("gapper.core.utils")
 
 
 class CustomTestFn(Protocol):
-    """The custom test function protocol."""
+    """The function type to be called for custom tests."""
 
     def __call__[T](
         self,
@@ -43,7 +43,7 @@ class CustomTestFn(Protocol):
         solution: T,
         submission: T,
     ) -> None:
-        """The function type to be called for custom tests.
+        """Implement.
 
         :param param: The TestCaseWrapper instance.
             It contains the test case information, including the test case name, the test case
@@ -59,10 +59,10 @@ class CustomTestFn(Protocol):
 
 
 class CustomEqualityCheckFn(Protocol):
-    """The custom equality check function protocol."""
+    """The function type to be called for custom equality checks."""
 
     def __call__[T](self, expected: T, actual: T, msg: str | None = None) -> None:
-        """The function type to be called for custom equality checks.
+        """Implement.
 
         :param expected: The expected result, which will be executed result of the solution
         :param actual: The actual result, which will be the executed result of the submission
@@ -73,7 +73,7 @@ class CustomEqualityCheckFn(Protocol):
 
 
 class PostChecksFn(Protocol):
-    """The post check function protocol."""
+    """The function type to be called for post checks all the equality check of a test case."""
 
     def __call__[T](
         self,
@@ -84,7 +84,7 @@ class PostChecksFn(Protocol):
         expected_results: Tuple[Any, str | None],
         actual_results: Tuple[Any, str | None],
     ) -> None:
-        """The function type to be called for post checks all the equality check of a test case.
+        """Implement.
 
         :param param: The TestCaseWrapper instance.
             It contains the test case information, including the test case name, the test case
@@ -104,13 +104,15 @@ class PostChecksFn(Protocol):
 
 
 class PostTestFn(Protocol):
+    """The function type to be called after all tests are run."""
+
     def __call__(
         self,
         test_results: List[TestResult],
         test_proxy: TestResult | None,
         metadata: GradescopeSubmissionMetadata | None,
     ) -> None:
-        """The function type to be called after all tests are run.
+        """Implement.
 
         :param test_results: A list of test results from tested test cases.
             Note that, the number of results will remain the same through
@@ -128,6 +130,7 @@ def generate_custom_input(input_list: Iterable[str]) -> Callable[[Any], str]:
     """Generate a custom input function for a test case.
 
     :param input_list: The list of inputs to be used.
+    :return: The custom input function.
     """
     _iterator = iter(input_list)
 
@@ -161,6 +164,7 @@ class CaptureStdout:
         self._io_device: StringIO | None = None
 
     def __enter__(self) -> Self:
+        """Enter as a context manager."""
         if self._capture:
             self._io_device = StringIO()
             self._capture_device = redirect_stdout(self._io_device)
@@ -168,6 +172,7 @@ class CaptureStdout:
         return self
 
     def __exit__(self, *args) -> None:
+        """Exit as the context manager."""
         if self._capture and self._capture_device:
             return self._capture_device.__exit__(*args)
         return None
@@ -188,6 +193,13 @@ class ModuleLoader:
     def _load_module_spec_and_module(
         path: Path, name: str = "module", exec_mod: bool = False
     ) -> Tuple[ModuleSpec, ModuleType]:
+        """Load a module spec and module from a file.
+
+        :param path: The path to the file.
+        :param name: The name of the module to be registered.
+        :param exec_mod: Whether to execute the module.
+        :return: The module spec and the module.
+        """
         spec = importlib.util.spec_from_file_location(name, path)
 
         if spec is None:
@@ -207,6 +219,7 @@ class ModuleLoader:
 
     @staticmethod
     def _load_symbol_from_module(md: ModuleType, symbol: str) -> Any:
+        """Load a symbol from a module."""
         return getattr(md, symbol)
 
 
@@ -215,6 +228,7 @@ def apply_context_on_fn[T: FunctionType](f: T, context: dict[str, Any]) -> T:
 
     :param f: The function to apply context on.
     :param context: The context to be applied.
+    :return: The function with context applied.
     """
     if isinstance(f, FunctionType):
         _util_logger.debug(f"Applying context {context} on function {f}")

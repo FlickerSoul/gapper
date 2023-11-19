@@ -89,6 +89,7 @@ class Function(PipelineFactory):
 
     class FunctionEntry(PipelineBase):
         def __call__(self, obj: Any) -> Any:
+            """Call the function on the object."""
             caller = getattr(obj, self._name, None)
             if caller is None:
                 raise AttributeError(f"Object {obj} has no attribute {self._name}.")
@@ -101,7 +102,9 @@ class Property(PipelineBase):
     """A pipeline action factory generating property lookups."""
 
     def __init__(self, name: str) -> None:
+        """Init the pipeline action."""
         super().__init__(name)
 
     def __call__(self, obj: Any) -> None:
+        """Get Property from object."""
         return getattr(obj, self._name)

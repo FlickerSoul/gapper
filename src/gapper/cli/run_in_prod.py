@@ -1,3 +1,4 @@
+"""CLI command to run the autograder in production mode."""
 from pathlib import Path
 from typing import Annotated
 
