@@ -29,6 +29,6 @@ class ProblemConfig:
     check_stdout: bool = False
     mock_input: bool = False
     captured_context: Iterable[str] = ()
-    easy_context: bool = False
+    easy_context: bool = True
     is_script: bool = False
     extras: ProblemConfigExtra = field(default_factory=lambda: defaultdict(None))

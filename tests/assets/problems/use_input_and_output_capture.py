@@ -17,6 +17,6 @@ __problem_config__ = {
     "check_stdout": True,
     "mock_input": True,
     "captured_context": (),
-    "easy_context": False,
+    "easy_context": True,
     "extras": {},
 }

@@ -171,7 +171,7 @@ def problem(
     check_stdout: bool = False,
     mock_input: bool = False,
     context: Iterable[str] = (),
-    easy_context: bool = False,
+    easy_context: bool = True,
 ) -> Callable[
     [Callable[ProbInputType, ProbOutputType]],
     Problem[ProbInputType, ProbOutputType],
@@ -186,7 +186,7 @@ def problem(
     check_stdout: Optional[bool] = None,
     mock_input: Optional[bool] = None,
     context: Iterable[str] = (),
-    easy_context: bool = False,
+    easy_context: bool = True,
 ) -> Callable[
     [Callable[ProbInputType, ProbOutputType]],
     Problem[ProbInputType, ProbOutputType],

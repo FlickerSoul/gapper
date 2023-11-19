@@ -32,6 +32,6 @@ __problem_config__ = {
     "check_stdout": False,
     "mock_input": False,
     "captured_context": ("GasStation",),
-    "easy_context": False,
+    "easy_context": True,
     "extras": {},
 }
