@@ -34,10 +34,10 @@ def recursive_check(
 
 
 # @test_cases.params(
-#     20, 30, gap_post_checks=[recursive_check]
+#     20, 30, gap_post_hooks=[recursive_check]
 # )  # this is expected to not work
-@test_cases.singular_params(0, 1, 5, gap_post_checks=recursive_check)
-@test_case(10, gap_post_checks=[recursive_check])
+@test_cases.singular_params(0, 1, 5, gap_post_hooks=recursive_check)
+@test_case(10, gap_post_hooks=[recursive_check])
 @problem()
 def fib(n: int) -> int:
     if n == 0:

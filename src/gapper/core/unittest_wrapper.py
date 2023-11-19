@@ -303,13 +303,13 @@ class TestCaseWrapper(TestCase):
             if self.problem.config.check_stdout:
                 check_fn(expected_out, actual_out)
 
-            if self.test_param.param_info.gap_post_checks is not None:
+            if self.test_param.param_info.gap_post_hooks is not None:
                 self._logger.debug("Running post checks")
 
-                if not isinstance(self.test_param.param_info.gap_post_checks, Sequence):
-                    post_checks = [self.test_param.param_info.gap_post_checks]
+                if not isinstance(self.test_param.param_info.gap_post_hooks, Sequence):
+                    post_checks = [self.test_param.param_info.gap_post_hooks]
                 else:
-                    post_checks = self.test_param.param_info.gap_post_checks
+                    post_checks = self.test_param.param_info.gap_post_hooks
 
                 for post_check in post_checks:
                     post_check(

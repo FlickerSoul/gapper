@@ -72,7 +72,7 @@ class CustomEqualityCheckFn(Protocol):
         ...
 
 
-class PostChecksFn(Protocol):
+class PostHookFn(Protocol):
     """The function type to be called for post checks all the equality check of a test case."""
 
     def __call__[T](
