@@ -9,13 +9,16 @@ def my_adder(a, b) -> int:
     return a + b % 10
 
 
-adder: Callable[[int, int], int]
+adder: Callable[[int, int], int]  # adder is not defined here, this is just a type hint
 
 
 def custom_test(param: TestCaseWrapper, result_proxy: TestResult, solution, submission):
     assert solution(*param.test_param.args, my_adder) == submission(
-        *param.test_param.args, adder
+        *param.test_param.args,
+        adder,  # notice here,
     )
+    # adder is not defined, but we can use it
+    # this is because it will be captured from students' submission context
     assert my_adder(*param.test_param.args) == adder(*param.test_param.args)
 
 

@@ -156,7 +156,7 @@ def problem(
     *,
     is_script: bool = False,
     context: Iterable[str] = (),
-    easy_context: bool = False,
+    easy_context: bool = True,
 ) -> Callable[
     [Callable[ProbInputType, ProbOutputType]],
     Problem[ProbInputType, ProbOutputType],
