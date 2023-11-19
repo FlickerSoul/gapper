@@ -156,6 +156,47 @@ class ParamExtractor:
         return False
 
 
+class _BoundTestParam(partial):
+    __slots__ = ()
+
+    @overload
+    def __new__(
+        cls,
+        *args: Any,
+        gap_expect: Any | Sequence[Any] | None = None,
+        gap_expect_stdout: str | Sequence[str] | None = None,
+        gap_hidden: bool | Sequence[bool] = False,
+        gap_name: str | Sequence[str] | None = None,
+        gap_extra_points: float | Sequence[float] | None = None,
+        gap_override_check: CustomEqualityCheckFn
+        | Sequence[CustomEqualityCheckFn]
+        | None = None,
+        gap_easy_context: bool | Sequence[bool] = False,
+        gap_override_test: CustomTestFn | Sequence[CustomTestFn] | None = None,
+        gap_post_hooks: List[List[PostHookFn]]
+        | List[PostHookFn]
+        | PostHookFn
+        | None = None,
+        gap_pre_hooks: List[List[PreHookFn]]
+        | List[PreHookFn]
+        | PreHookFn
+        | None = None,
+        gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
+        gap_is_pipeline: bool | Sequence[bool] = False,
+        gap_max_score: float | Sequence[float] | None = None,
+        gap_weight: float | Sequence[float] | None = None,
+        gap_params: bool = False,
+        gap_param_iter: bool = False,
+        gap_singular_params: bool = False,
+        gap_singular_param_iter: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        ...
+
+    def __new__(cls, *args, **kwargs) -> _BoundTestParam:
+        return super().__new__(cls, TestParam, *args, **kwargs)
+
+
 class TestParam(ParamExtractor):
     """A class to represent a test case (parameter). Will be used as @test_case() decorator.
 
@@ -163,6 +204,7 @@ class TestParam(ParamExtractor):
     """
 
     pipeline: ClassVar[partial[TestParam]]
+    bind = _BoundTestParam
 
     @overload
     def __init__(
@@ -299,15 +341,6 @@ class TestParam(ParamExtractor):
         else:
             return f"({kwargs_format})"
 
-    @classmethod
-    def bind(
-        cls,
-        **kwargs,
-    ) -> partial[TestParam]:
-        """Bind the gap kwargs to the test case."""
-        gap_kwargs = ParamExtractor.extra_gap_info(kwargs)
-        return partial(cls, **gap_kwargs)
-
     def __eq__(self, other: TestParam) -> bool:
         """Check if the test parameter is equal to another test parameter.
 
@@ -335,6 +368,53 @@ param = TestParam
 test_case.pipeline = partial(TestParam, gap_is_pipeline=True)
 
 
+class _BoundTestParamBundle(partial):
+    __slots__ = ("params", "param_iter", "singular_params", "singular_param_iter")
+
+    @overload
+    def __new__(
+        cls,
+        *args: Any,
+        gap_expect: Any | Sequence[Any] | None = None,
+        gap_expect_stdout: str | Sequence[str] | None = None,
+        gap_hidden: bool | Sequence[bool] = False,
+        gap_name: str | Sequence[str] | None = None,
+        gap_extra_points: float | Sequence[float] | None = None,
+        gap_override_check: CustomEqualityCheckFn
+        | Sequence[CustomEqualityCheckFn]
+        | None = None,
+        gap_easy_context: bool | Sequence[bool] = False,
+        gap_override_test: CustomTestFn | Sequence[CustomTestFn] | None = None,
+        gap_post_hooks: List[List[PostHookFn]]
+        | List[PostHookFn]
+        | PostHookFn
+        | None = None,
+        gap_pre_hooks: List[List[PreHookFn]]
+        | List[PreHookFn]
+        | PreHookFn
+        | None = None,
+        gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
+        gap_is_pipeline: bool | Sequence[bool] = False,
+        gap_max_score: float | Sequence[float] | None = None,
+        gap_weight: float | Sequence[float] | None = None,
+        gap_params: bool = False,
+        gap_param_iter: bool = False,
+        gap_singular_params: bool = False,
+        gap_singular_param_iter: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        ...
+
+    def __new__(cls, *args, **kwargs) -> _BoundTestParamBundle:
+        obj = super().__new__(cls, TestParamBundle, *args, **kwargs)
+        obj.params = partial(obj, gap_params=True)
+        obj.param_iter = partial(obj, gap_param_iter=True)
+        obj.singular_params = partial(obj, gap_singular_params=True)
+        obj.singular_param_iter = partial(obj, gap_singular_param_iter=True)
+
+        return obj
+
+
 class TestParamBundle:
     """A class to represent a test parameter bundle (test_cases). Will be used as @test_cases() decorator.
 
@@ -353,8 +433,10 @@ class TestParamBundle:
     singular_params: ClassVar[partial[TestParamBundle]]
     singular_param_iter: ClassVar[partial[TestParamBundle]]
 
+    bind = _BoundTestParamBundle
+
     @overload
-    def __init__[T: Problem[ProbInputType, ProbOutputType]](
+    def __init__(
         self,
         *args: Any,
         gap_expect: Any | Sequence[Any] | None = None,
@@ -387,7 +469,7 @@ class TestParamBundle:
         ...
 
     @overload
-    def __init__[T: Problem[ProbInputType, ProbOutputType]](
+    def __init__(
         self,
         *args: Any,
         gap_expect: Any | Sequence[Any] | None = None,
@@ -644,25 +726,6 @@ class TestParamBundle:
             prob = final_param.register_test_param(prob)
 
         return prob
-
-    @classmethod
-    def bind(cls, **kwargs) -> partial[TestParamBundle]:
-        """Bind the gap kwargs to the test cases."""
-        gap_kwargs = ParamExtractor.extra_gap_info(kwargs)
-        partial_cls = partial(cls, **gap_kwargs)
-        for helper in [
-            "params",
-            "param_iter",
-            "singular_params",
-            "singular_param_iter",
-            "zip",
-            "product",
-        ]:
-            setattr(
-                partial_cls, helper, partial(partial_cls, **{f"gap_{helper}": True})
-            )
-
-        return partial_cls
 
 
 tcs = TestParamBundle

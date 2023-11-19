@@ -273,11 +273,17 @@ def test_tc_bind(gap_kwargs) -> None:
 def test_tcs_bind(gap_kwargs) -> None:
     is_set = object()
     bound = test_cases.bind(**{gap_kwargs: is_set})
-    for helper in ["params", "param_iter", "singular_params", "singular_param_iter"]:
-        assert helper in bound.__dict__
+    for helper_name in [
+        "params",
+        "param_iter",
+        "singular_params",
+        "singular_param_iter",
+    ]:
+        assert helper_name in bound.__slots__
 
         test_args = [[1], [2], [3]]
-        bundle = getattr(bound, helper)(test_args)
+        helper = getattr(bound, helper_name)
+        bundle = helper(test_args)
 
         for case in bundle.final_params:
-            assert getattr(case.param_info, gap_kwargs) == is_set
+            assert getattr(case.param_info, gap_kwargs) is is_set
