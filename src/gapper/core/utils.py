@@ -17,6 +17,7 @@ from typing import (
     Dict,
     Iterable,
     List,
+    NamedTuple,
     Protocol,
     Self,
     Tuple,
@@ -72,6 +73,36 @@ class CustomEqualityCheckFn(Protocol):
         ...
 
 
+class PreHookFn(Protocol):
+    """The function type to be called for post checks all the equality check of a test case."""
+
+    def __call__[T](
+        self,
+        param: TestCaseWrapper,
+        result_proxy: TestResult,
+        solution: T,
+        submission: T,
+    ) -> None:
+        """Implement.
+
+        :param param: The TestCaseWrapper instance.
+            It contains the test case information, including the test case name, the test case
+            parameters, etc.
+        :param result_proxy: The TestResult instance of this custom test to be used as a proxy.
+            You can use this proxy to affect the test result of this test case. See
+            .. seealso:: :class:`gapper.core.test_result.TestResult` for more details.
+        :param solution: The expected result, which will be the solution under the @problem decorator
+        :param submission: The actual result, which will be the submission from the student
+        :raises AssertionError: It should raise assertion error if the post check fails.
+        """
+        ...
+
+
+class ResultBundle(NamedTuple):
+    result: Any
+    stdout: str | None
+
+
 class PostHookFn(Protocol):
     """The function type to be called for post checks all the equality check of a test case."""
 
@@ -81,8 +112,8 @@ class PostHookFn(Protocol):
         result_proxy: TestResult,
         solution: T,
         submission: T,
-        expected_results: Tuple[Any, str | None],
-        actual_results: Tuple[Any, str | None],
+        expected_results: ResultBundle,
+        actual_results: ResultBundle,
     ) -> None:
         """Implement.
 

@@ -26,6 +26,7 @@ from gapper.core.test_result import TestResult
 from gapper.core.utils import (
     CaptureStdout,
     CustomTestFn,
+    ResultBundle,
     apply_context_on_fn,
     generate_custom_input,
 )
@@ -258,6 +259,54 @@ class TestCaseWrapper(TestCase):
 
         self._logger.debug(f"Test result initialized: {result}")
 
+    def run_pre_hooks(self, submission: Any, result: TestResult) -> None:
+        """Run the pre hooks defined in the test parameter.
+
+        :param submission: The submission to be tested.
+        :param result: The result object to be used and written to.
+        """
+        if self.test_param.param_info.gap_pre_hooks is not None:
+            self._logger.debug("Running pre checks")
+            if not isinstance(self.test_param.param_info.gap_pre_hooks, Sequence):
+                pre_hooks = [self.test_param.param_info.gap_pre_hooks]
+            else:
+                pre_hooks = self.test_param.param_info.gap_pre_hooks
+
+            for pre_hook in pre_hooks:
+                pre_hook(self, result, self.problem.solution, submission)
+
+    def run_post_hooks(
+        self,
+        submission: Any,
+        result: TestResult,
+        expected_results: ResultBundle,
+        actual_results: ResultBundle,
+    ) -> None:
+        """Run the post hooks defined in the test parameter.
+
+        :param submission: The submission to be tested.
+        :param result: The result object to be used and written to.
+        :param expected_results: The expected results of the test: (Output, stdout).
+        :param actual_results: The actual results of the test: (Output, stdout).
+        """
+        if self.test_param.param_info.gap_post_hooks is not None:
+            self._logger.debug("Running post checks")
+
+            if not isinstance(self.test_param.param_info.gap_post_hooks, Sequence):
+                post_checks = [self.test_param.param_info.gap_post_hooks]
+            else:
+                post_checks = self.test_param.param_info.gap_post_hooks
+
+            for post_check in post_checks:
+                post_check(
+                    self,
+                    result,
+                    self.problem.solution,
+                    submission,
+                    expected_results,
+                    actual_results,
+                )
+
     def _run_test(self, submission: Any, result: TestResult) -> TestResult:
         """Run the test on the submission.
 
@@ -294,6 +343,10 @@ class TestCaseWrapper(TestCase):
 
             self._logger.debug(f"Selected evaluation fn {eval_fn.__name__}")
 
+            self.run_pre_hooks(submission, result)
+
+            self._logger.debug(f"Running test evaluation")
+
             expected_result, expected_out = eval_fn(
                 self.problem.solution, self.test_param
             )
@@ -303,23 +356,12 @@ class TestCaseWrapper(TestCase):
             if self.problem.config.check_stdout:
                 check_fn(expected_out, actual_out)
 
-            if self.test_param.param_info.gap_post_hooks is not None:
-                self._logger.debug("Running post checks")
-
-                if not isinstance(self.test_param.param_info.gap_post_hooks, Sequence):
-                    post_checks = [self.test_param.param_info.gap_post_hooks]
-                else:
-                    post_checks = self.test_param.param_info.gap_post_hooks
-
-                for post_check in post_checks:
-                    post_check(
-                        self,
-                        result,
-                        self.problem.solution,
-                        submission,
-                        (expected_result, expected_out),
-                        (actual_result, actual_out),
-                    )
+            self.run_post_hooks(
+                submission,
+                result,
+                ResultBundle(expected_result, expected_out),
+                ResultBundle(actual_result, actual_out),
+            )
 
         self._logger.debug("Test completed")
 

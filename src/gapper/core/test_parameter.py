@@ -42,6 +42,7 @@ if TYPE_CHECKING:
         CustomEqualityCheckFn,
         CustomTestFn,
         PostHookFn,
+        PreHookFn,
     )
 
 
@@ -58,6 +59,7 @@ class GapReservedKeywords(Enum):
     gap_override_check = "gap_override_check"
     gap_easy_context = "gap_easy_context"
     gap_override_test = "gap_override_test"
+    gap_pre_hooks = "gap_pre_hooks"
     gap_post_hooks = "gap_post_hooks"
     gap_description = "gap_description"
     gap_is_pipeline = "gap_is_pipeline"
@@ -73,6 +75,7 @@ class ParamInfo:
     gap_override_check: CustomEqualityCheckFn | None = None
     gap_easy_context: bool = False
     gap_override_test: CustomTestFn | None = None
+    gap_pre_hooks: List[PreHookFn] | PreHookFn | None = None
     gap_post_hooks: List[PostHookFn] | PostHookFn | None = None
     gap_description: str | Iterable[str] | None = None
     gap_is_pipeline: bool = False
@@ -173,6 +176,7 @@ class TestParam(ParamExtractor):
         gap_override_check: CustomEqualityCheckFn | None = None,
         gap_easy_context: bool = False,
         gap_override_test: CustomTestFn | None = None,
+        gap_pre_hooks: List[PreHookFn] | PreHookFn | None = None,
         gap_post_hooks: List[PostHookFn] | PostHookFn | None = None,
         gap_description: str | Iterable[str] | None = None,
         gap_is_pipeline: bool = False,
@@ -209,6 +213,7 @@ class TestParam(ParamExtractor):
         gap_override_check: CustomEqualityCheckFn | None = None,
         gap_easy_context: bool = False,
         gap_override_test: CustomTestFn | None = None,
+        gap_pre_hooks: List[PreHookFn] | PreHookFn | None = None,
         gap_post_hooks: List[PostHookFn] | PostHookFn | None = None,
         gap_description: str | Iterable[str] | None = None,
         gap_is_pipeline: bool = False,
@@ -356,6 +361,10 @@ class TestParamBundle:
         | List[PostHookFn]
         | PostHookFn
         | None = None,
+        gap_pre_hooks: List[List[PreHookFn]]
+        | List[PreHookFn]
+        | PreHookFn
+        | None = None,
         gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
         gap_is_pipeline: bool | Sequence[bool] = False,
         gap_max_score: float | Sequence[float] | None = None,
@@ -381,6 +390,10 @@ class TestParamBundle:
         | None = None,
         gap_easy_context: bool | Sequence[bool] = False,
         gap_override_test: CustomTestFn | Sequence[CustomTestFn] | None = None,
+        gap_pre_hooks: List[List[PreHookFn]]
+        | List[PreHookFn]
+        | PreHookFn
+        | None = None,
         gap_post_hooks: List[List[PostHookFn]]
         | List[PostHookFn]
         | PostHookFn
