@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 from copy import deepcopy
+from types import FunctionType
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -25,7 +26,6 @@ from gapper.core.pipeline_support import PipelineBase
 from gapper.core.test_result import TestResult
 from gapper.core.utils import (
     CaptureStdout,
-    CustomTestFn,
     ResultBundle,
     apply_context_on_fn,
     generate_custom_input,
@@ -273,6 +273,7 @@ class TestCaseWrapper(TestCase):
                 pre_hooks = self.test_param.param_info.gap_pre_hooks
 
             for pre_hook in pre_hooks:
+                pre_hook = self.apply_context(pre_hook)
                 pre_hook(self, result, self.problem.solution, submission)
 
     def run_post_hooks(
@@ -293,12 +294,14 @@ class TestCaseWrapper(TestCase):
             self._logger.debug("Running post checks")
 
             if not isinstance(self.test_param.param_info.gap_post_hooks, Sequence):
-                post_checks = [self.test_param.param_info.gap_post_hooks]
+                post_hooks = [self.test_param.param_info.gap_post_hooks]
             else:
-                post_checks = self.test_param.param_info.gap_post_hooks
+                post_hooks = self.test_param.param_info.gap_post_hooks
 
-            for post_check in post_checks:
-                post_check(
+            for post_hook in post_hooks:
+                post_hook = self.apply_context(post_hook)
+
+                post_hook(
                     self,
                     result,
                     self.problem.solution,
@@ -317,18 +320,10 @@ class TestCaseWrapper(TestCase):
 
         if self.test_param.param_info.gap_override_test is not None:
             self._logger.debug("Handing testing to gap_override_test")
-            if (
-                self.problem.config.easy_context
-                or self.test_param.param_info.gap_easy_context
-            ):
-                self._logger.debug("Using easy context")
-                self.gap_override_test_with_context(
-                    self, result, self.problem.solution, submission
-                )
-            else:
-                self.test_param.param_info.gap_override_test(
-                    self, result, self.problem.solution, submission
-                )
+            override_test = self.apply_context(
+                self.test_param.param_info.gap_override_test
+            )
+            override_test(self, result, self.problem.solution, submission)
         else:
             if self.test_param.param_info.gap_override_check:
                 check_fn: CustomEqualityCheckFn = (
@@ -367,12 +362,15 @@ class TestCaseWrapper(TestCase):
 
         return result
 
-    @property
-    def gap_override_test_with_context(self) -> CustomTestFn:
-        """The gap_override_test function with context loaded."""
-        return apply_context_on_fn(
-            self.test_param.param_info.gap_override_test, self.context
-        )
+    def apply_context[T: FunctionType](self, fn: T) -> T:
+        if (
+            self.problem.config.easy_context
+            or self.test_param.param_info.gap_easy_context
+        ):
+            self._logger.debug("Using easy context")
+            return apply_context_on_fn(fn, self.context)
+        else:
+            return fn
 
     def load_context(self, context: ContextManager) -> Self:
         """Load the submission context into the test case.

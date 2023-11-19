@@ -264,10 +264,20 @@ class TestParam(ParamExtractor):
         """Return the arguments of the test parameter."""
         return self._args
 
+    @args.setter
+    def args(self, args: tuple[Any, ...]) -> None:
+        """Set the arguments of the test parameter."""
+        self._args = args
+
     @property
     def kwargs(self) -> dict[str, Any]:
         """Return the keyword arguments of the test parameter."""
         return self._kwargs
+
+    @kwargs.setter
+    def kwargs(self, kwargs: dict[str, Any]) -> None:
+        """Set the keyword arguments of the test parameter."""
+        self._kwargs = kwargs
 
     def format(self, with_gap_kwargs: bool = False) -> str:
         """Format the test parameter."""
