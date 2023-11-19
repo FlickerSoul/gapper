@@ -96,8 +96,11 @@ class NoSubmissionError(StudentError):
     """Raised when no submission is loaded."""
 
     def __init__(self, expected_name: str):
-        super().__init__()
-        self.expected_name = expected_name
+        super().__init__(expected_name)
+
+    @property
+    def expected_name(self) -> str:
+        return self.args[0]
 
     def format(self) -> str:
         return (
@@ -111,8 +114,11 @@ class NoSubmissionError(StudentError):
 
 class MultipleSubmissionError(StudentError):
     def __init__(self, expected_name: str):
-        super().__init__()
-        self.expected_name = expected_name
+        super().__init__(expected_name)
+
+    @property
+    def expected_name(self) -> str:
+        return self.args[0]
 
     def format(self) -> str:
         return (
@@ -125,8 +131,11 @@ class MultipleSubmissionError(StudentError):
 
 class MissingContextValueError(StudentError):
     def __init__(self, value_name: str):
-        super().__init__()
-        self.value_name = value_name
+        super().__init__(value_name)
+
+    @property
+    def value_name(self) -> str:
+        return self.args[0]
 
     def format(self) -> str:
         return (
@@ -137,8 +146,11 @@ class MissingContextValueError(StudentError):
 
 class MultipleContextValueError(StudentError):
     def __init__(self, value_name: str):
-        super().__init__()
-        self.value_name = value_name
+        super().__init__(value_name)
+
+    @property
+    def value_name(self) -> str:
+        return self.args[0]
 
     def format(self) -> str:
         return (
@@ -154,12 +166,15 @@ class NoProblemDefinedError(InternalError):
 
 class MultipleProblemsDefinedError(InternalError):
     def __init__(self, names: Iterable[str]):
-        super().__init__()
-        self.names = names
+        super().__init__(*names)
+
+    @property
+    def names(self) -> Iterable[str]:
+        return self.args
 
     @property
     def formatted_names(self) -> str:
-        return ", ".join(self.names)
+        return ", ".join(self.args)
 
     def format(self) -> str:
         return f"Multiple problems ({self.formatted_names}) are defined."
