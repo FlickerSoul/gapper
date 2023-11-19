@@ -268,12 +268,14 @@ The `problem` has two over loads:
 ```python
 is_script: bool = False
 context: Iterable[str] = ()
+easy_context: bool = True
 ```
 and 
 ```python
 check_stdout: Optional[bool] = None
 mock_input: Optional[bool] = None
 context: Iterable[str] = ()
+easy_context: bool = True
 ```
 
 `is_script` is used to indicate if the assignment is a script, which is something like the following 
@@ -288,16 +290,8 @@ Leaving the `is_script` to `False`, the `@problem()` decorator treat decorated e
 
 `mock_input` feeds test case arguments into `input` call when the submission is run. 
 
-`context` is used to capture variables in submissions. In the following example, the `GasStation` in student's submission will become available to the autograder. 
+`context` is used to capture variables in submissions. Please see [(Easy) Context](Easy-Context.md) for more details.
 
-```python
-class GasStation:
-    """A gas station implementation."""
-
-@problem(context=['GasStation'])
-class Car:
-    """The car uses GasStation."""
-```
 
 ### Examples
 

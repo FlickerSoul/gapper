@@ -11,6 +11,7 @@ nav:
       - Tutorials/Getting-Started.md
       - Tutorials/Detailed-Usage.md
       - Tutorials/gap_-Keywords.md
+      - Tutorials/Easy-Context.md
       - Tutorials/Test-Result-(Proxy).md
       - Tutorials/Upload-Autograder.md
       - Tutorials/Various-Function-Protocols.md
