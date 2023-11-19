@@ -264,6 +264,13 @@ def apply_context_on_fn[T: FunctionType](f: T, context: dict[str, Any]) -> T:
     if isinstance(f, FunctionType):
         _util_logger.debug(f"Applying context {context} on function {f}")
 
+        _util_logger.debug("check duplicates in local variables")
+        for local_var_name in f.__code__.co_varnames:
+            if local_var_name in context:
+                raise ValueError(
+                    f"Cannot apply context value of {local_var_name} because it is already defined in the function"
+                )
+
         # update closure with context
         _util_logger.debug("Gathering closure with context")
         closure_mod: Dict[str, int] = {}
