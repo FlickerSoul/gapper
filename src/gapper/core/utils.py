@@ -261,59 +261,56 @@ def apply_context_on_fn[T: FunctionType](f: T, context: dict[str, Any]) -> T:
     :param context: The context to be applied.
     :return: The function with context applied.
     """
-    if isinstance(f, FunctionType):
-        _util_logger.debug(f"Applying context {context} on function {f}")
+    if not isinstance(f, FunctionType):
+        raise TypeError(f"Cannot apply context on {f} because it is not a function")
 
-        _util_logger.debug("check duplicates in local variables")
-        for local_var_name in f.__code__.co_varnames:
-            if local_var_name in context:
-                raise ValueError(
-                    f"Cannot apply context value of {local_var_name} because it is already defined in the function"
+    _util_logger.debug(f"Applying context {context} on function {f}")
+
+    _util_logger.debug("check duplicates in local variables")
+    for local_var_name in f.__code__.co_varnames:
+        if local_var_name in context:
+            raise ValueError(
+                f"Cannot apply context value of {local_var_name} because it is already defined in the function"
+            )
+
+    # update closure with context
+    _util_logger.debug("Gathering closure with context")
+    closure_mod: Dict[str, int] = {}
+    if f.__closure__ is not None:
+        for index, closure_var_name in enumerate(f.__code__.co_freevars):
+            if closure_var_name in context:
+                _util_logger.debug(
+                    f'Found closure variable "{closure_var_name}" ({index}) in context'
+                )
+                closure_mod[closure_var_name] = index
+            else:
+                _util_logger.debug(
+                    f'Cannot find closure variable "{closure_var_name}" in context, skipped"'
                 )
 
-        # update closure with context
-        _util_logger.debug("Gathering closure with context")
-        closure_mod: Dict[str, int] = {}
-        if f.__closure__ is not None:
-            for context_var_name in context.keys():
-                try:
-                    closure_pos = f.__code__.co_freevars.index(context_var_name)
-                    _util_logger.debug(
-                        f"Found closure variable {context_var_name} at position {closure_pos}"
-                    )
-                    closure_mod[context_var_name] = closure_pos
-                except ValueError:
-                    _util_logger.debug(
-                        f'Cannot find closure variable "{context_var_name}, skipped"'
-                    )
+    g = FunctionType(
+        f.__code__,
+        {
+            **f.__globals__,
+            **{
+                c_name: c_val
+                for c_name, c_val in context.items()
+                if c_name not in closure_mod
+            },
+        },  # copy globals and update with context
+        name=f.__name__,
+        argdefs=f.__defaults__,
+        closure=f.__closure__,
+    )
+    g = update_wrapper(g, f)
+    g.__kwdefaults__ = copy(f.__kwdefaults__)
 
-        g = FunctionType(
-            f.__code__,
-            {
-                **f.__globals__,
-                **{
-                    c_name: c_val
-                    for c_name, c_val in context.items()
-                    if c_name not in closure_mod
-                },
-            },  # copy globals and update with context
-            name=f.__name__,
-            argdefs=f.__defaults__,
-            closure=f.__closure__,
-        )
-        g = update_wrapper(g, f)
-        g.__kwdefaults__ = copy(f.__kwdefaults__)
+    _util_logger.debug(f"Function {f} copied")
 
-        _util_logger.debug(f"Function {f} copied")
+    for c_name, c_pos in closure_mod.items():
+        _util_logger.debug(f"Updating closure variable {c_name} at position {c_pos}")
+        g.__closure__[c_pos].cell_contents = context[c_name]
 
-        for c_name, c_pos in closure_mod.items():
-            _util_logger.debug(
-                f"Updating closure variable {c_name} at position {c_pos}"
-            )
-            g.__closure__[c_pos].cell_contents = context[c_name]
+    _util_logger.debug("Closure updated")
 
-        _util_logger.debug("Closure updated")
-
-        return g
-    else:
-        raise TypeError(f"Cannot apply context on {f} because it is not a function")
+    return g
