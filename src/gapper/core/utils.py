@@ -270,7 +270,7 @@ def apply_context_on_fn[T: FunctionType](f: T, context: dict[str, Any]) -> T:
     for local_var_name in f.__code__.co_varnames:
         if local_var_name in context:
             raise ValueError(
-                f"Cannot apply context value of {local_var_name} because it is already defined in the function"
+                f'Cannot apply context value of "{local_var_name}" because it is already defined in the function'
             )
 
     # update closure with context
