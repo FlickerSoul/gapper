@@ -31,15 +31,15 @@ adder: Callable[[int, int], int]
 
 
 # custom test that uses the captured context
-def custom_test(param: TestCaseWrapper, result_proxy: TestResult, solution, submission):
-    assert my_adder(*param.test_param.args) == adder(*param.test_param.args) # notice here
+def custom_test(case: TestCaseWrapper, result_proxy: TestResult, solution, submission):
+    assert my_adder(*case.test_param.args) == adder(*case.test_param.args) # notice here
     # adder is not defined, but we can use it
     # this is because it will be captured from students' submission context
     
     # test if student's adder behaves the same in the solution as in their submission
-    assert solution(*param.test_param.args, adder) == submission(
-        *param.test_param.args,
-        param.context.adder,  # access adder from test case
+    assert solution(*case.test_param.args, adder) == submission(
+        *case.test_param.args,
+        case.context.adder,  # access adder from test case
     )
     
 
@@ -64,7 +64,7 @@ def add(a, b, some_adder):
 
 The test will pass because the student's `adder` is semantically equivalent to the solution's `my_adder`.
 
-The `easy_context` flag, which is set to `True` by default, in the `@problem` decorator allows you to inject context variables directly. In the example above, you can use `add` even though it's not defined. If `easy_context` is set to False, you can still access the captured context using `param.context.<context_variable_name>`. For example, `param.context.adder`
+The `easy_context` flag, which is set to `True` by default, in the `@problem` decorator allows you to inject context variables directly. In the example above, you can use `add` even though it's not defined. If `easy_context` is set to False, you can still access the captured context using `case.context.<context_variable_name>`. For example, `case.context.adder`
 
 If any of the names specified in `context` is not present in student's submission, the submission will be rejected without testing. 
 

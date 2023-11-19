@@ -39,14 +39,14 @@ class CustomTestFn(Protocol):
 
     def __call__[T](
         self,
-        param: TestCaseWrapper,
+        case: TestCaseWrapper,
         result_proxy: TestResult,
         solution: T,
         submission: T,
     ) -> None:
         """Implement.
 
-        :param param: The TestCaseWrapper instance.
+        :param case: The TestCaseWrapper instance.
             It contains the test case information, including the test case name, the test case
             parameters, etc.
         :param result_proxy: The TestResult instance of this custom test to be used as a proxy.
@@ -78,14 +78,14 @@ class PreHookFn(Protocol):
 
     def __call__[T](
         self,
-        param: TestCaseWrapper,
+        case: TestCaseWrapper,
         result_proxy: TestResult,
         solution: T,
         submission: T,
     ) -> None:
         """Implement.
 
-        :param param: The TestCaseWrapper instance.
+        :param case: The TestCaseWrapper instance.
             It contains the test case information, including the test case name, the test case
             parameters, etc.
         :param result_proxy: The TestResult instance of this custom test to be used as a proxy.
@@ -108,7 +108,7 @@ class PostHookFn(Protocol):
 
     def __call__[T](
         self,
-        param: TestCaseWrapper,
+        case: TestCaseWrapper,
         result_proxy: TestResult,
         solution: T,
         submission: T,
@@ -117,7 +117,7 @@ class PostHookFn(Protocol):
     ) -> None:
         """Implement.
 
-        :param param: The TestCaseWrapper instance.
+        :param case: The TestCaseWrapper instance.
             It contains the test case information, including the test case name, the test case
             parameters, etc.
         :param result_proxy: The TestResult instance of this custom test to be used as a proxy.

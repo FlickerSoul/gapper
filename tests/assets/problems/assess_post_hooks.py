@@ -20,7 +20,7 @@ def check_recursive_ast(fn):
 
 
 def recursive_check(
-    param: TestCaseWrapper,
+    case: TestCaseWrapper,
     result_proxy: TestResult,
     solution,
     submission,

@@ -13,13 +13,13 @@ def factory() -> CustomTestFn:
     adder: Callable[[int, int], int]
 
     def custom_test(
-        param: TestCaseWrapper, result_proxy: TestResult, solution, submission
+        case: TestCaseWrapper, result_proxy: TestResult, solution, submission
     ):
         nonlocal adder
-        assert solution(*param.test_param.args, my_adder) == submission(
-            *param.test_param.args, adder
+        assert solution(*case.test_param.args, my_adder) == submission(
+            *case.test_param.args, adder
         )
-        assert my_adder(*param.test_param.args) == adder(*param.test_param.args)
+        assert my_adder(*case.test_param.args) == adder(*case.test_param.args)
 
     return custom_test
 

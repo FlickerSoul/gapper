@@ -10,11 +10,11 @@ class PrivateTestingMiddleware:
         return response * 2 + self.secret
 
 
-def custom_test(param: TestCaseWrapper, result_proxy, solution, submission) -> None:
-    standard_middleware = param.context.StandardMiddleware()
+def custom_test(case: TestCaseWrapper, result_proxy, solution, submission) -> None:
+    standard_middleware = case.context.StandardMiddleware()
     standard_sln = solution(standard_middleware)
     standard_sub = submission(standard_middleware)
-    for test_response in param.test_param.args:
+    for test_response in case.test_param.args:
         assert standard_sln.generate_middleware_response(
             test_response
         ) == standard_sub.generate_middleware_response(test_response)
@@ -23,7 +23,7 @@ def custom_test(param: TestCaseWrapper, result_proxy, solution, submission) -> N
     private_sln = solution(private_middleware)
     private_sub = submission(private_middleware)
 
-    for test_response in param.test_param.args:
+    for test_response in case.test_param.args:
         assert private_sln.generate_middleware_response(
             test_response
         ) == private_sub.generate_middleware_response(test_response)
