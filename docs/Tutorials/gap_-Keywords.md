@@ -177,9 +177,13 @@ def set_equality(solution_answer: Any, submission_answer: Any) -> bool:
 You can override entire test by passing a custom function to `gap_override_test` parameter, similar to override equality checks. For example, you not only want to check the answers, but also ensure the function is recursive. You can define `custom_test` as the following and pass it as `gap_override_test=custom_test` in your `@test_case()`. Note that you have to run the test and equality check by yourself, for the entire test process is overridden. 
 
 ```python
+import ast
+import inspect
 from gapper import problem, test_case
 from gapper.core.test_result import TestResult
 from gapper.core.unittest_wrapper import TestCaseWrapper
+
+from pytest import approx
 
 
 def check_recursive_ast(fn):
@@ -199,6 +203,10 @@ def custom_test(param: TestCaseWrapper, result_proxy: TestResult, solution, subm
     
     # param.assertTrue(check_recursive_ast(submission))
     # equivalent to `assert check_recursive_ast(submission)`
+    
+    # you can even use pytest helper functions
+    # the following line is dumb but just for demonstration
+    assert soln_ans == approx(subm_ans, rel=1e-3)
 
     if not check_recursive_ast(submission):
         result_proxy.set_score(result_proxy.max_score // 2)
@@ -218,7 +226,42 @@ class CustomTestFn(Protocol):
         ...
 ```
 
-## `gap_post_checks`
+## `gap_pre_hooks`
+
+`gap_post_hooks` are function(s) run before running the the student's answer and the solution.
+
+You can setup the environment or use it to modify the test case before. For example, 
+
+```python
+from gapper import problem, test_case
+from gapper.core.unittest_wrapper import TestCaseWrapper
+from gapper.core.test_result import TestResult
+from tempfile import NamedTemporaryFile
+
+def preparation(param: TestCaseWrapper, result_proxy: TestResult, submission, solution) -> None:
+    lines = param.test_param.args[0]
+    # put lines into a temporary file
+    with NamedTemporaryFile("w", delete=False) as infile:
+        infile.write("\n".join(lines))
+        
+    # set the args to the filename passed the student's function
+    param.test_param.args = (infile.name,)
+
+def gen_lines(num_of_lines: int) -> list[str]:
+    return [str(i) for i in range(num_of_lines)]
+
+@test_case(gen_lines(10), gap_pre_hooks=preparation)
+@problem()
+def print_lines(filename: str) -> int:
+    with open(filename, "r") as f:
+        return sum(map(lambda line: int(line.strip()), f.readlines()), 0)
+```
+
+
+
+## `gap_post_hooks`
+
+`gap_post_hooks` are function(s) run after running the student's answer and the solution, and comparing the results and stdout of the two.
 
 Consider the situation in which you'd like to provide extra checks but not override the whole test. You can write custom check functions and pass it into `gap_post_checks`. For example, you'd like to check if the students' solutions are recursive, you can write 
 
@@ -245,7 +288,7 @@ def recursive_check(param: TestCaseWrapper, result_proxy: TestResult, solution, 
             "Failed because recursive call not found in submission."
         )
 
-@test_case(10, gap_post_check=recursive_check)
+@test_case(10, gap_post_hooks=recursive_check)
 @problem()
 def fib(n: int) -> int:
     ...
@@ -254,7 +297,7 @@ def fib(n: int) -> int:
 A post check function has to follow the following positional parameter signature
 
 ```python
-class PostChecksFn(Protocol):
+class PostHookFn(Protocol):
     def __call__[T](
         self,
         param: TestCaseWrapper,
