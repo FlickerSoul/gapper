@@ -10,9 +10,11 @@ It can be confusing to remember all function protocols used in gapper. Below, we
 ## `gap_override_check`
 ::: gapper.core.utils.CustomEqualityCheckFn
 
+## `gap_pre_hook`
+::: gapper.core.utils.PreHookFn
 
-## `gap_post_check`
-::: gapper.core.utils.PostChecksFn
+## `gap_post_hook`
+::: gapper.core.utils.PostHookFn
 
 
 ## `post_test`

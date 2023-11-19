@@ -369,10 +369,7 @@ class TestCaseWrapper(TestCase):
 
     @property
     def gap_override_test_with_context(self) -> CustomTestFn:
-        """The gap_override_test function with context loaded.
-
-        :return: The gap_override_test function with context loaded.
-        """
+        """The gap_override_test function with context loaded."""
         return apply_context_on_fn(
             self.test_param.param_info.gap_override_test, self.context
         )
