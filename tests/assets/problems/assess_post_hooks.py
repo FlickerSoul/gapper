@@ -6,6 +6,8 @@ from gapper import problem, test_case, test_cases
 from gapper.core.test_result import TestResult
 from gapper.core.unittest_wrapper import TestCaseWrapper
 
+apple: int
+
 
 def check_recursive_ast(fn):
     tree = ast.parse(inspect.getsource(fn))
@@ -31,6 +33,7 @@ def recursive_check(
         result_proxy.add_description(
             "Failed because recursive call not found in submission."
         )
+    assert isinstance(apple, int)
 
 
 # @test_cases.params(
@@ -38,7 +41,7 @@ def recursive_check(
 # )  # this is expected to not work
 @test_cases.singular_params(0, 1, 5, gap_post_hooks=recursive_check)
 @test_case(10, gap_post_hooks=[recursive_check])
-@problem()
+@problem(context=["apple"])
 def fib(n: int) -> int:
     if n == 0:
         return 1
@@ -51,7 +54,7 @@ __problem_config__ = {
     "is_script": False,
     "check_stdout": False,
     "mock_input": False,
-    "captured_context": (),
+    "captured_context": ["apple"],
     "easy_context": True,
     "extras": {},
 }

@@ -1,3 +1,6 @@
+apple: int = 10
+
+
 def fib(n: int) -> int:
     if n == 0:
         return 1
