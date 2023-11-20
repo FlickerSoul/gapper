@@ -8,14 +8,15 @@ copyright: Copyright &copy; 2023 Larry Zeng and Contributors
 nav:
   - Home: index.md
   - Tutorials:
-      - Tutorials/Getting-Started.md
-      - Tutorials/Detailed-Usage.md
-      - Tutorials/gap_-Keywords.md
-      - Tutorials/Easy-Context.md
-      - Tutorials/Test-Result-(Proxy).md
-      - Tutorials/Upload-Autograder.md
-      - Tutorials/Various-Function-Protocols.md
-      - Tutorials/Examples.md
+    - Tutorials/Getting-Started.md
+    - Tutorials/Detailed-Usage.md
+    - Tutorials/gap_-Keywords.md
+    - Tutorials/Easy-Context.md
+    - Tutorials/Test-Result-(Proxy).md
+    - Tutorials/Upload-Autograder.md
+    - Tutorials/Various-Function-Protocols.md
+  - Examples:
+    - Examples/README.md
   - API:
     - API/problem.md
     - API/problem_extras.md
