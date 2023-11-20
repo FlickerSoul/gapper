@@ -7,4 +7,5 @@
             - CustomTestFn
             - CustomEqualityCheckFn
             - PostChecksFn
+            - PreTestFn
             - PostTestFn

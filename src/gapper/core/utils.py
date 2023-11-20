@@ -134,6 +134,20 @@ class PostHookFn(Protocol):
         ...
 
 
+class PreTestFn(Protocol):
+    def __call__(
+        self,
+        result_proxy: TestResult | None,
+        metadata: GradescopeSubmissionMetadata | None,
+    ) -> None:
+        """Implement.
+
+        :param result_proxy: The TestResult instance of this pre test to be used as a proxy.
+            If the pre_test's as_test_case is set to False, this will be None.
+        :param metadata: The metadata of the submission.
+        """
+
+
 class PostTestFn(Protocol):
     """The function type to be called after all tests are run."""
 

@@ -5,7 +5,7 @@ import logging
 from copy import deepcopy
 from pathlib import Path
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, Callable, Generator, Generic, List, Self
+from typing import TYPE_CHECKING, Any, Callable, Generator, List, Self
 
 from dill import Unpickler, dump
 
@@ -16,13 +16,12 @@ from gapper.core.errors import (
     MultipleSubmissionError,
     NoSubmissionError,
 )
-from gapper.core.problem import Problem
-from gapper.core.problem.problem_def import ProbInputType, ProbOutputType
 from gapper.core.test_result import TestResult
 from gapper.core.unittest_wrapper import ContextManager
 from gapper.core.utils import ModuleLoader
 
 if TYPE_CHECKING:
+    from gapper.core.problem import Problem
     from gapper.gradescope.datatypes.gradescope_meta import (
         GradescopeSubmissionMetadata,
     )
@@ -38,6 +37,8 @@ class ProblemUnpickler(Unpickler):
         """Find the class from the module and name."""
         match name:
             case "Problem":
+                from gapper.core.problem import Problem
+
                 return Problem
             case "Tester":
                 return Tester
@@ -45,7 +46,7 @@ class ProblemUnpickler(Unpickler):
         return super().find_class(module, name)
 
 
-class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
+class Tester[ProbInputType, ProbOutputType](ModuleLoader):
     """The tester class, handling test cases' testing."""
 
     def __init__(
@@ -69,7 +70,7 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         return self._problem
 
     @problem.setter
-    def problem(self, prob: Problem) -> None:
+    def problem(self, prob: Problem[ProbInputType, ProbOutputType]) -> None:
         """Set the problem to be tested."""
         self._problem = prob
 
@@ -193,6 +194,36 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
 
         self.check_context_completeness()
 
+        pre_results = self.run_pre_tests(metadata=metadata)
+        test_results = self.run_tests(metadata=metadata)
+        post_test_result = self.run_post_tests(
+            tested_tests_results=test_results, metadata=metadata
+        )
+
+        return [*pre_results, *test_results, *post_test_result]
+
+    def run_pre_tests(
+        self, metadata: GradescopeSubmissionMetadata | None
+    ) -> List[TestResult]:
+        pre_test_results = []
+        for pre_test in self.problem.pre_tests:
+            if pre_test.as_test_case:
+                result_proxy = TestResult(pre_test.hook_fn.__name__)
+            else:
+                result_proxy = None
+
+            pre_test.run(result_proxy=result_proxy, metadata=metadata)
+
+            if result_proxy is not None:
+                pre_test_results.append(result_proxy)
+
+        self._logger.debug("Pre-tests completed")
+
+        return pre_test_results
+
+    def run_tests(
+        self, metadata: GradescopeSubmissionMetadata | None
+    ) -> List[TestResult]:
         test_results: List[TestResult] = []
 
         for test in self.problem.generate_tests():
@@ -207,37 +238,36 @@ class Tester(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
                 )
             )
 
-        self.run_post_tests(results=test_results, metadata=metadata)
-
         return test_results
 
     def run_post_tests(
         self,
         *,
-        results: List[TestResult],
+        tested_tests_results: List[TestResult],
         metadata: GradescopeSubmissionMetadata | None,
     ) -> List[TestResult]:
         """Run the post tests.
 
-        :param results: The results of the tests.
+        :param tested_tests_results: The results of the tests.
         :param metadata: The metadata of the submission, which could be None.
         """
-        addition_test_results = []
-        for post_test_case in self.problem.post_tests:
-            if post_test_case.as_test_case:
-                result_proxy = TestResult(post_test_case.post_test_fn.__name__)
+        post_test_results = []
+        for post_test in self.problem.post_tests:
+            if post_test.as_test_case:
+                result_proxy = TestResult(post_test.hook_fn.__name__)
             else:
                 result_proxy = None
 
-            post_test_case.run(results, result_proxy, metadata)
+            post_test.run(
+                tested_tests_results, result_proxy=result_proxy, metadata=metadata
+            )
 
             if result_proxy is not None:
-                addition_test_results.append(result_proxy)
+                post_test_results.append(result_proxy)
 
-        results.extend(addition_test_results)
-        self._logger.debug("Post tests completed and results added")
+        self._logger.debug("Post tests completed")
 
-        return results
+        return post_test_results
 
     @classmethod
     def from_file(cls, path: Path) -> Tester:

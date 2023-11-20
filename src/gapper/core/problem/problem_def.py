@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import logging
+from collections import defaultdict
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Callable,
+    Dict,
     Generator,
     Generic,
     Iterable,
@@ -13,6 +15,7 @@ from typing import (
     Optional,
     ParamSpec,
     TypeVar,
+    cast,
     overload,
 )
 
@@ -21,12 +24,14 @@ from gapper.core.errors import (
     NoProblemDefinedError,
 )
 from gapper.core.problem.problem_config import ProblemConfig
+from gapper.core.tester import HookTypes, PostTest, PreTest
 from gapper.core.unittest_wrapper import TestCaseWrapper
 from gapper.core.utils import ModuleLoader
 
 if TYPE_CHECKING:
     from gapper.core.test_parameter import TestParam
-    from gapper.core.tester import PostTest
+    from gapper.core.tester import HookBase
+
 
 ProbInputType = ParamSpec("ProbInputType")
 ProbOutputType = TypeVar("ProbOutputType")
@@ -51,7 +56,7 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         self._config: ProblemConfig = config
         self._solution = solution
         self._test_params: List[TestParam] = []
-        self._post_tests: List[PostTest] = []
+        self._hooks: Dict[HookTypes, List[HookBase]] = defaultdict(list)
         self._logger = _problem_logger.getChild(self.expected_submission_name)
 
         self._logger.debug(f"Problem created with config: {self._config}")
@@ -72,9 +77,14 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         return self._solution
 
     @property
+    def pre_tests(self) -> List[PreTest]:
+        """The post tests of the problem."""
+        return cast(List[PreTest], self._hooks[HookTypes.PRE_TEST])
+
+    @property
     def post_tests(self) -> List[PostTest]:
         """The post tests of the problem."""
-        return self._post_tests
+        return cast(List[PostTest], self._hooks[HookTypes.POST_TEST])
 
     @property
     def expected_submission_name(self) -> str:
@@ -89,13 +99,14 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         self._logger.debug(f"Adding test parameter {test_param.format()}")
         self._test_params.append(test_param)
 
-    def add_post_test(self, post_test: PostTest) -> None:
+    def add_hook(self, hook: HookBase, hook_type: HookTypes) -> None:
         """Add a post test to the problem.
 
-        :param post_test: The post test to add.
+        :param hook: The post test to add.
+        :param hook_type: The type of the hook.
         """
-        self._logger.debug(f"Adding post test {post_test}")
-        self._post_tests.append(post_test)
+        self._logger.debug(f"Adding {hook_type.value} hook {hook}")
+        self._hooks[hook_type].append(hook)
 
     def __call__(
         self, *args: ProbInputType.args, **kwargs: ProbInputType.kwargs
