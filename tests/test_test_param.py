@@ -6,6 +6,11 @@ from gapper import param, test_case, test_cases
 from gapper.core.test_parameter import GapReservedKeywords
 
 
+def test_gap_keyword_enum() -> None:
+    for item in GapReservedKeywords:
+        assert item.value == item.name
+
+
 def test_weight_and_max_score_cannot_be_specified_both() -> None:
     with pytest.raises(
         ValueError,

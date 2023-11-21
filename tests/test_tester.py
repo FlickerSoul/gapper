@@ -8,7 +8,7 @@ from gapper.core.errors import (
     NoSubmissionError,
 )
 from gapper.core.problem import Problem
-from gapper.core.tester import Tester
+from gapper.core.tester import HookTypes, Tester
 
 from tests.conftest import (
     MULTIPLE_SUBMISSIONS_FOLDER,
@@ -19,6 +19,11 @@ from tests.conftest import (
     make_tester_name,
     preset_problem_paths,
 )
+
+
+def test_hook_types_naming() -> None:
+    for item in HookTypes:
+        assert str(item.name).lower() == item.value
 
 
 @pytest.mark.parametrize(
