@@ -22,6 +22,7 @@ __all__ = [
     "tcs",
     "TestParam",
     "TestParamBundle",
+    "ParamExtractor",
     "test_case",
     "param",
     "test_cases",
