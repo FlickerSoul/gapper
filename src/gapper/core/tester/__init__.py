@@ -1,8 +1,8 @@
 """The public tester API."""
-from .hook import HookBase, HookTypes
-from .post_tests_hook import PostTests, post_tests
-from .pre_tests_hook import PreTests, pre_tests
+from gapper.core.hook import HookBase, HookTypes
+
 from .tester_def import Tester
+from .tester_hooks import PostTests, PreTests, post_tests, pre_tests
 
 __all__ = [
     "Tester",

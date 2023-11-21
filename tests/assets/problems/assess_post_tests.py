@@ -1,7 +1,6 @@
 from typing import List
 
-from gapper import post_tests, problem, test_cases
-from gapper.core.test_result import TestResult
+from gapper import TestResult, post_tests, problem, test_cases
 from gapper.gradescope.datatypes.gradescope_meta import (
     GradescopeSubmissionMetadata,
 )

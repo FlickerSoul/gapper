@@ -98,8 +98,8 @@ class PreHookFn(Protocol):
         ...
 
 
-class ResultBundle(NamedTuple):
-    result: Any
+class ResultBundle[Output](NamedTuple):
+    output: Output
     stdout: str | None
 
 
@@ -134,7 +134,7 @@ class PostHookFn(Protocol):
         ...
 
 
-class PreTestFn(Protocol):
+class PreTestsFn(Protocol):
     def __call__(
         self,
         result_proxy: TestResult | None,
@@ -148,7 +148,7 @@ class PreTestFn(Protocol):
         """
 
 
-class PostTestFn(Protocol):
+class PostTestsFn(Protocol):
     """The function type to be called after all tests are run."""
 
     def __call__(

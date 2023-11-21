@@ -3,8 +3,7 @@ import tempfile
 from pathlib import Path
 from typing import Generator
 
-from gapper import pre_tests, problem, tcs
-from gapper.core.test_result import TestResult
+from gapper import TestResult, pre_tests, problem, tcs
 from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 files = []

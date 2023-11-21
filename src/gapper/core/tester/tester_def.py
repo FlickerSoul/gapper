@@ -16,8 +16,9 @@ from gapper.core.errors import (
     MultipleSubmissionError,
     NoSubmissionError,
 )
+from gapper.core.hook import HookHolder, HookTypes
 from gapper.core.test_result import TestResult
-from gapper.core.unittest_wrapper import ContextManager
+from gapper.core.unittest_wrapper.utils import ContextManager
 from gapper.core.utils import ModuleLoader
 
 if TYPE_CHECKING:
@@ -46,7 +47,7 @@ class ProblemUnpickler(Unpickler):
         return super().find_class(module, name)
 
 
-class Tester[ProbInputType, ProbOutputType](ModuleLoader):
+class Tester[ProbInputType, ProbOutputType](HookHolder, ModuleLoader):
     """The tester class, handling test cases' testing."""
 
     def __init__(
@@ -57,6 +58,7 @@ class Tester[ProbInputType, ProbOutputType](ModuleLoader):
 
         :param problem: The problem to be tested.
         """
+        super().__init__()
         self._problem: Problem[ProbInputType, ProbOutputType] = problem
         self._submission: Any | None = None
         self._submission_context: ContextManager = ContextManager()
@@ -83,6 +85,26 @@ class Tester[ProbInputType, ProbOutputType](ModuleLoader):
     def submission_context(self) -> ContextManager:
         """The context of captured from the submission."""
         return self._submission_context
+
+    def generate_hooks(self, hook_type: HookTypes) -> None:
+        match hook_type:
+            case HookTypes.PRE_TESTS:
+                self._hooks[hook_type] = self.problem.pre_tests_hooks
+            case HookTypes.POST_TESTS:
+                self._hooks[hook_type] = self.problem.post_tests_hooks
+            case _:
+                raise ValueError(f"Tester cannot use hook of type {hook_type}")
+
+    def run_hooks(self, hook_type: HookTypes, *args, **kwargs) -> List[TestResult]:
+        results: List[TestResult] = []
+        hooks = self.get_or_gen_hooks(hook_type)
+        for hook in hooks:
+            result = hook.run(*args, **kwargs)
+            if result is not None:
+                results.append(result)
+
+        self._logger.debug(f"Running hook {hook_type} finished")
+        return results
 
     def _load_script_submission_from_path(
         self, path: Path
@@ -194,38 +216,15 @@ class Tester[ProbInputType, ProbOutputType](ModuleLoader):
 
         self.check_context_completeness()
 
-        pre_results = self.run_pre_tests(metadata=metadata)
+        pre_results = self.run_hooks(HookTypes.PRE_TESTS, metadata=metadata)
         test_results = self.run_tests(metadata=metadata)
-        post_test_result = self.run_post_tests(
-            tested_tests_results=test_results, metadata=metadata
+        post_test_result = self.run_hooks(
+            HookTypes.POST_TESTS, tested_tests_results=test_results, metadata=metadata
         )
-        self.tear_down_pre_tests()
-        self.tear_down_post_tests()
+        self.tear_down_hooks(HookTypes.PRE_TESTS)
+        self.tear_down_hooks(HookTypes.PRE_TESTS)
 
         return [*pre_results, *test_results, *post_test_result]
-
-    def run_pre_tests(
-        self, metadata: GradescopeSubmissionMetadata | None
-    ) -> List[TestResult]:
-        pre_test_results = []
-        for pre_hook in self.problem.pre_tests_hooks:
-            if pre_hook.as_test_case:
-                result_proxy = TestResult(pre_hook.hook_fn.__name__)
-            else:
-                result_proxy = None
-
-            pre_hook.run(result_proxy=result_proxy, metadata=metadata)
-
-            if result_proxy is not None:
-                pre_test_results.append(result_proxy)
-
-        self._logger.debug("Pre-tests completed")
-
-        return pre_test_results
-
-    def tear_down_pre_tests(self) -> None:
-        for pre_hook in self.problem.pre_tests_hooks:
-            pre_hook.tear_down()
 
     def run_tests(
         self, metadata: GradescopeSubmissionMetadata | None
@@ -245,39 +244,6 @@ class Tester[ProbInputType, ProbOutputType](ModuleLoader):
             )
 
         return test_results
-
-    def run_post_tests(
-        self,
-        *,
-        tested_tests_results: List[TestResult],
-        metadata: GradescopeSubmissionMetadata | None,
-    ) -> List[TestResult]:
-        """Run the post tests.
-
-        :param tested_tests_results: The results of the tests.
-        :param metadata: The metadata of the submission, which could be None.
-        """
-        post_test_results = []
-        for post_hook in self.problem.post_tests_hooks:
-            if post_hook.as_test_case:
-                result_proxy = TestResult(post_hook.hook_fn.__name__)
-            else:
-                result_proxy = None
-
-            post_hook.run(
-                tested_tests_results, result_proxy=result_proxy, metadata=metadata
-            )
-
-            if result_proxy is not None:
-                post_test_results.append(result_proxy)
-
-        self._logger.debug("Post tests completed")
-
-        return post_test_results
-
-    def tear_down_post_tests(self) -> None:
-        for post_hook in self.problem.post_tests_hooks:
-            post_hook.tear_down()
 
     @classmethod
     def from_file(cls, path: Path) -> Tester:

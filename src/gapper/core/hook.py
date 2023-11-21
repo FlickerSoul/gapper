@@ -3,7 +3,8 @@ from __future__ import annotations
 import abc
 import enum
 import inspect
-from typing import TYPE_CHECKING, Callable, ClassVar, Generator
+from collections import defaultdict
+from typing import TYPE_CHECKING, Callable, ClassVar, Dict, Generator, List
 
 from gapper.core.errors import InternalError, SubmissionSyntaxError, TestFailedError
 from gapper.core.test_parameter import ParamExtractor
@@ -19,12 +20,14 @@ class HookTypes(enum.Enum):
 
     PRE_TESTS = "pre_tests"
     POST_TESTS = "post_tests"
+    PRE_TEST = "pre_test"
+    POST_TEST = "post_test"
 
 
 HookFnReturnType = Generator | None
 
 
-class HookBase[FnType: Callable[..., HookFnReturnType]](ParamExtractor):
+class HookBase[**P, FnType: Callable[P, HookFnReturnType]](ParamExtractor):
     _hook_type: ClassVar[HookTypes]
 
     def __init__(
@@ -61,10 +64,13 @@ class HookBase[FnType: Callable[..., HookFnReturnType]](ParamExtractor):
     def run(
         self,
         *args,
-        result_proxy: TestResult | None,
-        metadata: GradescopeSubmissionMetadata | None,
+        result_proxy: TestResult | None = None,
+        metadata: GradescopeSubmissionMetadata | None = None,
         **kwargs,
     ) -> TestResult | None:
+        if self.as_test_case and result_proxy is None:
+            result_proxy = TestResult(self.hook_fn.__name__)
+
         self._setup_result(result_proxy)
 
         try:
@@ -109,15 +115,9 @@ class HookBase[FnType: Callable[..., HookFnReturnType]](ParamExtractor):
                 )
             )
 
-    @abc.abstractmethod
-    def _run(
-        self,
-        *args,
-        result_proxy: TestResult | None,
-        metadata: GradescopeSubmissionMetadata | None,
-        **kwargs,
-    ) -> None:
-        ...
+    def _run(self, *args: P.args, **kwargs: P.kwargs) -> None:
+        self.hook_fn_res = self.hook_fn(*args, **kwargs)
+        self.process_generator()
 
     @abc.abstractmethod
     def __repr__(self) -> str:
@@ -137,3 +137,35 @@ class HookBase[FnType: Callable[..., HookFnReturnType]](ParamExtractor):
                 raise InternalError(
                     f"Generator not exhausted in the {self._hook_type} of fn {self.hook_fn.__name__}"
                 )
+
+
+class HookHolder:
+    def __init__(self) -> None:
+        self._hooks: Dict[HookTypes, List[HookBase] | None] = defaultdict(lambda: None)
+
+    def get_or_gen_hooks(self, hook_type: HookTypes) -> List[HookBase]:
+        if self.get_hooks(hook_type) is None:
+            self.generate_hooks(hook_type)
+
+        return self._hooks[hook_type]
+
+    def get_hooks(self, hook_type: HookTypes) -> List[HookBase] | None:
+        return self._hooks[hook_type]
+
+    @abc.abstractmethod
+    def generate_hooks(self, hook_type: HookTypes) -> None:
+        ...
+
+    @abc.abstractmethod
+    def run_hooks(
+        self, hook_type: HookTypes, *args, **kwargs
+    ) -> List[TestResult] | None:
+        ...
+
+    def tear_down_hooks(self, hook_type: HookTypes) -> None:
+        hooks = self.get_hooks(hook_type)
+        if hooks is None:
+            return
+
+        for hook in hooks:
+            hook.tear_down()

@@ -7,9 +7,6 @@ from types import FunctionType
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    NamedTuple,
-    Protocol,
     Self,
     Sequence,
     Tuple,
@@ -22,10 +19,13 @@ from gapper.core.errors import (
     SubmissionSyntaxError,
     TestFailedError,
 )
+from gapper.core.hook import HookHolder
 from gapper.core.pipeline_support import PipelineBase
 from gapper.core.test_result import TestResult
+from gapper.core.tester import HookTypes
+from gapper.core.unittest_wrapper.utils import ContextManager, EvalFn, stdout_cm_adder
+from gapper.core.unittest_wrapper.wrapper_hooks import PostTest, PreTest
 from gapper.core.utils import (
-    CaptureStdout,
     ResultBundle,
     apply_context_on_fn,
     generate_custom_input,
@@ -42,45 +42,7 @@ if TYPE_CHECKING:
 _test_wrapper_logger = logging.getLogger("gapper.test_wrapper")
 
 
-class ContextManager(dict):
-    """A context manager that is also a dict."""
-
-    def __getattr__(self, item: str) -> Any:
-        """Get the item from the dict."""
-        try:
-            return self[item]
-        except KeyError as e:
-            raise AttributeError from e
-
-
-class EvalOutput[Output](NamedTuple):
-    """The output of the evaluation function."""
-
-    output: Output
-    stdout: str | None
-
-
-class EvalFn[Input, Output](Protocol):
-    """The evaluation function type."""
-
-    def __call__(self, to_be_eval: Input, param: TestParam) -> EvalOutput:
-        """Evaluate the to_be_eval with test param."""
-        ...
-
-
-def _stdout_cm_adder[Output](
-    fn: Callable[..., Output]
-) -> Callable[..., EvalOutput[Output]]:
-    def _wrapper(self, *args, **kwargs) -> Any:
-        with CaptureStdout(capture=self.problem.config.check_stdout) as cm:
-            res = fn(self, *args, **kwargs)
-
-        return res, cm.value
-
-    return _wrapper
-
-
-class TestCaseWrapper(TestCase):
+class TestCaseWrapper(TestCase, HookHolder):
     """A wrapper for the unittest.TestCase class.
 
     This serves as a proxy for the testing process to get useful
@@ -93,7 +55,8 @@ class TestCaseWrapper(TestCase):
         :param test_param: The test parameter to be used in testing.
         :param problem: The problem definition to be used in testing.
         """
-        super().__init__()
+        TestCase.__init__(self)
+        HookHolder.__init__(self)
         self._test_param = test_param
         self._problem = problem
         self._context: ContextManager | None = None
@@ -120,11 +83,11 @@ class TestCaseWrapper(TestCase):
         """The metadata of the submission."""
         return self._metadata
 
-    @_stdout_cm_adder
+    @stdout_cm_adder
     def _eval_regular[Input](self, to_be_eval: Input, param: TestParam) -> Any:
         return to_be_eval(*deepcopy(param.args), **deepcopy(param.kwargs))
 
-    @_stdout_cm_adder
+    @stdout_cm_adder
     def _eval_mock_input[Input](self, to_be_eval: Input, param: TestParam) -> Any:
         """Evaluate the function with mock input."""
         with patch("builtins.input", generate_custom_input(deepcopy(param.args))):
@@ -132,7 +95,7 @@ class TestCaseWrapper(TestCase):
 
         return result
 
-    @_stdout_cm_adder
+    @stdout_cm_adder
     def _eval_pipeline[Input](self, to_be_eval: Input, param: TestParam) -> Any:
         """Evaluate the pipeline."""
         result = []
@@ -259,56 +222,30 @@ class TestCaseWrapper(TestCase):
 
         self._logger.debug(f"Test result initialized: {result}")
 
-    def run_pre_hooks(self, submission: Any, result: TestResult) -> None:
-        """Run the pre hooks defined in the test parameter.
+    def generate_hooks(self, hook_type: HookTypes) -> None:
+        match hook_type:
+            case HookTypes.PRE_TEST:
+                hook_fns = self.test_param.param_info.gap_pre_hooks
+                hook_wrapper = PreTest
+            case HookTypes.POST_TEST:
+                hook_fns = self.test_param.param_info.gap_post_hooks
+                hook_wrapper = PostTest
+            case _:
+                raise ValueError(f"Test Case cannot handle hook {hook_type}")
 
-        :param submission: The submission to be tested.
-        :param result: The result object to be used and written to.
-        """
-        if self.test_param.param_info.gap_pre_hooks is not None:
-            self._logger.debug("Running pre checks")
-            if not isinstance(self.test_param.param_info.gap_pre_hooks, Sequence):
-                pre_hooks = [self.test_param.param_info.gap_pre_hooks]
-            else:
-                pre_hooks = self.test_param.param_info.gap_pre_hooks
+        if hook_fns is None:
+            self._hooks[hook_type] = []
+        else:
+            if not isinstance(hook_fns, Sequence):
+                hook_fns: Sequence = [hook_fns]
 
-            for pre_hook in pre_hooks:
-                pre_hook = self.apply_context(pre_hook)
-                pre_hook(self, result, self.problem.solution, submission)
+            self._hooks[hook_type] = [
+                hook_wrapper(self.apply_context(hook_fn)) for hook_fn in hook_fns
+            ]
 
-    def run_post_hooks(
-        self,
-        submission: Any,
-        result: TestResult,
-        expected_results: ResultBundle,
-        actual_results: ResultBundle,
-    ) -> None:
-        """Run the post hooks defined in the test parameter.
-
-        :param submission: The submission to be tested.
-        :param result: The result object to be used and written to.
-        :param expected_results: The expected results of the test: (Output, stdout).
-        :param actual_results: The actual results of the test: (Output, stdout).
-        """
-        if self.test_param.param_info.gap_post_hooks is not None:
-            self._logger.debug("Running post checks")
-
-            if not isinstance(self.test_param.param_info.gap_post_hooks, Sequence):
-                post_hooks = [self.test_param.param_info.gap_post_hooks]
-            else:
-                post_hooks = self.test_param.param_info.gap_post_hooks
-
-            for post_hook in post_hooks:
-                post_hook = self.apply_context(post_hook)
-
-                post_hook(
-                    self,
-                    result,
-                    self.problem.solution,
-                    submission,
-                    expected_results,
-                    actual_results,
-                )
+    def run_hooks(self, hook_type: HookTypes, *args, **kwargs) -> None:
+        for hook in self.get_or_gen_hooks(hook_type):
+            hook.run(*args, **kwargs)
 
     def _run_test(self, submission: Any, result: TestResult) -> TestResult:
         """Run the test on the submission.
@@ -325,42 +262,54 @@ class TestCaseWrapper(TestCase):
             )
             override_test(self, result, self.problem.solution, submission)
         else:
-            if self.test_param.param_info.gap_override_check:
-                check_fn: CustomEqualityCheckFn = (
-                    self.test_param.param_info.gap_override_check
-                )
-            else:
-                check_fn = self.assertEqual  # type: ignore
-
-            self._logger.debug(f"Checking test equality with fn {check_fn.__name__}")
-
             eval_fn: EvalFn = self._select_eval_fn()
-
             self._logger.debug(f"Selected evaluation fn {eval_fn.__name__}")
 
-            self.run_pre_hooks(submission, result)
+            self.run_hooks(
+                HookTypes.PRE_TEST,
+                case=self,
+                result_proxy=result,
+                solution=self.problem.solution,
+                submission=submission,
+            )
 
             self._logger.debug(f"Running test evaluation")
+            expected = eval_fn(self.problem.solution, self.test_param)
+            actual = eval_fn(submission, self.test_param)
 
-            expected_result, expected_out = eval_fn(
-                self.problem.solution, self.test_param
+            self.check_results(expected, actual)
+
+            self.run_hooks(
+                HookTypes.POST_TEST,
+                case=self,
+                result_proxy=result,
+                solution=self.problem.solution,
+                submission=submission,
+                expected_results=expected,
+                actual_results=actual,
             )
-            actual_result, actual_out = eval_fn(submission, self.test_param)
 
-            check_fn(expected_result, actual_result)
-            if self.problem.config.check_stdout:
-                check_fn(expected_out, actual_out)
-
-            self.run_post_hooks(
-                submission,
-                result,
-                ResultBundle(expected_result, expected_out),
-                ResultBundle(actual_result, actual_out),
-            )
+            self.tear_down_hooks(HookTypes.PRE_TEST)
+            self.tear_down_hooks(HookTypes.POST_TEST)
 
         self._logger.debug("Test completed")
 
         return result
+
+    def check_results(self, expected: ResultBundle, actual: ResultBundle) -> None:
+        if self.test_param.param_info.gap_override_check:
+            check_fn: CustomEqualityCheckFn = (
+                self.test_param.param_info.gap_override_check
+            )
+        else:
+            check_fn = self.assertEqual  # type: ignore
+        self._logger.debug(f"Checking test equality with fn {check_fn.__name__}")
+
+        check_fn(expected.output, actual.output)
+        if self.problem.config.check_stdout:
+            check_fn(expected.stdout, actual.stdout)
+
+        self._logger.debug("Test checked")
 
     def apply_context[T: FunctionType](self, fn: T) -> T:
         if (
