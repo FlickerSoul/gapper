@@ -1,7 +1,7 @@
 """The public tester API."""
 from .hook import HookBase, HookTypes
-from .post_test_hook import PostTests, post_tests
-from .pre_test_hook import PreTests, pre_tests
+from .post_tests_hook import PostTests, post_tests
+from .pre_tests_hook import PreTests, pre_tests
 from .tester_def import Tester
 
 __all__ = [
