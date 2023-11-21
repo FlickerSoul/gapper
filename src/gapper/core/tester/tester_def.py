@@ -199,6 +199,8 @@ class Tester[ProbInputType, ProbOutputType](ModuleLoader):
         post_test_result = self.run_post_tests(
             tested_tests_results=test_results, metadata=metadata
         )
+        self.tear_down_pre_tests()
+        self.tear_down_post_tests()
 
         return [*pre_results, *test_results, *post_test_result]
 
@@ -220,6 +222,10 @@ class Tester[ProbInputType, ProbOutputType](ModuleLoader):
         self._logger.debug("Pre-tests completed")
 
         return pre_test_results
+
+    def tear_down_pre_tests(self) -> None:
+        for pre_hook in self.problem.pre_tests_hooks:
+            pre_hook.tear_down()
 
     def run_tests(
         self, metadata: GradescopeSubmissionMetadata | None
@@ -268,6 +274,10 @@ class Tester[ProbInputType, ProbOutputType](ModuleLoader):
         self._logger.debug("Post tests completed")
 
         return post_test_results
+
+    def tear_down_post_tests(self) -> None:
+        for post_hook in self.problem.post_tests_hooks:
+            post_hook.tear_down()
 
     @classmethod
     def from_file(cls, path: Path) -> Tester:

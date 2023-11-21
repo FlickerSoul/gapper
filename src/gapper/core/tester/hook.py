@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import abc
 import enum
-from typing import TYPE_CHECKING, Callable, ClassVar
+import inspect
+from typing import TYPE_CHECKING, Callable, ClassVar, Generator
 
 from gapper.core.errors import InternalError, SubmissionSyntaxError, TestFailedError
 from gapper.core.test_parameter import ParamExtractor
@@ -20,7 +21,10 @@ class HookTypes(enum.Enum):
     POST_TESTS = "post_tests"
 
 
-class HookBase[FnType: Callable[..., None]](ParamExtractor):
+HookFnReturnType = Generator | None
+
+
+class HookBase[FnType: Callable[..., HookFnReturnType]](ParamExtractor):
     _hook_type: ClassVar[HookTypes]
 
     def __init__(
@@ -44,6 +48,7 @@ class HookBase[FnType: Callable[..., None]](ParamExtractor):
 
         self.hook_fn = hook_fn
         self.as_test_case = as_test_case
+        self.hook_fn_res: HookFnReturnType = None
 
     def __call__(self, problem: Problem) -> Problem:
         """Add the post test to the problem.
@@ -117,3 +122,18 @@ class HookBase[FnType: Callable[..., None]](ParamExtractor):
     @abc.abstractmethod
     def __repr__(self) -> str:
         ...
+
+    def process_generator(self) -> None:
+        if inspect.isgenerator(self.hook_fn_res):
+            next(self.hook_fn_res)
+
+    def tear_down(self) -> None:
+        if inspect.isgenerator(self.hook_fn_res):
+            try:
+                next(self.hook_fn_res)
+            except StopIteration:
+                pass
+            else:
+                raise InternalError(
+                    f"Generator not exhausted in the {self._hook_type} of fn {self.hook_fn.__name__}"
+                )

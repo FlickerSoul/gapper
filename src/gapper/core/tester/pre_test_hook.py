@@ -16,7 +16,8 @@ class PreTests(HookBase):
         result_proxy: TestResult | None,
         metadata: GradescopeSubmissionMetadata | None,
     ) -> None:
-        self.hook_fn(result_proxy, metadata)
+        self.hook_fn_res = self.hook_fn(result_proxy, metadata)
+        self.process_generator()
 
 
 pre_tests = PreTests

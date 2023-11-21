@@ -1,3 +1,4 @@
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +33,7 @@ def test_hook_types_naming() -> None:
     indirect=["tester_fixture"],
 )
 def test_tester_run(tester_fixture: Tester[Any, Any], path: Path) -> None:
+    tester_fixture = deepcopy(tester_fixture)
     submission_path = TEST_SUBMISSIONS_FOLDER / path.name
 
     for test_result in tester_fixture.load_submission_from_path(submission_path).run():

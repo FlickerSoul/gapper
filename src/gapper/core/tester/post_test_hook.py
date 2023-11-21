@@ -25,7 +25,8 @@ class PostTests(HookBase):
         result_proxy: TestResult,
         metadata: GradescopeSubmissionMetadata | None,
     ) -> None:
-        self.hook_fn(*args, result_proxy, metadata)
+        self.hook_fn_res = self.hook_fn(*args, result_proxy, metadata)
+        self.process_generator()
 
 
 post_tests = PostTests
