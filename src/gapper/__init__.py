@@ -14,7 +14,9 @@ from .core.test_parameter import (
     test_cases_singular_params,
     test_cases_zip,
 )
-from .core.tester import post_test
+from .core.test_result import TestResult
+from .core.tester import post_test, pre_test
+from .gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 __all__ = [
     "gs_connect",
@@ -31,4 +33,7 @@ __all__ = [
     "test_cases_singular_params",
     "test_cases_zip",
     "post_test",
+    "pre_test",
+    "TestResult",
+    "GradescopeSubmissionMetadata",
 ]

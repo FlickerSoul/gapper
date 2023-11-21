@@ -65,11 +65,11 @@ class HookBase[FnType: Callable[..., None]](ParamExtractor):
         try:
             self._run(*args, result_proxy=result_proxy, metadata=metadata, **kwargs)
         except AssertionError as e:
-            result_proxy and result_proxy.add_error(
+            result_proxy.add_error(
                 TestFailedError(e), set_failed=result_proxy.is_pass_status_unset
             )
         except SyntaxError as e:
-            result_proxy and result_proxy.add_error(
+            result_proxy.add_error(
                 SubmissionSyntaxError(e),
                 set_failed=result_proxy.is_pass_status_unset,
             )
