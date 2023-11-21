@@ -95,6 +95,6 @@ def test_post_test(request: pytest.FixtureRequest) -> None:
     results = tester.load_submission_from_path(
         TEST_SUBMISSIONS_FOLDER / prob_name
     ).run()
-    assert len(tester.problem.test_cases) + len(tester.problem.post_tests) == len(
+    assert len(tester.problem.test_cases) + len(tester.problem.post_tests_hooks) == len(
         results
     )

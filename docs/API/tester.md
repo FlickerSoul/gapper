@@ -1,18 +1,19 @@
-# `Tester` and `post_test`
+# `Tester`, `pre_tests` and `post_tests`
 
 ## Note 
 
-`post_test` is an alias of `PostTest`. That is
+`post_tests` is an alias of `PostTest` and `pre_tests` is an alias of `PreTest`. That is
 
 ```python
-from gapper import post_test
-from gapper.core.tester import PostTest
+from gapper import post_tests, pre_tests
+from gapper.core.tester import PostTests, PreTests
 
-assert post_test is PostTest
+assert post_tests is PostTests
+assert pre_tests is PreTests
 ```
 
 ## Tester API
 ::: gapper.core.tester.tester_def
 
-## `PostTest` and `post_test` API
+## `PostTest`, `pre_tests` and `post_tests` API
 ::: gapper.core.tester.post_test_hook

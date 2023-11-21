@@ -1,6 +1,6 @@
 from typing import List
 
-from gapper import post_test, problem, test_cases
+from gapper import post_tests, problem, test_cases
 from gapper.core.test_result import TestResult
 from gapper.gradescope.datatypes.gradescope_meta import (
     GradescopeSubmissionMetadata,
@@ -21,7 +21,7 @@ def check_at_least_half_is_correct(
 
 
 @test_cases.singular_param_iter([i for i in range(10)], gap_max_score=1)
-@post_test(check_at_least_half_is_correct)
+@post_tests(check_at_least_half_is_correct)
 @problem()
 def square(x: int | float) -> int | float:
     return x**2

@@ -8,10 +8,10 @@ from gapper.gradescope.datatypes.gradescope_meta import (
 )
 
 
-class PostTest(HookBase):
-    """A decorator for post tests. Will be used as @post_test() decorator."""
+class PostTests(HookBase):
+    """A decorator for post tests. Will be used as @post_tests() decorator."""
 
-    _hook_type = HookTypes.POST_TEST
+    _hook_type = HookTypes.POST_TESTS
 
     def __repr__(self) -> str:
         """Return the representation of the post-test."""
@@ -28,4 +28,4 @@ class PostTest(HookBase):
         self.hook_fn(*args, result_proxy, metadata)
 
 
-post_test = PostTest
+post_tests = PostTests

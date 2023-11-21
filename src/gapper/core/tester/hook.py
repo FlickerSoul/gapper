@@ -16,8 +16,8 @@ if TYPE_CHECKING:
 class HookTypes(enum.Enum):
     """The types of hooks."""
 
-    PRE_TEST = "pre_test"
-    POST_TEST = "post_test"
+    PRE_TESTS = "pre_tests"
+    POST_TESTS = "post_tests"
 
 
 class HookBase[FnType: Callable[..., None]](ParamExtractor):

@@ -15,7 +15,7 @@ from .core.test_parameter import (
     test_cases_zip,
 )
 from .core.test_result import TestResult
-from .core.tester import post_test, pre_test
+from .core.tester import post_tests, pre_tests
 from .gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 __all__ = [
@@ -32,8 +32,8 @@ __all__ = [
     "test_cases_singular_param_iter",
     "test_cases_singular_params",
     "test_cases_zip",
-    "post_test",
-    "pre_test",
+    "post_tests",
+    "pre_tests",
     "TestResult",
     "GradescopeSubmissionMetadata",
 ]

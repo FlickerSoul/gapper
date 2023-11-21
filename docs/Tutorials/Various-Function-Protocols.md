@@ -16,6 +16,8 @@ It can be confusing to remember all function protocols used in gapper. Below, we
 ## `gap_post_hook`
 ::: gapper.core.utils.PostHookFn
 
+## `pre_tests`
+::: gapper.core.utils.PreTestFn
 
-## `post_test`
+## `post_tests`
 ::: gapper.core.utils.PostTestFn

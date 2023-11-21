@@ -143,7 +143,7 @@ class PreTestFn(Protocol):
         """Implement.
 
         :param result_proxy: The TestResult instance of this pre test to be used as a proxy.
-            If the pre_test's as_test_case is set to False, this will be None.
+            If the `pre_tests`' as_test_case is set to False, this will be None.
         :param metadata: The metadata of the submission.
         """
 
@@ -165,7 +165,7 @@ class PostTestFn(Protocol):
             set to True. The results from post tests will not be added until the
             post testing phrase is completed.
         :param test_proxy: The TestResult instance of this post test to be used as a proxy.
-            If the post_test's as_test_case is set to False, this will be None.
+            If the `post_tests`' as_test_case is set to False, this will be None.
         :param metadata: The metadata of the submission.
         """
         ...

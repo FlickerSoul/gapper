@@ -206,13 +206,13 @@ class Tester[ProbInputType, ProbOutputType](ModuleLoader):
         self, metadata: GradescopeSubmissionMetadata | None
     ) -> List[TestResult]:
         pre_test_results = []
-        for pre_test in self.problem.pre_tests:
-            if pre_test.as_test_case:
-                result_proxy = TestResult(pre_test.hook_fn.__name__)
+        for pre_hook in self.problem.pre_tests_hooks:
+            if pre_hook.as_test_case:
+                result_proxy = TestResult(pre_hook.hook_fn.__name__)
             else:
                 result_proxy = None
 
-            pre_test.run(result_proxy=result_proxy, metadata=metadata)
+            pre_hook.run(result_proxy=result_proxy, metadata=metadata)
 
             if result_proxy is not None:
                 pre_test_results.append(result_proxy)
@@ -252,13 +252,13 @@ class Tester[ProbInputType, ProbOutputType](ModuleLoader):
         :param metadata: The metadata of the submission, which could be None.
         """
         post_test_results = []
-        for post_test in self.problem.post_tests:
-            if post_test.as_test_case:
-                result_proxy = TestResult(post_test.hook_fn.__name__)
+        for post_hook in self.problem.post_tests_hooks:
+            if post_hook.as_test_case:
+                result_proxy = TestResult(post_hook.hook_fn.__name__)
             else:
                 result_proxy = None
 
-            post_test.run(
+            post_hook.run(
                 tested_tests_results, result_proxy=result_proxy, metadata=metadata
             )
 

@@ -3,8 +3,8 @@ from gapper.core.tester.hook import HookBase, HookTypes
 from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
-class PreTest(HookBase):
-    _hook_type = HookTypes.PRE_TEST
+class PreTests(HookBase):
+    _hook_type = HookTypes.PRE_TESTS
 
     def __repr__(self) -> str:
         """Return the representation of the pre-test."""
@@ -19,4 +19,4 @@ class PreTest(HookBase):
         self.hook_fn(result_proxy, metadata)
 
 
-pre_test = PreTest
+pre_tests = PreTests

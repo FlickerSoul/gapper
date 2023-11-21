@@ -2,7 +2,7 @@ import random
 import tempfile
 from pathlib import Path
 
-from gapper import pre_test, problem, tcs
+from gapper import pre_tests, problem, tcs
 from gapper.core.test_result import TestResult
 from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
@@ -27,7 +27,7 @@ def file_generator(
 
 
 @tcs.singular_param_iter(files)
-@pre_test(file_generator, as_test_case=False)
+@pre_tests(file_generator, as_test_case=False)
 @problem()
 def get_file_lines(file_name: str) -> int:
     with open(file_name) as f:

@@ -24,7 +24,7 @@ from gapper.core.errors import (
     NoProblemDefinedError,
 )
 from gapper.core.problem.problem_config import ProblemConfig
-from gapper.core.tester import HookTypes, PostTest, PreTest
+from gapper.core.tester import HookTypes, PostTests, PreTests
 from gapper.core.unittest_wrapper import TestCaseWrapper
 from gapper.core.utils import ModuleLoader
 
@@ -77,14 +77,14 @@ class Problem(ModuleLoader, Generic[ProbInputType, ProbOutputType]):
         return self._solution
 
     @property
-    def pre_tests(self) -> List[PreTest]:
+    def pre_tests_hooks(self) -> List[PreTests]:
         """The post tests of the problem."""
-        return cast(List[PreTest], self._hooks[HookTypes.PRE_TEST])
+        return cast(List[PreTests], self._hooks[HookTypes.PRE_TESTS])
 
     @property
-    def post_tests(self) -> List[PostTest]:
+    def post_tests_hooks(self) -> List[PostTests]:
         """The post tests of the problem."""
-        return cast(List[PostTest], self._hooks[HookTypes.POST_TEST])
+        return cast(List[PostTests], self._hooks[HookTypes.POST_TESTS])
 
     @property
     def expected_submission_name(self) -> str:
