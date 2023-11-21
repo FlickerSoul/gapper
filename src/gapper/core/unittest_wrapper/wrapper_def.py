@@ -24,7 +24,7 @@ from gapper.core.pipeline_support import PipelineBase
 from gapper.core.test_result import TestResult
 from gapper.core.tester import HookTypes
 from gapper.core.unittest_wrapper.utils import ContextManager, EvalFn, stdout_cm_adder
-from gapper.core.unittest_wrapper.wrapper_hooks import PostTest, PreTest
+from gapper.core.unittest_wrapper.wrapper_hooks import PostHook, PreHook
 from gapper.core.utils import (
     ResultBundle,
     apply_context_on_fn,
@@ -224,12 +224,12 @@ class TestCaseWrapper(TestCase, HookHolder):
 
     def generate_hooks(self, hook_type: HookTypes) -> None:
         match hook_type:
-            case HookTypes.PRE_TEST:
+            case HookTypes.PRE_HOOK:
                 hook_fns = self.test_param.param_info.gap_pre_hooks
-                hook_wrapper = PreTest
-            case HookTypes.POST_TEST:
+                hook_wrapper = PreHook
+            case HookTypes.POST_HOOK:
                 hook_fns = self.test_param.param_info.gap_post_hooks
-                hook_wrapper = PostTest
+                hook_wrapper = PostHook
             case _:
                 raise ValueError(f"Test Case cannot handle hook {hook_type}")
 
@@ -266,7 +266,7 @@ class TestCaseWrapper(TestCase, HookHolder):
             self._logger.debug(f"Selected evaluation fn {eval_fn.__name__}")
 
             self.run_hooks(
-                HookTypes.PRE_TEST,
+                HookTypes.PRE_HOOK,
                 case=self,
                 result_proxy=result,
                 solution=self.problem.solution,
@@ -280,7 +280,7 @@ class TestCaseWrapper(TestCase, HookHolder):
             self.check_results(expected, actual)
 
             self.run_hooks(
-                HookTypes.POST_TEST,
+                HookTypes.POST_HOOK,
                 case=self,
                 result_proxy=result,
                 solution=self.problem.solution,
@@ -289,8 +289,8 @@ class TestCaseWrapper(TestCase, HookHolder):
                 actual_results=actual,
             )
 
-            self.tear_down_hooks(HookTypes.PRE_TEST)
-            self.tear_down_hooks(HookTypes.POST_TEST)
+            self.tear_down_hooks(HookTypes.PRE_HOOK)
+            self.tear_down_hooks(HookTypes.POST_HOOK)
 
         self._logger.debug("Test completed")
 

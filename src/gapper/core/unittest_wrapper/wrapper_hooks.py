@@ -4,7 +4,7 @@ from gapper.core.hook import HookBase, HookTypes
 from gapper.core.test_result import TestResult
 
 
-class PreTest(HookBase):
+class PreHook(HookBase):
     def _run(
         self,
         *args,
@@ -19,11 +19,11 @@ class PreTest(HookBase):
         return f"PreTestsHook(hook_fn={self.hook_fn})"
 
 
-pre_test = PreTest
+pre_hook = PreHook
 
 
-class PostTest(HookBase):
-    _hook_type = HookTypes.POST_TEST
+class PostHook(HookBase):
+    _hook_type = HookTypes.POST_HOOK
 
     def _run(
         self,
@@ -44,4 +44,4 @@ class PostTest(HookBase):
         return f"PostTestHook(hook_fn={self.hook_fn})"
 
 
-post_test = PostTest
+post_hook = PostHook

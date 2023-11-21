@@ -20,8 +20,8 @@ class HookTypes(enum.Enum):
 
     PRE_TESTS = "pre_tests"
     POST_TESTS = "post_tests"
-    PRE_TEST = "pre_test"
-    POST_TEST = "post_test"
+    PRE_HOOK = "pre_hook"
+    POST_HOOK = "post_hook"
 
 
 HookFnReturnType = Generator | None
