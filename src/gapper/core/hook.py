@@ -118,6 +118,7 @@ class HookBase[**P, FnType: Callable[P, HookFnReturnType]](ParamExtractor):
         return f"{type(self)}(hook_fn={self.hook_fn}, as_test_case={self.as_test_case}, **{self.param_info})"
 
     def process_generator(self) -> None:
+        """Process the generator if the hook function returns a generator."""
         if inspect.isgenerator(self.hook_fn_res):
             try:
                 next(self.hook_fn_res)
@@ -127,6 +128,7 @@ class HookBase[**P, FnType: Callable[P, HookFnReturnType]](ParamExtractor):
                 ) from e
 
     def tear_down(self) -> None:
+        """Tear down the generated generator."""
         if inspect.isgenerator(self.hook_fn_res):
             try:
                 next(self.hook_fn_res)
@@ -147,25 +149,45 @@ class HookHolder:
         self._hooks: Dict[HookTypes, List[HookBase] | None] = defaultdict(lambda: None)
 
     def get_or_gen_hooks(self, hook_type: HookTypes) -> List[HookBase]:
+        """Get or generate the hooks of the given type. The result is guaranteed to be a list.
+
+        :param hook_type: The type of the hooks.
+        """
         if self.get_hooks(hook_type) is None:
             self.generate_hooks(hook_type)
 
         return self._hooks[hook_type]
 
     def get_hooks(self, hook_type: HookTypes) -> List[HookBase] | None:
+        """Get the hooks of the given type.
+
+        :param hook_type: The type of the hooks.
+        """
         return self._hooks[hook_type]
 
     @abc.abstractmethod
     def generate_hooks(self, hook_type: HookTypes) -> None:
-        ...
+        """Generate the hooks of the given type.
+
+        :param hook_type: The type of the hooks.
+        """
 
     @abc.abstractmethod
     def run_hooks(
         self, hook_type: HookTypes, *args, **kwargs
     ) -> List[TestResult] | None:
-        ...
+        """Run the hooks of the given type given args and kwargs.
+
+        :param hook_type: The type of the hooks.
+        :param args: The args to be passed to the hooks.
+        :param kwargs: The kwargs to be passed to the hooks.
+        """
 
     def tear_down_hooks(self, hook_type: HookTypes) -> None:
+        """Tear down the hooks of the given type.
+
+        :param hook_type: The type of the hooks.
+        """
         hooks = self.get_hooks(hook_type)
         if hooks is None:
             return

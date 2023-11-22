@@ -15,6 +15,13 @@ assert pre_tests is PreTests
 ## Tester API
 ::: gapper.core.tester.tester_def
 
-## `PostTest`, `pre_tests` and `post_tests` API
-::: gapper.core.tester.post_tests
-::: gapper.core.tester.pre_tests
+## `PreTests`, `pre_tests`, `PostTests`, and `post_tests` API
+
+### `PreTests` and `pre_tests`
+::: gapper.core.tester
+    options:
+        members:
+            - pre_tests
+            - PreTests  
+            - post_tests
+            - PostTests 

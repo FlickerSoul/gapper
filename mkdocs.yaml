@@ -28,6 +28,7 @@ nav:
     - API/result_synthesizer.md
     - API/tester.md
     - API/gradescope_data_types.md
+    - API/hook.md
     - API/errors.md
   - Contribute:
     - Contributing/how_to_contribute.md

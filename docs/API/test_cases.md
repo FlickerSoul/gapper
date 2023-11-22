@@ -1,4 +1,4 @@
-# @test_case(s) -- `TestParam` and `TestParamBundle`
+# @test_case(s) -- `TestParam` and `TestParamBundle`,  and `gap_*_hooks`
 
 ## Note
 
@@ -19,5 +19,14 @@ from gapper.core.test_parameter import TestParamBundle
 assert test_cases is TestParamBundle
 ```
 
-## API
+## `test_case(s)` API
 ::: gapper.core.test_parameter
+
+## `gap_*_hooks` API
+::: gapper.core.unittest_wrapper.wrapper_hooks
+    options:
+        members:
+            - PreHook
+            - pre_hook
+            - PostHook  
+            - post_hook 
