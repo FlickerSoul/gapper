@@ -23,28 +23,7 @@ class TestResult:
 
 ## Usage
 
-The signature of a `gap_override_test` function and a `gap_post_check` function are the following, in which the second positional argument is the `TestResult` proxy.
-
-```python
-
-class CustomTestFn(Protocol):
-    def __call__[T](self, param: TestCaseWrapper, result_proxy: TestResult, expected: T, actual: T) -> None:
-        ...
-```
-
-```python
-class PostChecksFn(Protocol):
-    def __call__[T](
-        self,
-        param: TestCaseWrapper,
-        result_proxy: TestResult,
-        solution: T,
-        submission: T,
-        expected_results: Tuple[Any, str | None],
-        actual_results: Tuple[Any, str | None],
-    ) -> None:
-        ...
-```
+The functions to `gap_override_test`, `gap_post_hooks`, `gap_pre_hooks`, `pre_tests` and `post_tests` all need an input of `TestResult` type. See [this page](./Various-Function-Protocols.md) for their signatures. 
 
 You can set the result attributes using `set_<attribute>()` function. For example, 
 

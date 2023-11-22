@@ -40,7 +40,7 @@ def custom_test(case: TestCaseWrapper, result_proxy: TestResult, solution, submi
     # test if student's adder behaves the same in the solution as in their submission
     assert solution(*case.test_param.args, adder) == submission(
         *case.test_param.args,
-        case.context.adder,  # access adder from test case
+        case.context.adder,  # case.context.adder is the same as adder
     )
 
 
