@@ -19,16 +19,17 @@ You can find its installation instructions [here](https://github.com/pyenv/pyenv
 2. Clone the repo by `git clone https://github.com/<your_user_name>/gapper.git`.
 3. Install dependencies using `poetry install`.
 4. Set up the pre-commit hooks by `pre-commit install --hook-type pre-commit --hook-type pre-push`. See <a href="#code-style">Code Style</a>.
-    - If you're using IDEs from JetBrains, please install the [ruff plugin](https://plugins.jetbrains.com/plugin/20574-ruff). 
-    - If you're using vim/neovim, please install the [ruff LSP server](https://github.com/astral-sh/ruff-lsp) and enable it.
-    - If you're using VSCode, please install the [ruff VSCode extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff).
-5. Write code, commit.
-6. Test your code by running `pytest tests`. See <a href="#testing">Testing</a>.
+5. (Optionally but recommended) Install the IDE plugins for `ruff`:
+   - If you're using IDEs from JetBrains, please install the [ruff plugin](https://plugins.jetbrains.com/plugin/20574-ruff). 
+   - If you're using vim/neovim, please install the [ruff LSP server](https://github.com/astral-sh/ruff-lsp) and enable it.
+   - If you're using VSCode, please install the [ruff VSCode extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff).
+6. Write code, commit.
+7. Test your code by running `pytest tests`. See <a href="#testing">Testing</a>.
     - Integrations tests like testing CLI commands and GUI can be slow. You can ignore them by adding 
       `--ignore-glob=*integration_test.py` flag to your `pytest` command. 
     - Note that some tests require you set up gradescope account details, or otherwise they will be skipped
-7. Push to your account.
-8. Open a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests).
+8. Push to your account.
+9. Open a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests).
 
 ## Code Style
 
