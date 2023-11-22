@@ -12,12 +12,6 @@ class PostTests(HookBase):
 
     _hook_type = HookTypes.POST_TESTS
 
-    def __repr__(self) -> str:
-        """Return the representation of the post-test."""
-        return (
-            f"PostTest(post_test_fn={self.hook_fn}, as_test_case={self.as_test_case})"
-        )
-
     def _run(
         self,
         *args,
@@ -33,10 +27,6 @@ post_tests = PostTests
 
 class PreTests(HookBase):
     _hook_type = HookTypes.PRE_TESTS
-
-    def __repr__(self) -> str:
-        """Return the representation of the pre-test."""
-        return f"PreTest(hook_fn={self.hook_fn}, as_test_case={self.as_test_case})"
 
     def _run(
         self,

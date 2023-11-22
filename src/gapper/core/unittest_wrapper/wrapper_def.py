@@ -243,9 +243,13 @@ class TestCaseWrapper(TestCase, HookHolder):
                 hook_wrapper(self.apply_context(hook_fn)) for hook_fn in hook_fns
             ]
 
+        self._logger.debug(f"Generated {hook_type} hooks")
+
     def run_hooks(self, hook_type: HookTypes, *args, **kwargs) -> None:
+        self._logger.debug(f"Start running {hook_type} hooks")
         for hook in self.get_or_gen_hooks(hook_type):
             hook.run(*args, **kwargs)
+        self._logger.debug(f"Finished running {hook_type} hooks")
 
     def _run_test(self, submission: Any, result: TestResult) -> TestResult:
         """Run the test on the submission.

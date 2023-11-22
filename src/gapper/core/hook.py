@@ -6,7 +6,7 @@ import inspect
 from collections import defaultdict
 from typing import TYPE_CHECKING, Callable, ClassVar, Dict, Generator, List
 
-from gapper.core.errors import InternalError, SubmissionSyntaxError, TestFailedError
+from gapper.core.errors import InternalError, TestFailedError
 from gapper.core.test_parameter import ParamExtractor
 from gapper.core.test_result import TestResult
 from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
@@ -51,7 +51,7 @@ class HookBase[**P, FnType: Callable[P, HookFnReturnType]](ParamExtractor):
 
         self.hook_fn = hook_fn
         self.as_test_case = as_test_case
-        self.hook_fn_res: HookFnReturnType = None
+        self.hook_fn_res: HookFnReturnType | None = None
 
     def __call__(self, problem: Problem) -> Problem:
         """Add the post test to the problem.
@@ -78,11 +78,6 @@ class HookBase[**P, FnType: Callable[P, HookFnReturnType]](ParamExtractor):
         except AssertionError as e:
             result_proxy.add_error(
                 TestFailedError(e), set_failed=result_proxy.is_pass_status_unset
-            )
-        except SyntaxError as e:
-            result_proxy.add_error(
-                SubmissionSyntaxError(e),
-                set_failed=result_proxy.is_pass_status_unset,
             )
         except Exception as e:
             result_proxy.add_error(
@@ -119,13 +114,17 @@ class HookBase[**P, FnType: Callable[P, HookFnReturnType]](ParamExtractor):
         self.hook_fn_res = self.hook_fn(*args, **kwargs)
         self.process_generator()
 
-    @abc.abstractmethod
     def __repr__(self) -> str:
-        ...
+        return f"{type(self)}(hook_fn={self.hook_fn}, as_test_case={self.as_test_case}, **{self.param_info})"
 
     def process_generator(self) -> None:
         if inspect.isgenerator(self.hook_fn_res):
-            next(self.hook_fn_res)
+            try:
+                next(self.hook_fn_res)
+            except Exception as e:
+                raise InternalError(
+                    f"Facing error running {self._hook_type} hook"
+                ) from e
 
     def tear_down(self) -> None:
         if inspect.isgenerator(self.hook_fn_res):
@@ -133,6 +132,10 @@ class HookBase[**P, FnType: Callable[P, HookFnReturnType]](ParamExtractor):
                 next(self.hook_fn_res)
             except StopIteration:
                 pass
+            except Exception as e:
+                raise InternalError(
+                    f"Facing error during {self._hook_type} hook teardown of fn {self.hook_fn.__name__}"
+                ) from e
             else:
                 raise InternalError(
                     f"Generator not exhausted in the {self._hook_type} of fn {self.hook_fn.__name__}"
