@@ -292,6 +292,10 @@ Leaving the `is_script` to `False`, the `@problem()` decorator treat decorated e
 
 `context` is used to capture variables in submissions. Please see [(Easy) Context](Easy-Context.md) for more details.
 
+### Extra Things
+
+You can add `@gs_connect` decorator anywhere above the `@problem` to support automatic autograder upload. 
+Please refer to [this page](./Upload-Autograder.md) for more details.
 
 ### Examples
 
@@ -374,6 +378,15 @@ def fn(a, b):
     ...
 ```
 
+Note that, we have shorter aliases for `test_case` and `test_cases`, which are `tc` and `tcs` respectively.
+
+```python
+from gapper import tc, tcs, test_case, test_cases
+
+assert tc is test_case
+assert tcs is test_cases
+```
+
 ### Specify Parameters 
 
 Given a function `def fn()`, arguments specified in `@test_case()` will be unfolded to parameters of fn when testing. That is, for instance, the input of `a`, `args`, `kw=1`, and `kwargs` in `@test_case(a, *args, kw=1, **kwargs)` will result in `fn(a, *args, kw=1, **kwargs)` when testing. 
@@ -404,20 +417,118 @@ The following is the explanation of the effect of each option.
 You can configure test cases' properties by using keyword arguments start with `gap_`. For each test case, the supported options are 
 
 ```python
-gap_expect: The expected output of the test case.
-gap_expect_stdout: The expected stdout of the test case.
-gap_hidden: Whether the test case is hidden.
-gap_name: The name of the test case.
-gap_extra_points: The extra credit of the test case.
-gap_override_check: The custom equality check function.
-gap_override_test: The custom test function.
-gap_description: The description of the test case.
-gap_is_pipeline: Whether the test case is a pipeline.
-gap_max_score: The max score of the test case.
-gap_weight: The weight of the test case.
+gap_expect: Any | Sequence[Any] | None = None,
+gap_expect_stdout: str | Sequence[str] | None = None,
+gap_hidden: bool | Sequence[bool] = False,
+gap_name: str | Sequence[str] | None = None,
+gap_extra_points: float | Sequence[float] | None = None,
+gap_override_check: CustomEqualityCheckFn
+| Sequence[CustomEqualityCheckFn]
+| None = None,
+gap_easy_context: bool | Sequence[bool] = False,
+gap_override_test: CustomTestFn | Sequence[CustomTestFn] | None = None,
+gap_post_hooks: List[List[PostHookFn]]
+| List[PostHookFn]
+| PostHookFn
+| None = None,
+gap_pre_hooks: List[List[PreHookFn]]
+| List[PreHookFn]
+| PreHookFn
+| None = None,
+gap_description: str | Iterable[str] | Sequence[Iterable[str]] | None = None,
+gap_is_pipeline: bool | Sequence[bool] = False,
+gap_max_score: float | Sequence[float] | None = None,
+gap_weight: float | Sequence[float] | None = None,
 ```
 
 We will dedicate a page to discuss their usages. [gap_ Keywords](gap_-Keywords.md)
+
+
+### Before and After All The Tests
+
+You can add `@pre_tests` and `@post_tests` decorators anywhere above the `@problem` decorator. These decorators 
+help you setup functions run before and after __all__ the tests respectively. Suppose you want to setup some files used in testing,
+you can do it with `@pre_tests`. For example, 
+
+```python
+from gapper import problem, pre_tests, post_tests, tcs
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from typing import List
+
+files: List[Path] = []
+tmp_dir: Path | None = None
+
+def create_files(num_of_files: int, directory: Path) -> None:
+    for i in range(num_of_files):
+        path = directory / f"file_{i}.txt"
+        with open(path, "w") as f:
+            f.write("hello world")
+        files.append(path)
+            
+def pre_test_hook(*_) -> None:
+    global tmp_dir
+    with TemporaryDirectory(delete=False) as temporary:
+        tmp_dir = Path(tmp_dir)
+        create_files(10, tmp_dir)
+        
+
+def post_test_hook(*args) -> None:
+      global tmp_dir
+      assert tmp_dir is not None 
+      tmp_dir.rmdir()
+    
+
+@tcs.singular_param_iter(files)
+@pre_tests(pre_test_hook, as_test_case=False)
+@post_tests(post_test_hook, as_test_case=False)
+@problem()
+def count_lines(in_file: Path) -> int:
+    with open(in_file) as f:
+        return len(f.readlines())
+```
+
+The functions passed `pre_tests` and `post_tests` support yield syntax, similar to `gap_pre_hooks` and `gap_post_hooks`.
+
+For example, the `pre_test_hook` and `post_test_hook` in the code above can be merged into one 
+
+```python
+from gapper import problem, pre_tests, tcs
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from typing import List
+
+files: List[Path] = []
+
+
+def create_files(num_of_files: int, directory: Path) -> None:
+  ...
+
+
+def pre_test_hook(*_) -> None:
+    with TemporaryDirectory() as tmp_dir:
+        create_files(10, Path(tmp_dir))
+        
+        # everything above yield will be run before all the tests
+        yield 
+        # everything below yield all be run after running pre tests, the actual tests
+        # and all post tests
+        # in this case, the code after yield exists the with block, so the temporary
+        # directory will be safely deleted, for this is the moment when all tests are done
+
+
+@tcs.singular_param_iter(files)
+@pre_tests(pre_test_hook, as_test_case=False)
+@problem()
+def count_lines(in_file: Path) -> int:
+    ...
+```
+
+The `as_test_case` argument in `pre_tests` and `post_tests` is used to indicate if the function should be treated as a test case. 
+If `as_test_case` is `True`, a test result will be created for that specific `pre_tests` or `post_tests` run, and will be counted 
+towards the total score and display in gradescope, just like a test case. 
 
 ### Examples
 

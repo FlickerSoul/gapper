@@ -13,12 +13,14 @@ gap_hidden: Whether the test case is hidden.
 gap_name: The name of the test case.
 gap_extra_points: The extra credit of the test case.
 gap_override_check: The custom equality check function.
+gap_easy_context: Whether to use context directly in gap override tests.
 gap_override_test: The custom test function.
-gap_post_checks: The custom post check functions.
+gap_pre_hooks: The custom functions run before tests.
+gap_post_hooks: The custom functions run after tests.
 gap_description: The description of the test case.
 gap_is_pipeline: Whether the test case is a pipeline.
 gap_max_score: The max score of the test case. This and gap_weight cannot be specified as the same time. 
-gap_weight: The weight of the test case. This and gap_max_score cannot be specified as the same time. 
+gap_weight: The weight of the test case. This and gap_max_score cannot be specified as the same time. .
 ```
 
 ## How To Specify Them In `@test_case()` And `@test_cases`
@@ -262,6 +264,29 @@ def print_lines(filename: str) -> int:
         return sum(map(lambda line: int(line.strip()), f.readlines()), 0)
 ```
 
+Note that, the `preparation` function should have a tear down phase to clean up the temporary file created, since the code above sets the automatic deletion to `False`. 
+The hooks support yield syntax, which nicely separate a hook into two phases, setup and tear down. For example, 
+the function `preparation` can be rewritten as 
+
+```python
+from typing import Generator
+from gapper import TestCaseWrapper, TestResult
+from tempfile import NamedTemporaryFile
+
+
+def preparation(param: TestCaseWrapper, result_proxy: TestResult, submission, solution) -> Generator[None, None, None]:
+    lines = param.test_param.args[0]
+    # put lines into a temporary file
+    with NamedTemporaryFile("w") as infile:
+        infile.write("\n".join(lines))
+        param.test_param.args = (infile.name,)
+        
+        # everything above yield will be run before the test case is tested
+        yield 
+        # everything below yield will be run after all tests of the test case are done
+        # this means the code exists the with statement after testing the test case
+        # on which the temporary file can be safely deleted
+```
 
 
 ## `gap_post_hooks`
@@ -320,6 +345,8 @@ class PostHookFn(Protocol):
     ) -> None:
         ...
 ```
+
+Note that post test hooks also support the yield syntax as stated in the `gap_pre_hooks` section. 
 
 ## `gap_pipeline` 
 
