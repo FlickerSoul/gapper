@@ -5,7 +5,7 @@ from typing import Annotated
 import typer
 
 from gapper.cli.cli_options import VerboseOpt, timed
-from gapper.cli.utils import cli_logger
+from gapper.cli.utils import cli_logger, setup_root_logger
 from gapper.gradescope.main import run_autograder
 from gapper.gradescope.vars import (
     AUTOGRADER_METADATA,
@@ -13,7 +13,6 @@ from gapper.gradescope.vars import (
     AUTOGRADER_SUBMISSION,
     AUTOGRADER_TESTER_PICKLE,
 )
-from gapper.logger_utils import setup_root_logger
 
 
 @timed

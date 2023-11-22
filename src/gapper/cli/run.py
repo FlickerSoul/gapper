@@ -9,7 +9,7 @@ from gapper.cli.cli_options import (
     timed,
 )
 from gapper.cli.rich_test_result_output import rich_print_test_results
-from gapper.cli.utils import cli_logger
+from gapper.cli.utils import cli_logger, setup_root_logger
 from gapper.core.injection import InjectionHandler
 from gapper.core.problem import Problem
 from gapper.core.result_synthesizer import ResultSynthesizer
@@ -17,7 +17,6 @@ from gapper.core.tester import Tester
 from gapper.gradescope.datatypes.gradescope_meta import (
     GradescopeSubmissionMetadata,
 )
-from gapper.logger_utils import setup_root_logger
 
 
 @timed

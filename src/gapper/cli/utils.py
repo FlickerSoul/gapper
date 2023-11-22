@@ -11,6 +11,9 @@ from gapper.connect.api.assignment import GSAssignmentEssential
 from gapper.connect.gui.app_ui import GradescopeConnect
 from gapper.connect.gui.upload_app_ui import AutograderUploadApp
 
+_package_logger = logging.getLogger("gapper")
+cli_logger = logging.getLogger("gapper.cli")
+
 
 def load_account_from_path(login_save_path: Path) -> GSAccount:
     """Load the account cookie login info from the given path.
@@ -87,4 +90,26 @@ def upload_with_connect_details(
     gs_app.run()
 
 
-cli_logger = logging.getLogger("gapper.cli")
+def setup_root_logger(verbose: bool) -> None:
+    """Set up the root logger.
+
+    :param verbose: Whether to run in verbose mode.
+    """
+    level = logging.DEBUG if verbose else logging.INFO
+    _package_logger.setLevel(level)
+
+    ch = logging.StreamHandler()
+    ch.setLevel(level)
+
+    # add formatter to ch
+    ch.setFormatter(
+        logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+    )
+
+    # add ch to logger
+    _package_logger.addHandler(ch)
+
+    _package_logger.debug(f"Set up root logger with level {level}.")

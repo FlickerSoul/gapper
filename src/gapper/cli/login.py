@@ -9,10 +9,9 @@ from gapper.cli.cli_options import (
     VerboseOpt,
     timed,
 )
-from gapper.cli.utils import check_login_valid
+from gapper.cli.utils import check_login_valid, setup_root_logger
 from gapper.connect.api.account import GSAccount
 from gapper.connect.gui.utils import DEFAULT_LOGIN_SAVE_PATH
-from gapper.logger_utils import setup_root_logger
 
 
 @timed
