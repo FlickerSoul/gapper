@@ -186,10 +186,6 @@ class _BoundTestParam(partial):
         gap_is_pipeline: bool | Sequence[bool] = False,
         gap_max_score: float | Sequence[float] | None = None,
         gap_weight: float | Sequence[float] | None = None,
-        gap_params: bool = False,
-        gap_param_iter: bool = False,
-        gap_singular_params: bool = False,
-        gap_singular_param_iter: bool = False,
         **kwargs: Any,
     ) -> None:
         ...
@@ -237,10 +233,11 @@ class TestParam(ParamExtractor):
         :param gap_override_check: The custom equality check function.
         :param gap_easy_context: Whether to use context directly in gap override tests.
         :param gap_override_test: The custom test function.
-        :param gap_post_hooks: The custom post check functions.
+        :param gap_pre_hooks: The custom functions run before tests.
+        :param gap_post_hooks: The custom functions run after tests.
         :param gap_description: The description of the test case.
         :param gap_is_pipeline: Whether the test case is a pipeline.
-        :param gap_max_score: The max score of the test case.
+        :param gap_max_score: The max score of the test case. This and gap_weight cannot be specified as the same ti
         :param kwargs: The keyword arguments for the test parameter, including kwargs.
         """
 
@@ -274,10 +271,11 @@ class TestParam(ParamExtractor):
         :param gap_override_check: The custom equality check function.
         :param gap_easy_context: Whether to use context directly in gap override tests.
         :param gap_override_test: The custom test function.
-        :param gap_post_hooks: The custom post check functions.
+        :param gap_pre_hooks: The custom functions run before tests.
+        :param gap_post_hooks: The custom functions run after tests.
         :param gap_description: The description of the test case.
         :param gap_is_pipeline: Whether the test case is a pipeline.
-        :param gap_weight: The weight of the test case.
+        :param gap_weight: The weight of the test case. This and gap_max_score cannot be specified as the same time.
         :param kwargs: The keyword arguments for the test parameter, including kwargs.
         """
 
@@ -529,7 +527,7 @@ class TestParamBundle:
         :param kwargs: The keyword arguments for the test parameter bundle.
             .. seealso::
                 :class:`gapper.core.test_parameter.TestParam`
-               seealso::
+            .. seealso::
                 :class:`gapper.core.test_parameter.ParamExtractor`
         """
         if (

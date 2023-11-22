@@ -16,7 +16,7 @@ from .core.test_parameter import (
 )
 from .core.test_result import TestResult
 from .core.tester import post_tests, pre_tests
-from .core.unittest_wrapper import post_hook, pre_hook
+from .core.unittest_wrapper import TestCaseWrapper, post_hook, pre_hook
 from .gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 __all__ = [
@@ -39,4 +39,5 @@ __all__ = [
     "pre_tests",
     "TestResult",
     "GradescopeSubmissionMetadata",
+    "TestCaseWrapper",
 ]
