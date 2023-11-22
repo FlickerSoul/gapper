@@ -17,6 +17,7 @@ from gapper.core.test_result import TestResult
 
 from typing import Callable
 
+
 # my_adder is a solution adder defined along with the solution
 def my_adder(a, b) -> int:
     return a + b % 10
@@ -32,22 +33,22 @@ adder: Callable[[int, int], int]
 
 # custom test that uses the captured context
 def custom_test(case: TestCaseWrapper, result_proxy: TestResult, solution, submission):
-    assert my_adder(*case.test_param.args) == adder(*case.test_param.args) # notice here
+    assert my_adder(*case.test_param.args) == adder(*case.test_param.args)  # notice here
     # adder is not defined, but we can use it
     # this is because it will be captured from students' submission context
-    
+
     # test if student's adder behaves the same in the solution as in their submission
     assert solution(*case.test_param.args, adder) == submission(
         *case.test_param.args,
         case.context.adder,  # access adder from test case
     )
-    
+
 
 @test_cases.param_iter(([i, i + 1] for i in range(10)), gap_override_test=custom_test)
 @test_case(1, 2, gap_override_test=custom_test)
 # we specify the name of the context to be captured
 # easy_context is the flag that allows `add` to be used even though it's not defined
-@problem(context=["adder"], easy_context=True) 
+@problem(context=["adder"], easy_context=True)
 def add(a: int, b: int, the_adder: Callable[[int, int], int]) -> int:
     return the_adder(a, b)
 ```

@@ -492,11 +492,12 @@ from gapper import problem, test_case, test_cases
 from gapper.core.unittest_wrapper import TestCaseWrapper
 from gapper.core.test_result import TestResult
 
+
 def override_test(tc: TestCaseWrapper, result: TestResult, solution, submission):
     solution_answer = solution(*tc.test_param.args)
     student_answer = submission(*tc.test_param.args)
     tc.assertEqual(solution_answer, student_answer)
-    
+
     result.set_pass_status("failed")
 
 
