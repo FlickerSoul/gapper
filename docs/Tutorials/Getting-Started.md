@@ -168,6 +168,9 @@ def print_digits(n: int) -> None:
 
 You can then in the command line invoke `gapper gen print_digits.py`, which will generate a `print_digits.zip` file. Note that, the random numbers are generated during creation time instead judging time, meaning once the autograder is created, the random numbers are chosen and fixed for all student submissions. 
 
+You can upload manually to gradescope using the following steps. If you want to save this extra step, you can use the upload functionality provided by 
+`gapper`. Please see [this section](./Upload-Autograder.md) for more information.
+
 On gradescope, when creating a new assignment, choose `Programming Assignment` and fill in the required details. 
 
 <img width="1289" alt="image" src="https://github.com/FlickerSoul/gapper/assets/13360148/b43335fa-c403-447e-b4d1-f4cb18523848">
@@ -179,5 +182,3 @@ Then, on the `configure autograder` page, click `Select Autograder (.zip)` butto
 After the autograder is built, you can click on `Test Autograder` next to the `Update Autograder` button, and upload the `print_digits.py` solution to see the grading result. 
 
 <img width="2180" alt="image" src="https://github.com/FlickerSoul/gapper/assets/13360148/b1c7a82b-6b22-4e80-a6dc-9e50a4c3ca1c">
-
-

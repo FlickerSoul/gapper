@@ -16,4 +16,5 @@ assert pre_tests is PreTests
 ::: gapper.core.tester.tester_def
 
 ## `PostTest`, `pre_tests` and `post_tests` API
-::: gapper.core.tester.post_test_hook
+::: gapper.core.tester.post_tests
+::: gapper.core.tester.pre_tests
