@@ -1,9 +1,7 @@
 from typing import Callable
 
 from gapper import problem, test_case, test_cases
-from gapper.core.test_result import TestResult
-from gapper.core.types import CustomTestFn
-from gapper.core.unittest_wrapper import TestCaseWrapper
+from gapper.core.types import CustomTestData, CustomTestFn
 
 
 def factory() -> CustomTestFn:
@@ -13,13 +11,13 @@ def factory() -> CustomTestFn:
     adder: Callable[[int, int], int]
 
     def custom_test(
-        case: TestCaseWrapper, result_proxy: TestResult, solution, submission
+        data: CustomTestData,
     ):
         nonlocal adder
-        assert solution(*case.test_param.args, my_adder) == submission(
-            *case.test_param.args, adder
+        assert data.solution(*data.case.test_param.args, my_adder) == data.submission(
+            *data.case.test_param.args, adder
         )
-        assert my_adder(*case.test_param.args) == adder(*case.test_param.args)
+        assert my_adder(*data.case.test_param.args) == adder(*data.case.test_param.args)
 
     return custom_test
 

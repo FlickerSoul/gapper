@@ -2,8 +2,8 @@ import random
 import tempfile
 from pathlib import Path
 
-from gapper import TestResult, pre_tests, problem, tcs
-from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+from gapper import pre_tests, problem, tcs
+from gapper.core.types import PreTestsData
 
 files = []
 
@@ -19,9 +19,7 @@ def make_files(file_num: int) -> None:
                     f.write(f"{random.randint(1, 100)}\n")
 
 
-def file_generator(
-    result_proxy: TestResult | None, metadata: GradescopeSubmissionMetadata | None
-) -> None:
+def file_generator(_: PreTestsData) -> None:
     make_files(5)
 
 

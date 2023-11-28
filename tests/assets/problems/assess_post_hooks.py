@@ -1,10 +1,8 @@
 import ast
 import inspect
-from typing import Any, Tuple
 
 from gapper import problem, test_case, test_cases
-from gapper.core.test_result import TestResult
-from gapper.core.unittest_wrapper import TestCaseWrapper
+from gapper.core.types import PostTestHookData
 
 apple: int
 
@@ -19,14 +17,9 @@ def check_recursive_ast(fn):
     return False
 
 
-def recursive_check(
-    case: TestCaseWrapper,
-    result_proxy: TestResult,
-    solution,
-    submission,
-    sln_results: Tuple[Any, str | None],
-    sub_results: Tuple[Any, str | None],
-) -> None:
+def recursive_check(data: PostTestHookData) -> None:
+    result_proxy, submission = data.result_proxy, data.submission
+
     if not check_recursive_ast(submission):
         result_proxy.set_score(result_proxy.max_score // 2)
         result_proxy.set_pass_status("failed")

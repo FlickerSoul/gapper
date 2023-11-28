@@ -3,8 +3,8 @@ import tempfile
 from pathlib import Path
 from typing import Generator
 
-from gapper import TestResult, pre_tests, problem, tcs
-from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+from gapper import pre_tests, problem, tcs
+from gapper.core.types import PreTestsData
 
 files = []
 
@@ -22,9 +22,7 @@ def make_files(file_num: int) -> Generator[None, None, None]:
         yield
 
 
-def file_generator(
-    result_proxy: TestResult | None, metadata: GradescopeSubmissionMetadata | None
-) -> Generator[None, None, None]:
+def file_generator(_: PreTestsData) -> Generator[None, None, None]:
     return make_files(5)
 
 

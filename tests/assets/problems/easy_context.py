@@ -1,8 +1,7 @@
 from typing import Callable
 
 from gapper import problem, test_case, test_cases
-from gapper.core.test_result import TestResult
-from gapper.core.unittest_wrapper import TestCaseWrapper
+from gapper.core.types import CustomTestData
 
 
 def my_adder(a, b) -> int:
@@ -12,14 +11,14 @@ def my_adder(a, b) -> int:
 adder: Callable[[int, int], int]  # adder is not defined here, this is just a type hint
 
 
-def custom_test(case: TestCaseWrapper, result_proxy: TestResult, solution, submission):
-    assert solution(*case.test_param.args, my_adder) == submission(
-        *case.test_param.args,
+def custom_test(data: CustomTestData) -> None:
+    assert data.solution(*data.case.test_param.args, my_adder) == data.submission(
+        *data.case.test_param.args,
         adder,  # notice here,
     )
     # adder is not defined, but we can use it
     # this is because it will be captured from students' submission context
-    assert my_adder(*case.test_param.args) == adder(*case.test_param.args)
+    assert my_adder(*data.case.test_param.args) == adder(*data.case.test_param.args)
 
 
 @test_cases.param_iter(([i, i + 1] for i in range(10)), gap_override_test=custom_test)

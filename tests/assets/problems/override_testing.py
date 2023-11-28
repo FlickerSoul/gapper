@@ -1,5 +1,5 @@
 from gapper import problem, test_case, test_cases
-from gapper.core.unittest_wrapper import TestCaseWrapper
+from gapper.core.types import CustomTestData
 
 
 class PrivateTestingMiddleware:
@@ -10,7 +10,9 @@ class PrivateTestingMiddleware:
         return response * 2 + self.secret
 
 
-def custom_test(case: TestCaseWrapper, result_proxy, solution, submission) -> None:
+def custom_test(data: CustomTestData) -> None:
+    case, solution, submission = data.case, data.solution, data.submission
+
     standard_middleware = case.context.StandardMiddleware()
     standard_sln = solution(standard_middleware)
     standard_sub = submission(standard_middleware)

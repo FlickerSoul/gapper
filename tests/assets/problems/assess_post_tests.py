@@ -1,19 +1,14 @@
-from typing import List
-
-from gapper import TestResult, post_tests, problem, test_cases
-from gapper.gradescope.datatypes.gradescope_meta import (
-    GradescopeSubmissionMetadata,
-)
+from gapper import post_tests, problem, test_cases
+from gapper.core.types import PostTestsData
 
 
-def check_at_least_half_is_correct(
-    test_results: List[TestResult],
-    test_proxy: TestResult,
-    metadata: GradescopeSubmissionMetadata | None,
-) -> None:
+def check_at_least_half_is_correct(data: PostTestsData) -> None:
     # if the number of passed tests is greater than half of the total number of tests
-    if sum(result.is_passed for result in test_results) > len(test_results) // 2:
-        test_proxy.set_pass_status("passed")
+    if (
+        sum(result.is_passed for result in data.test_results)
+        > len(data.test_results) // 2
+    ):
+        data.result_proxy.set_pass_status("passed")
 
 
 @test_cases.singular_param_iter([i for i in range(10)], gap_max_score=1)
