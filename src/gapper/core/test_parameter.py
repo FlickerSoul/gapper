@@ -39,7 +39,7 @@ from gapper.core.errors import InternalError
 if TYPE_CHECKING:
     from gapper.core.problem import Problem
     from gapper.core.problem.problem_def import ProbInputType, ProbOutputType
-    from gapper.core.utils import (
+    from gapper.core.types import (
         CustomEqualityCheckFn,
         CustomTestFn,
         PostHookFn,

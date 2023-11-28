@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Any, Callable, Protocol
 
 from gapper.core.test_parameter import TestParam
-from gapper.core.utils import CaptureStdout, ResultBundle
+from gapper.core.types import ResultBundle
+from gapper.core.utils import CaptureStdout
 
 
 class ContextManager(dict):

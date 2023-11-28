@@ -23,10 +23,17 @@ from gapper.core.hook import HookHolder
 from gapper.core.pipeline_support import PipelineBase
 from gapper.core.test_result import TestResult
 from gapper.core.tester import HookTypes
+from gapper.core.types import (
+    CustomEqualityCheckFn,
+    CustomTestData,
+    CustomTestFn,
+    PostTestHookData,
+    PreTestHookData,
+    ResultBundle,
+)
 from gapper.core.unittest_wrapper.utils import ContextManager, EvalFn, stdout_cm_adder
 from gapper.core.unittest_wrapper.wrapper_hooks import PostHook, PreHook
 from gapper.core.utils import (
-    ResultBundle,
     apply_context_on_fn,
     generate_custom_input,
 )
@@ -34,7 +41,6 @@ from gapper.core.utils import (
 if TYPE_CHECKING:
     from gapper.core.problem import Problem
     from gapper.core.test_parameter import TestParam
-    from gapper.core.utils import CustomEqualityCheckFn
     from gapper.gradescope.datatypes.gradescope_meta import (
         GradescopeSubmissionMetadata,
     )
@@ -245,10 +251,10 @@ class TestCaseWrapper(TestCase, HookHolder):
 
         self._logger.debug(f"Generated {hook_type} hooks")
 
-    def run_hooks(self, hook_type: HookTypes, *args, **kwargs) -> None:
+    def run_hooks(self, hook_type: HookTypes, data) -> None:
         self._logger.debug(f"Start running {hook_type} hooks")
         for hook in self.get_or_gen_hooks(hook_type):
-            hook.run(*args, **kwargs)
+            hook.run(data)
         self._logger.debug(f"Finished running {hook_type} hooks")
 
     def _run_test(self, submission: Any, result: TestResult) -> TestResult:
@@ -261,20 +267,19 @@ class TestCaseWrapper(TestCase, HookHolder):
 
         if self.test_param.param_info.gap_override_test is not None:
             self._logger.debug("Handing testing to gap_override_test")
-            override_test = self.apply_context(
+            override_test: CustomTestFn = self.apply_context(
                 self.test_param.param_info.gap_override_test
             )
-            override_test(self, result, self.problem.solution, submission)
+            override_test(
+                CustomTestData(self, result, self.problem.solution, submission)
+            )
         else:
             eval_fn: EvalFn = self._select_eval_fn()
             self._logger.debug(f"Selected evaluation fn {eval_fn.__name__}")
 
             self.run_hooks(
                 HookTypes.PRE_HOOK,
-                case=self,
-                result_proxy=result,
-                solution=self.problem.solution,
-                submission=submission,
+                PreTestHookData(self, result, self.problem.solution, submission),
             )
 
             self._logger.debug(f"Running test evaluation")
@@ -285,12 +290,14 @@ class TestCaseWrapper(TestCase, HookHolder):
 
             self.run_hooks(
                 HookTypes.POST_HOOK,
-                case=self,
-                result_proxy=result,
-                solution=self.problem.solution,
-                submission=submission,
-                expected_results=expected,
-                actual_results=actual,
+                PostTestHookData(
+                    self,
+                    result,
+                    self.problem.solution,
+                    submission,
+                    expected,
+                    actual,
+                ),
             )
 
             self.tear_down_hooks(HookTypes.PRE_HOOK)

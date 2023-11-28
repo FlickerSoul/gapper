@@ -2,8 +2,8 @@ from typing import Callable
 
 from gapper import problem, test_case, test_cases
 from gapper.core.test_result import TestResult
+from gapper.core.types import CustomTestFn
 from gapper.core.unittest_wrapper import TestCaseWrapper
-from gapper.core.utils import CustomTestFn
 
 
 def factory() -> CustomTestFn:

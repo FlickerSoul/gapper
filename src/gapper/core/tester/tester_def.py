@@ -18,6 +18,7 @@ from gapper.core.errors import (
 )
 from gapper.core.hook import HookHolder, HookTypes
 from gapper.core.test_result import TestResult
+from gapper.core.types import HookDataBase, PostTestsData, PreTestsData
 from gapper.core.unittest_wrapper.utils import ContextManager
 from gapper.core.utils import ModuleLoader
 
@@ -95,11 +96,11 @@ class Tester[ProbInputType, ProbOutputType](HookHolder, ModuleLoader):
             case _:
                 raise ValueError(f"Tester cannot use hook of type {hook_type}")
 
-    def run_hooks(self, hook_type: HookTypes, *args, **kwargs) -> List[TestResult]:
+    def run_hooks(self, hook_type: HookTypes, data: HookDataBase) -> List[TestResult]:
         results: List[TestResult] = []
         hooks = self.get_or_gen_hooks(hook_type)
         for hook in hooks:
-            result = hook.run(*args, **kwargs)
+            result = hook.run(data)
             if result is not None:
                 results.append(result)
 
@@ -216,10 +217,13 @@ class Tester[ProbInputType, ProbOutputType](HookHolder, ModuleLoader):
 
         self.check_context_completeness()
 
-        pre_results = self.run_hooks(HookTypes.PRE_TESTS, metadata=metadata)
+        pre_results = self.run_hooks(
+            HookTypes.PRE_TESTS, PreTestsData(metadata=metadata)
+        )
         test_results = self.run_tests(metadata=metadata)
         post_test_result = self.run_hooks(
-            HookTypes.POST_TESTS, tested_tests_results=test_results, metadata=metadata
+            HookTypes.POST_TESTS,
+            PostTestsData(test_results=test_results, metadata=metadata),
         )
         self.tear_down_hooks(HookTypes.PRE_TESTS)
         self.tear_down_hooks(HookTypes.PRE_TESTS)

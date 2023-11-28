@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Callable, ClassVar, Dict, Generator, List
 from gapper.core.errors import InternalError, TestFailedError
 from gapper.core.test_parameter import ParamExtractor
 from gapper.core.test_result import TestResult
-from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
+from gapper.core.types import HookDataBase
 
 if TYPE_CHECKING:
     from gapper.core.problem import Problem
@@ -61,33 +61,27 @@ class HookBase[**P, FnType: Callable[P, HookFnReturnType]](ParamExtractor):
         problem.add_hook(self, self._hook_type)
         return problem
 
-    def run(
-        self,
-        *args,
-        result_proxy: TestResult | None = None,
-        metadata: GradescopeSubmissionMetadata | None = None,
-        **kwargs,
-    ) -> TestResult | None:
-        if self.as_test_case and result_proxy is None:
-            result_proxy = TestResult(self.hook_fn.__name__)
+    def run[T: HookDataBase](self, data: T) -> TestResult | None:
+        if self.as_test_case and data.result_proxy is None:
+            data.result_proxy = TestResult(self.hook_fn.__name__)
 
-        self._setup_result(result_proxy)
+        self._setup_result(data.result_proxy)
 
         try:
-            self._run(*args, result_proxy=result_proxy, metadata=metadata, **kwargs)
+            self._run(data)
         except AssertionError as e:
-            result_proxy.add_error(
-                TestFailedError(e), set_failed=result_proxy.is_pass_status_unset
+            data.result_proxy.add_error(
+                TestFailedError(e), set_failed=data.result_proxy.is_pass_status_unset
             )
         except Exception as e:
-            result_proxy.add_error(
-                InternalError(e), set_failed=result_proxy.is_pass_status_unset
+            data.result_proxy.add_error(
+                InternalError(e), set_failed=data.result_proxy.is_pass_status_unset
             )
         else:
-            if result_proxy and result_proxy.is_pass_status_unset:
-                result_proxy.set_pass_status("passed")
+            if data.result_proxy and data.result_proxy.is_pass_status_unset:
+                data.result_proxy.set_pass_status("passed")
 
-        return result_proxy
+        return data.result_proxy
 
     def _setup_result(self, result: TestResult | None) -> None:
         if result is None:
@@ -174,13 +168,12 @@ class HookHolder:
 
     @abc.abstractmethod
     def run_hooks(
-        self, hook_type: HookTypes, *args, **kwargs
+        self, hook_type: HookTypes, data: HookDataBase
     ) -> List[TestResult] | None:
         """Run the hooks of the given type given args and kwargs.
 
         :param hook_type: The type of the hooks.
-        :param args: The args to be passed to the hooks.
-        :param kwargs: The kwargs to be passed to the hooks.
+        :param data: The data to be passed to the hooks.
         """
 
     def tear_down_hooks(self, hook_type: HookTypes) -> None:
