@@ -12,8 +12,7 @@ function `custom_test` that uses the captured context, and the problem solution 
 
 ```python
 from gapper import problem, test_case, test_cases
-from gapper.core.unittest_wrapper import TestCaseWrapper
-from gapper.core.test_result import TestResult
+from gapper.core.types import CustomTestData
 
 from typing import Callable
 
@@ -32,15 +31,15 @@ adder: Callable[[int, int], int]
 
 
 # custom test that uses the captured context
-def custom_test(case: TestCaseWrapper, result_proxy: TestResult, solution, submission):
-    assert my_adder(*case.test_param.args) == adder(*case.test_param.args)  # notice here
+def custom_test(data: CustomTestData):
+    assert my_adder(*data.args) == adder(*data.args)  # notice here
     # adder is not defined, but we can use it
     # this is because it will be captured from students' submission context
 
     # test if student's adder behaves the same in the solution as in their submission
-    assert solution(*case.test_param.args, adder) == submission(
-        *case.test_param.args,
-        case.context.adder,  # case.context.adder is the same as adder
+    assert data.solution(*data.args, adder) == data.submission(
+        *data.args,
+        data.case.context.adder,  # case.context.adder is the same as adder
     )
 
 

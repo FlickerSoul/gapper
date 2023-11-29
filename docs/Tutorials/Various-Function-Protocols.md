@@ -3,19 +3,44 @@
 It can be confusing to remember all function protocols used in gapper. Below, we list the function signatures and their docstrings for each use case.
 
 ## `gap_override_test`
-::: gapper.core.utils.CustomTestFn
+::: gapper.core.types
+    options:
+        members: 
+            - CustomTestFn
+            - CustomTestData
 
 ## `gap_override_check`
-::: gapper.core.utils.CustomEqualityCheckFn
+::: gapper.core.types
+    options:
+        members: 
+            - CustomEqualityCheckFn
+            - CustomEqualityTestData
 
 ## `gap_pre_hook`
-::: gapper.core.utils.PreHookFn
+::: gapper.core.types
+    options:
+        members: 
+            - PreHookFn
+            - PreHookData
 
 ## `gap_post_hook`
-::: gapper.core.utils.PostHookFn
+::: gapper.core.types
+    options:
+        members: 
+            - PostHookFn
+            - PostHookData
 
 ## `pre_tests`
-::: gapper.core.utils.PreTestsFn
+::: gapper.core.types
+    options:
+        members: 
+            - PreTestsFn
+            - PreTestsData
+
 
 ## `post_tests`
-::: gapper.core.utils.PostTestsFn
+::: gapper.core.types
+    options:
+        members: 
+            - PostTestsFn
+            - PostTestsData

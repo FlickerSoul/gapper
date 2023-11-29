@@ -444,7 +444,7 @@ gap_weight: float | Sequence[float] | None = None,
 We will dedicate a page to discuss their usages. [gap_ Keywords](gap_-Keywords.md)
 
 
-### Before and After All The Tests
+### Run Something Before and After All The Tests
 
 You can add `@pre_tests` and `@post_tests` decorators anywhere above the `@problem` decorator. These decorators 
 help you setup functions run before and after __all__ the tests respectively. Suppose you want to setup some files used in testing,
@@ -467,14 +467,14 @@ def create_files(num_of_files: int, directory: Path) -> None:
             f.write("hello world")
         files.append(path)
             
-def pre_test_hook(*_) -> None:
+def pre_test_hook(_) -> None:
     global tmp_dir
     with TemporaryDirectory(delete=False) as temporary:
         tmp_dir = Path(tmp_dir)
         create_files(10, tmp_dir)
         
 
-def post_test_hook(*args) -> None:
+def post_test_hook(_) -> None:
       global tmp_dir
       assert tmp_dir is not None 
       tmp_dir.rmdir()
@@ -507,7 +507,7 @@ def create_files(num_of_files: int, directory: Path) -> None:
   ...
 
 
-def pre_test_hook(*_) -> None:
+def pre_test_hook(_) -> None:
     with TemporaryDirectory() as tmp_dir:
         create_files(10, Path(tmp_dir))
         
@@ -558,7 +558,7 @@ def randomly_generate_numbers(times: int) -> Generator[param, None, None]:
     for _ in range(times):
         yield param([random.randint(0, 100) for _ in range(random.randint(0, 100))])
 
-@test_cases.param_iterm(randomly_generate_numbers(10), gap_max_score=1) # the first two lines have the same semantics, which is creating 
+@test_cases.param_iter(randomly_generate_numbers(10), gap_max_score=1) # the first two lines have the same semantics, which is creating 
 @test_cases.params(*randomly_generate_numbers(10), gap_max_score=1)     # 10 random generated numbers, each worth 1 point 
 @test_cases.params(param([1, 2]), param([3, 4], gap_max_score=2))       # `param` is a helper that allows you to specify parameters, in a more 
 @test_cases.params([[5, 6]], [[7, 8]], gap_hidden=[True, False])        # readable way. This problem has 6 test cases, where the parameters 
@@ -584,10 +584,11 @@ This is how you can override the equality check between the solution and the sub
 
 ```python
 from gapper import problem, test_cases, test_case  
+from gapper.core.types import CustomEqualityTestData
 from typing import Iterable
 
-def override_check(solution_ans, submission_ans) -> bool:
-    return set(solution_ans) == set(submission_ans)
+def override_check(data: CustomEqualityTestData) -> None:
+    assert set(data.expected) == set(data.actual)
 
 @test_cases(11, 12, 13, gap_override_check=override_check)
 @test_case(10, gap_override_check=override_check)
@@ -600,16 +601,15 @@ This is how you can override how the submission should be tested.
 
 ```python
 from gapper import problem, test_case, test_cases
-from gapper.core.unittest_wrapper import TestCaseWrapper
-from gapper.core.test_result import TestResult
+from gapper.core.types import CustomTestData
 
 
-def override_test(tc: TestCaseWrapper, result: TestResult, solution, submission):
-    solution_answer = solution(*tc.test_param.args)
-    student_answer = submission(*tc.test_param.args)
-    tc.assertEqual(solution_answer, student_answer)
+def override_test(data: CustomTestData):
+    solution_answer = data.solution(*data.case.test_param.args)
+    student_answer = data.submission(*data.case.test_param.args)
+    data.case.assertEqual(solution_answer, student_answer)
 
-    result.set_pass_status("failed")
+    data.result_proxy.set_pass_status("failed")
 
 
 @test_cases([3, 4], [5, 6], gap_override_test=override_test)

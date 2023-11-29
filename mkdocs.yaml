@@ -22,7 +22,7 @@ nav:
     - API/problem_extras.md
     - API/test_cases.md
     - API/test_result.md
-    - API/utils.md
+    - API/useful_types.md
     - API/pipeline_support.md
     - API/test_case_wrapper.md
     - API/result_synthesizer.md

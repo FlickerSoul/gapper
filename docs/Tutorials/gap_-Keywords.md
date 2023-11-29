@@ -164,14 +164,18 @@ will result in 5 extra points when the student passes the test, shown as followi
 
 ## `gap_override_check`
 
-You can override tests' equality checks by passing a comparator function to `gap_override_check` keyword. 
+You can override tests' equality checks by passing a comparator function to `gap_override_check` keyword. The 
+function should raise an `AssertionError` if the two values are not equal. 
 
-For example, suppose the you want to compare answers from students' submissions with the solution but do not care about ordering, you can pass 
+For example, suppose that you want to compare answers from students' submissions with the solution but do not care about ordering, you can pass 
 `gap_override_check=set_equality` to `@test_case()` where `set_equality` is pre-defined in your script as 
 
 ```python
-def set_equality(solution_answer: Any, submission_answer: Any) -> bool:
-    return set(solution_answer) == set(submission_answer)
+from gapper.core.types import CustomEqualityTestData
+
+
+def set_equality(data: CustomEqualityTestData) -> None:
+    assert set(data.expected) == set(data.actual)
 ```
 
 ## `gap_override_test`
@@ -182,8 +186,7 @@ You can override entire test by passing a custom function to `gap_override_test`
 import ast
 import inspect
 from gapper import problem, test_case
-from gapper.core.test_result import TestResult
-from gapper.core.unittest_wrapper import TestCaseWrapper
+from gapper.core.types import CustomTestData
 
 from pytest import approx
 
@@ -198,11 +201,11 @@ def check_recursive_ast(fn):
     return False
 
 
-def custom_test(param: TestCaseWrapper, result_proxy: TestResult, solution, submission) -> bool:
-    soln_ans = solution(*param.args, **param.kwargs)
-    subm_ans = submission(*param.args, **param.kwargs)
+def custom_test(data: CustomTestData) -> None:
+    soln_ans = data.solution(*data.args, **data.kwargs)
+    subm_ans = data.submission(*data.args, **data.kwargs)
 
-    param.assertEqual(soln_ans, subm_ans)  # equivalent to `assert soln_ans == subm_ans`
+    data.case.assertEqual(soln_ans, subm_ans)  # equivalent to `assert soln_ans == subm_ans`
 
     # param.assertTrue(check_recursive_ast(submission))
     # equivalent to `assert check_recursive_ast(submission)`
@@ -211,8 +214,8 @@ def custom_test(param: TestCaseWrapper, result_proxy: TestResult, solution, subm
     # the following line is dumb but just for demonstration
     assert soln_ans == approx(subm_ans, rel=1e-3)
 
-    if not check_recursive_ast(submission):
-        result_proxy.set_score(result_proxy.max_score // 2)
+    if not check_recursive_ast(data.submission):
+        data.result_proxy.set_score(data.result_proxy.max_score // 2)
 
 
 @test_case(10, gap_override_test=custom_test)
@@ -224,9 +227,10 @@ def fib(n: int) -> int:
 A overriding function show have the following positional parameter signature 
 
 ```python
+from gapper.core.types import CustomTestData
 
 class CustomTestFn(Protocol):
-    def __call__[T](self, param: TestCaseWrapper, result_proxy: TestResult, expected: T, actual: T) -> None:
+    def __call__[T](self, data: CustomTestData[T]) -> None:
         ...
 ```
 
@@ -238,19 +242,18 @@ You can setup the environment or use it to modify the test case before. For exam
 
 ```python
 from gapper import problem, test_case
-from gapper.core.unittest_wrapper import TestCaseWrapper
-from gapper.core.test_result import TestResult
+from gapper.core.types import PreHookData
 from tempfile import NamedTemporaryFile
 
 
-def preparation(param: TestCaseWrapper, result_proxy: TestResult, submission, solution) -> None:
-    lines = param.test_param.args[0]
+def preparation(data: PreHookData) -> None:
+    lines = data.args[0]
     # put lines into a temporary file
     with NamedTemporaryFile("w", delete=False) as infile:
         infile.write("\n".join(lines))
 
     # set the args to the filename passed the student's function
-    param.test_param.args = (infile.name,)
+    data.param.args = (infile.name,)
 
 
 def gen_lines(num_of_lines: int) -> list[str]:
@@ -270,22 +273,33 @@ the function `preparation` can be rewritten as
 
 ```python
 from typing import Generator
-from gapper import TestCaseWrapper, TestResult
 from tempfile import NamedTemporaryFile
+from gapper.core.types import PreHookData
 
 
-def preparation(param: TestCaseWrapper, result_proxy: TestResult, submission, solution) -> Generator[None, None, None]:
-    lines = param.test_param.args[0]
+def preparation(data: PreHookData) -> Generator[None, None, None]:
+    lines = data.args[0]
     # put lines into a temporary file
     with NamedTemporaryFile("w") as infile:
         infile.write("\n".join(lines))
-        param.test_param.args = (infile.name,)
+        data.param.args = (infile.name,)
         
         # everything above yield will be run before the test case is tested
         yield 
         # everything below yield will be run after all tests of the test case are done
         # this means the code exists the with statement after testing the test case
         # on which the temporary file can be safely deleted
+```
+
+
+A pre hook function has to follow the following positional parameter signature
+
+```python
+from gapper.core.types import PreHookData
+
+class PostHookFn(Protocol):
+    def __call__[T](self, data: PreHookData[T]) -> None:
+        ...
 ```
 
 
@@ -297,8 +311,7 @@ Consider the situation in which you'd like to provide extra checks but not overr
 
 ```python
 from gapper import problem, test_case
-from gapper.core.test_result import TestResult
-from gapper.core.unittest_wrapper import TestCaseWrapper
+from gapper.core.types import PostHookData
 
 import ast 
 import inspect
@@ -314,12 +327,11 @@ def check_recursive_ast(fn):
     return False
 
 
-def recursive_check(param: TestCaseWrapper, result_proxy: TestResult, solution, submission,
-                    sln_results: Tuple[Any, str | None], sub_results: Tuple[Any, str | None]) -> None:
-    if not check_recursive_ast(submission):
-        result_proxy.set_score(result_proxy.max_score // 2)
-        result_proxy.set_pass_status("failed")
-        result_proxy.add_description(
+def recursive_check(data: PostHookData) -> None:
+    if not check_recursive_ast(data.submission):
+        data.result_proxy.set_score(data.result_proxy.max_score // 2)
+        data.result_proxy.set_pass_status("failed")
+        data.result_proxy.add_description(
             "Failed because recursive call not found in submission."
         )
 
@@ -330,19 +342,13 @@ def fib(n: int) -> int:
     ...
 ```
 
-A post check function has to follow the following positional parameter signature
+A post hook function has to follow the following positional parameter signature
 
 ```python
+from gapper.core.types import PostHookData
+
 class PostHookFn(Protocol):
-    def __call__[T](
-        self,
-        param: TestCaseWrapper,
-        result_proxy: TestResult,
-        solution: T,
-        submission: T,
-        expected_results: Tuple[Any, str | None],
-        actual_results: Tuple[Any, str | None],
-    ) -> None:
+    def __call__[T](self, data: PostHookData[T]) -> None:
         ...
 ```
 
