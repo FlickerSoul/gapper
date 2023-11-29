@@ -1,16 +1,83 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, NamedTuple, Protocol
+from typing import TYPE_CHECKING, Any, Dict, List, NamedTuple, Protocol, Tuple
 
 if TYPE_CHECKING:
+    from gapper.core.test_parameter import TestParam
     from gapper.core.test_result import TestResult
     from gapper.core.unittest_wrapper import TestCaseWrapper
     from gapper.gradescope.datatypes.gradescope_meta import GradescopeSubmissionMetadata
 
 
+class _TCMixin(Protocol):
+    """The mixin for test case."""
+
+    case: TestCaseWrapper
+
+    @property
+    def tc(self) -> TestCaseWrapper:
+        """The test case wrapper."""
+        return self.case
+
+    @property
+    def param(self) -> TestParam:
+        """The parameter information of the test case."""
+        return self.case.test_param
+
+    @property
+    def args(self) -> Tuple[Any, ...]:
+        """The arguments of the test case."""
+        return self.case.test_param.args
+
+    @property
+    def kwargs(self) -> Dict[str, Any]:
+        """The keyword arguments of the test case."""
+        return self.case.test_param.kwargs
+
+
+class _SolSubMixin[T](Protocol):
+    solution: T
+    submission: T
+
+    @property
+    def sol(self) -> T:
+        """The solution object."""
+        return self.solution
+
+    @property
+    def sub(self) -> T:
+        """The submission object."""
+        return self.submission
+
+
+class _SolSubResultMixin[T](Protocol):
+    expected_results: ResultBundle
+    actual_results: ResultBundle
+
+    @property
+    def sol_output(self) -> T:
+        """The solution output."""
+        return self.expected_results.output
+
+    @property
+    def sol_stdout(self) -> str | None:
+        """The solution stdout."""
+        return self.expected_results.stdout
+
+    @property
+    def sub_output(self) -> T:
+        """The submission output."""
+        return self.actual_results.output
+
+    @property
+    def sub_stdout(self) -> str | None:
+        """The submission stdout."""
+        return self.actual_results.stdout
+
+
 @dataclass
-class CustomTestData[T]:
+class CustomTestData[T](_TCMixin, _SolSubMixin[T]):
     case: TestCaseWrapper
     result_proxy: TestResult
     solution: T
@@ -29,7 +96,7 @@ class HookDataBase(Protocol):
 
 
 @dataclass
-class PreTestHookData[T](HookDataBase):
+class PreTestHookData[T](HookDataBase, _TCMixin, _SolSubMixin[T]):
     case: TestCaseWrapper
     result_proxy: TestResult
     solution: T
@@ -37,7 +104,9 @@ class PreTestHookData[T](HookDataBase):
 
 
 @dataclass
-class PostTestHookData[T](HookDataBase):
+class PostTestHookData[T](
+    HookDataBase, _TCMixin, _SolSubMixin[T], _SolSubResultMixin[T]
+):
     case: TestCaseWrapper
     result_proxy: TestResult
     solution: T
