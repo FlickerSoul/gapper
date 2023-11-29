@@ -6,3 +6,4 @@ tmp/
 dist/
 .coverage
 htmlcov/
+site/
