@@ -112,7 +112,7 @@ If you want to use gapper and thus the virtual environment again, simply call `s
 ///
 
 ```bash
-pip install gapper
+pip install gapper~=1.3.0
 ```
 
 ### Create Autograder
@@ -127,7 +127,7 @@ def print_digits(n: int) -> None:
         print_digits(n // 10)
 ```
 
-First, you need to install `gapper` by running `pip install gapper` in your terminal (the minimal Python version is 3.12.0). Once it's installed, you can import `problem` from `gapper` and invoke it as a decorator, like the following. This will transform the solution into a problem operated by the autograder. The `check_stdout` flag instructs the autograder to check `stdout` output from the `print` function. 
+First, you need to install `gapper` by running `pip install gapper~=1.3.0` in your terminal (the minimal Python version is 3.12.0). Once it's installed, you can import `problem` from `gapper` and invoke it as a decorator, like the following. This will transform the solution into a problem operated by the autograder. The `check_stdout` flag instructs the autograder to check `stdout` output from the `print` function. 
 
 ```python
 # print_digits.py

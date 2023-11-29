@@ -28,7 +28,7 @@ GAP is a tool that allows you to create a Gradescope autograder from a decorator
 
 Install from PyPI
 ```bash
-pip install gapper
+pip install gapper~=1.3.0
 ```
 
 For detailed instruction, please read [the documentation page](https://gapper.universe.observer/Tutorials/Getting-Started/#workflow-brief)

@@ -8,7 +8,12 @@ The python version required is `>=3.12.0`.
 
 You can either install from PyPI
 ```bash
-pip install gapper
+pip install gapper~=1.3.0
+```
+
+or install using poetry
+```bash
+poetry add gapper~=1.3.0
 ```
 
 or install from source
