@@ -2,7 +2,7 @@ import random
 from tempfile import NamedTemporaryFile
 
 from gapper import problem, tc, tcs
-from gapper.core.types import PreTestHookData
+from gapper.core.types import PreHookData
 
 apple: int
 
@@ -11,7 +11,7 @@ def generate_file_content(lines: int) -> str:
     return "\n".join(str(random.randint(0, 100)) for _ in range(lines))
 
 
-def process_file(data: PreTestHookData):
+def process_file(data: PreHookData):
     case = data.case
 
     file_content = case.test_param.args[0]

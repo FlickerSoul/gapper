@@ -2,7 +2,7 @@ import ast
 import inspect
 
 from gapper import problem, test_case, test_cases
-from gapper.core.types import PostTestHookData
+from gapper.core.types import PostHookData
 
 apple: int
 
@@ -17,7 +17,7 @@ def check_recursive_ast(fn):
     return False
 
 
-def recursive_check(data: PostTestHookData) -> None:
+def recursive_check(data: PostHookData) -> None:
     result_proxy, submission = data.result_proxy, data.submission
 
     if not check_recursive_ast(submission):

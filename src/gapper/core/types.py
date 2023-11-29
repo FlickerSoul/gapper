@@ -96,7 +96,7 @@ class HookDataBase(Protocol):
 
 
 @dataclass
-class PreTestHookData[T](HookDataBase, _TCMixin, _SolSubMixin[T]):
+class PreHookData[T](HookDataBase, _TCMixin, _SolSubMixin[T]):
     case: TestCaseWrapper
     result_proxy: TestResult
     solution: T
@@ -104,9 +104,7 @@ class PreTestHookData[T](HookDataBase, _TCMixin, _SolSubMixin[T]):
 
 
 @dataclass
-class PostTestHookData[T](
-    HookDataBase, _TCMixin, _SolSubMixin[T], _SolSubResultMixin[T]
-):
+class PostHookData[T](HookDataBase, _TCMixin, _SolSubMixin[T], _SolSubResultMixin[T]):
     case: TestCaseWrapper
     result_proxy: TestResult
     solution: T
@@ -155,7 +153,7 @@ class CustomEqualityCheckFn(Protocol):
 class PreHookFn(Protocol):
     """The function type to be called for post checks all the equality check of a test case."""
 
-    def __call__[T](self, data: PreTestHookData[T]) -> None:
+    def __call__[T](self, data: PreHookData[T]) -> None:
         """Implement.
 
         :param data: The PreTestHookData instance.
@@ -172,7 +170,7 @@ class ResultBundle[Output](NamedTuple):
 class PostHookFn(Protocol):
     """The function type to be called for post checks all the equality check of a test case."""
 
-    def __call__[T](self, data: PostTestHookData[T]) -> None:
+    def __call__[T](self, data: PostHookData[T]) -> None:
         """Implement.
 
         :param data: The PostTestHookData instance.

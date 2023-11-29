@@ -27,8 +27,8 @@ from gapper.core.types import (
     CustomEqualityCheckFn,
     CustomTestData,
     CustomTestFn,
-    PostTestHookData,
-    PreTestHookData,
+    PostHookData,
+    PreHookData,
     ResultBundle,
 )
 from gapper.core.unittest_wrapper.utils import ContextManager, EvalFn, stdout_cm_adder
@@ -279,7 +279,7 @@ class TestCaseWrapper(TestCase, HookHolder):
 
             self.run_hooks(
                 HookTypes.PRE_HOOK,
-                PreTestHookData(self, result, self.problem.solution, submission),
+                PreHookData(self, result, self.problem.solution, submission),
             )
 
             self._logger.debug(f"Running test evaluation")
@@ -290,7 +290,7 @@ class TestCaseWrapper(TestCase, HookHolder):
 
             self.run_hooks(
                 HookTypes.POST_HOOK,
-                PostTestHookData(
+                PostHookData(
                     self,
                     result,
                     self.problem.solution,
