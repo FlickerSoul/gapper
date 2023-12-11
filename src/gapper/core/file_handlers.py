@@ -6,6 +6,8 @@ from sys import version_info
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 
+import jinja2
+
 from gapper.core.tester import Tester
 from gapper.gradescope.vars import DEFAULT_TESTER_PICKLE_NAME
 
@@ -25,7 +27,7 @@ class AutograderZipper:
             "requirements.txt",
         }
         self.ignore_folder = {"__pycache__"}
-        self.ignore_files = {".pyc", ".DS_Store"}
+        self.ignore_files = {".pyc", ".DS_Store", ".j2"}
 
     def generate_zip(self, zip_file_path: Path) -> None:
         """Generate the autograder zip file given a save path.
@@ -45,10 +47,15 @@ class AutograderZipper:
         with importlib.resources.as_file(
             importlib.resources.files("gapper.gradescope.resources")
         ) as resource_folder:
-            zip_file.write(
-                resource_folder / f"setup-{version_info.major}.{version_info.minor}.sh",
-                arcname="setup.sh",
+            with open(resource_folder / "setup.j2", "r") as setup_file:
+                template_content = setup_file.read()
+                setup_sh_template = jinja2.Template(template_content)
+
+            setup_shell_script = setup_sh_template.render(
+                py_minor=version_info.minor, py_major=version_info.major
             )
+
+            zip_file.writestr("setup.sh", setup_shell_script)
 
             for file in resource_folder.iterdir():
                 if file.name in self.gs_setup_files:

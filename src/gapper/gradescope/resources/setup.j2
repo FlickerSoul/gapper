@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# install python {{ py_major }}.{{ py_minor }}
+apt-get update -y
+apt-get install -y software-properties-common
+add-apt-repository -y ppa:deadsnakes/ppa
+apt-get install -y python{{ py_major }}.{{ py_minor }} python{{ py_major }}.{{ py_minor }}-distutils
+
+# install gapper
+curl -sS https://bootstrap.pypa.io/get-pip.py | python{{ py_major }}.{{ py_minor }}
+pip install --upgrade setuptools wheel
+pip install -e /autograder/source
+python{{ py_major }}.{{ py_minor }} -m pip cache purge
