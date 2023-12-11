@@ -1,23 +1,8 @@
+from __future__ import annotations
+
 import enum
 import re
 from typing import NamedTuple
-
-import requests
-from bs4 import BeautifulSoup
-
-
-def get_authenticity_token(session: requests.Session) -> str:
-    init_resp = session.get("https://www.gradescope.com/")
-    parsed_init_resp = BeautifulSoup(init_resp.text, "html.parser")
-    for form in parsed_init_resp.find_all("form"):
-        if form.get("action") == "/login":
-            for inp in form.find_all("input"):
-                if inp.get("name") == "authenticity_token":
-                    auth_token = inp.get("value")
-                    return auth_token
-
-    raise ValueError("Could not find authenticity token")
-
 
 SUBMIT_DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M"
 PARSE_DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S%:z"

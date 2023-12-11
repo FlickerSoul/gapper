@@ -14,7 +14,6 @@ from dataclasses_json import config, dataclass_json
 
 from gapper.connect.api.course import GSCourse
 from gapper.connect.api.mixins import SessionHolder
-from gapper.connect.api.utils import get_authenticity_token
 
 
 @dataclass_json
@@ -269,3 +268,16 @@ class GSAccount(SessionHolder):
             f.write(yaml_data)
 
         return yaml_data
+
+
+def get_authenticity_token(session: requests.Session) -> str:
+    init_resp = session.get("https://www.gradescope.com/")
+    parsed_init_resp = BeautifulSoup(init_resp.text, "html.parser")
+    for form in parsed_init_resp.find_all("form"):
+        if form.get("action") == "/login":
+            for inp in form.find_all("input"):
+                if inp.get("name") == "authenticity_token":
+                    auth_token = inp.get("value")
+                    return auth_token
+
+    raise ValueError("Could not find authenticity token")
