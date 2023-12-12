@@ -25,13 +25,11 @@ def test_zipping(tmp_path: Path) -> None:
         set -euo pipefail
 
         # install python {major}.{minor}
-        apt-get remove -y python3
-        apt-get autoremove -y
+        add-apt-repository -y ppa:deadsnakes/ppa
         apt-get update -y
         apt-get install -y software-properties-common
-        add-apt-repository -y ppa:deadsnakes/ppa
         apt-get install -y python{major}.{minor} python{major}.{minor}-distutils
-        ln -s $(which python3.12) $(which python3)
+        ln -s $(which python3.12) $(which python3)a
 
         # install gapper
         curl -sS https://bootstrap.pypa.io/get-pip.py | python{major}.{minor}
