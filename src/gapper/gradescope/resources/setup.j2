@@ -7,7 +7,7 @@ add-apt-repository -y ppa:deadsnakes/ppa
 apt-get update -y
 apt-get install -y software-properties-common
 apt-get install -y python{{ py_major }}.{{ py_minor }} python{{ py_major }}.{{ py_minor }}-distutils
-ln -s $(which python{{ py_major }}.{{ py_minor }}) $(which python3)a
+ln -s $(which python{{ py_major }}.{{ py_minor }}) $(which python3).gapper
 
 # install gapper
 curl -sS https://bootstrap.pypa.io/get-pip.py | python{{ py_major }}.{{ py_minor }}

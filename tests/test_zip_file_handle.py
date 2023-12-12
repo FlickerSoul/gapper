@@ -29,7 +29,7 @@ def test_zipping(tmp_path: Path) -> None:
         apt-get update -y
         apt-get install -y software-properties-common
         apt-get install -y python{major}.{minor} python{major}.{minor}-distutils
-        ln -s $(which python3.12) $(which python3)a
+        ln -s $(which python3.12) $(which python3).gapper
 
         # install gapper
         curl -sS https://bootstrap.pypa.io/get-pip.py | python{major}.{minor}
