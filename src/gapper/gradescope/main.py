@@ -50,7 +50,7 @@ def run_autograder(
         _autograder_main_logger.error(
             f"Internal error happened during execution: {e.format()}"
         )
-        error = InternalError(e)
+        error = e
     except StudentError as e:
         _autograder_main_logger.error(
             f"Student error happened during execution: {e.format()}"
