@@ -11,6 +11,7 @@ on:
       - tests/**
       - poetry.lock
       - pyproject.toml
+      - .github/workflows/python-package.yml
   pull_request:
     branches: [ "main" ]
     paths: 
@@ -18,7 +19,7 @@ on:
       - tests/**
       - poetry.lock
       - pyproject.toml
-
+      - .github/workflows/python-package.yml
 jobs:
   build:
 
@@ -28,7 +29,7 @@ jobs:
       matrix:
         python-version: ["3.12"]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install poetry
       run: |
         curl -O -sSL https://install.python-poetry.org/install-poetry.py
@@ -36,7 +37,7 @@ jobs:
         echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
         rm install-poetry.py
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'poetry'
