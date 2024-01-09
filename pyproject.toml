@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gapper"
-version = "1.3.2"
+version = "1.3.3"
 description = "Gradescope Autograder Packer"
 authors = ["Heyuan Zeng <hi@universe.observer>"]
 license = "MIT"
