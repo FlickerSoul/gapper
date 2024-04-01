@@ -82,7 +82,8 @@ class ResultSynthesizer:
             if res.max_score is not None and res.weight is not None:
                 raise InternalError(
                     "The max_score and weight of a test (result) cannot both be set. "
-                    f"But {res.rich_test_name} has both being None."
+                    f"But case `{res.rich_test_name}` has both being set. "
+                    f"max_score: {res.max_score}, weight: {res.weight}."
                 )
 
             if res.max_score is not None:
