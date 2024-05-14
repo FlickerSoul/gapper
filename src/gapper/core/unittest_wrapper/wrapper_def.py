@@ -16,6 +16,7 @@ from unittest.mock import patch
 
 from gapper.core.errors import (
     InternalError,
+    StudentError,
     SubmissionSyntaxError,
     TestFailedError,
 )
@@ -143,8 +144,10 @@ class TestCaseWrapper(TestCase, HookHolder):
             result.add_error(
                 SubmissionSyntaxError(e), set_failed=result.is_pass_status_unset
             )
-        except Exception as e:
+        except InternalError as e:
             result.add_error(InternalError(e), set_failed=result.is_pass_status_unset)
+        except Exception as e:
+            result.add_error(StudentError(e), set_failed=result.is_pass_status_unset)
         else:
             if result.is_pass_status_unset:
                 result.set_pass_status("passed")
