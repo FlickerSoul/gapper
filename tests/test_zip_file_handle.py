@@ -18,22 +18,24 @@ def test_zipping(tmp_path: Path) -> None:
 
     major, minor = version_info.major, version_info.minor
 
+    version_short = f"{major}.{minor}"
+
     assert setup_shell == dedent(
         f"""\
         #!/usr/bin/env bash
 
         set -euo pipefail
 
-        # install python {major}.{minor}
+        # install python {version_short}
         add-apt-repository -y ppa:deadsnakes/ppa
         apt-get update -y
         apt-get install -y software-properties-common
-        apt-get install -y python{major}.{minor} python{major}.{minor}-distutils
-        ln -s $(which python3.12) $(which python3).gapper
+        apt-get install -y python{version_short} python{version_short}-distutils
+        ln -s $(which python{version_short}) $(which python3).gapper
 
         # install gapper
-        curl -sS https://bootstrap.pypa.io/get-pip.py | python{major}.{minor}
+        curl -sS https://bootstrap.pypa.io/get-pip.py | python{version_short}
         pip install --upgrade setuptools wheel
         pip install -e /autograder/source
-        python{major}.{minor} -m pip cache purge"""
+        python{version_short} -m pip cache purge"""
     )
